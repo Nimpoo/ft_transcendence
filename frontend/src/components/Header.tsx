@@ -39,13 +39,13 @@ function Header(): JSX.Element {
 			</button>
 
 			<Link href="/">
-				<p className="
+				<h1 className="
 				text-gray-900 dark:text-white
 				xl:text-6xl lg:text-5xl md:text-3xl sm:text-2xl text-center
 				drop-shadow-[4px_3px_1px_rgba(0,0,0,0.25)]
 				">
 					The Transcendence
-				</p>
+				</h1>
 			</Link>
 
 			<button onClick={ () => play("zoro") }>
