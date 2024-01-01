@@ -29,7 +29,7 @@ function RootLayout({
 			</head>
 			<body className={ "bg-[url('/bg.png')] bg-cover bg-fixed bg-center bg-no-repeat text-white " + ubu.className }>
 				<div className="m-auto max-w-7xl">
-          <Header />
+					<Header />
 					{children}
 					<div id="gradient-bg">
 						<div id="gradient-container">
