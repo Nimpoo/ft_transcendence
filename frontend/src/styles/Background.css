@@ -1,0 +1,137 @@
+:root {
+	--color1: 146, 71, 212;
+	--color2: 153, 21, 21;
+	--color3: 77, 29, 212;
+	--color4: 104, 53, 227;
+	--color5: 100, 51, 226;
+	--color-interactive: 140, 100, 255;
+	--circle-size: 400px;
+	--blending: hard-light;
+}
+
+@keyframes moveInCircle {
+	0% {
+		transform: rotate(0deg);
+	}
+	50% {
+		transform: rotate(180deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes moveVertical {
+	0% {
+		transform: translateY(-50%);
+	}
+	50% {
+		transform: translateY(50%);
+	}
+	100% {
+		transform: translateY(-50%);
+	}
+}
+
+@keyframes moveHorizontal {
+	0% {
+		transform: translateX(-125%) translateY(-10%);
+	}
+	50% {
+		transform: translateX(125%) translateY(10%);
+	}
+	100% {
+		transform: translateX(-125%) translateY(-10%);
+	}
+}
+
+#gradient-bg {
+	z-index: -1;
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	overflow: hidden;
+	flex-shrink: 0;
+	top: 0;
+	left: 0;
+}
+
+#gradient-bg #gradient-container {
+	width : 100%;
+	height: 100%;
+}
+
+#gradient-bg #gradient-container #g1 {
+	position: absolute;
+	background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 60%) no-repeat;
+	border-radius: 100%;
+	width: var(--circle-size);
+	height: var(--circle-size);
+	top: calc(50% - var(--circle-size) / 2);
+	left: calc(50% - var(--circle-size) / 2);
+
+	transform-origin: center center;
+	animation: moveVertical 30s ease infinite;
+
+	opacity: 1;
+}
+
+#gradient-bg #gradient-container #g2 {
+	position: absolute;
+	background: radial-gradient(circle at center, rgba(var(--color2), 0.8) 0, rgba(var(--color2), 0) 60%) no-repeat;
+	border-radius: 100%;
+	width: calc(var(--circle-size) * 1.25);
+	height: calc(var(--circle-size) * 1.25);
+	top: calc(50% - var(--circle-size) / 2);
+	left: calc(50% - var(--circle-size) / 2);
+
+	transform-origin: calc(50% - 400px);
+	animation: moveInCircle 35s reverse infinite;
+
+	opacity: 1;
+}
+
+#gradient-bg #gradient-container #g3 {
+	position: absolute;
+	background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 60%) no-repeat;
+	border-radius: 100%;
+	width: calc(var(--circle-size) * 1.5);
+	height: calc(var(--circle-size) * 1.5);
+	top: calc(50% - var(--circle-size) / 2 + 200px);
+	left: calc(50% - var(--circle-size) / 2 - 500px);
+
+	transform-origin: calc(50% + 400px);
+	animation: moveInCircle 40s linear infinite;
+
+	opacity: 1;
+}
+
+#gradient-bg #gradient-container #g4 {
+	position: absolute;
+	background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%) no-repeat;
+	border-radius: 100%;
+	width: var(--circle-size);
+	height: var(--circle-size);
+	top: calc(50% - var(--circle-size) / 2);
+	left: calc(50% - var(--circle-size) / 2);
+
+	transform-origin: calc(50% - 280px);
+	animation: moveHorizontal 40s ease infinite;
+
+	opacity: 0.7;
+}
+
+#gradient-bg #gradient-container #g5 {
+	position: absolute;
+	background: radial-gradient(circle at center, rgba(var(--color5), 0.8) 0, rgba(var(--color5), 0) 50%) no-repeat;
+	border-radius: 100%;
+	width: calc(var(--circle-size) * 2);
+	height: calc(var(--circle-size) * 2);
+	top: calc(50% - var(--circle-size));
+	left: calc(110% + var(--circle-size));
+
+	transform-origin: calc(50% - 800px) calc(50% + 200px);
+	animation: moveInCircle 35s ease reverse infinite;
+
+	opacity: 1;
+}
