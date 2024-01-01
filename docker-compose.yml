@@ -7,4 +7,18 @@ services:
     ports:
       - 80:3000
     env_file: .env
+    depends_on:
+      - pong
+    restart: unless-stopped
+
+  pong:
+    build: backend/
+    env_file: .env
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres
+    env_file: .env
     restart: unless-stopped
