@@ -1,10 +1,6 @@
-name: Docker Image CI
+name: ft_transcendence-actions
 
-on:
-  push:
-    branches: [ "main", "frontend" ]
-  pull_request:
-    branches: [ "main", "frontend" ]
+on: [push, pull_request]
 
 jobs:
 
@@ -13,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build the project
-      run: docker compose up --build --detach
+    - run: yes | sh generate-env.sh
+    - run: docker compose up --build --detach
