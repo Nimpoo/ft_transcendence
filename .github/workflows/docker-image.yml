@@ -11,5 +11,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the project
-    - run: yes | sh generate-env.sh
-    - run: docker compose up --build --detach
+    - run: |
+        yes | sh generate-env.sh
+        docker compose up --build --detach
