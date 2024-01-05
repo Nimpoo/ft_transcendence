@@ -27,7 +27,7 @@ const handler = NextAuth({
 		async signIn({ user, account }) {
 			const jwt_secret = process.env["JWT_SECRET"]
 			if (account && jwt_secret) {
-				const response = await fetch("http://pong:8000/users/connect", { method: "POST", body: jwt.sign(account, jwt_secret) })
+				const response = await fetch("http://pong:8000/users/connect/", { method: "POST", body: jwt.sign(account, jwt_secret) })
 				if (response.status !== 200)
 					return false
 
