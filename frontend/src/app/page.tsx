@@ -15,7 +15,7 @@ const rob = Roboto({
 	weight: '400'
 })
 
-function ProviderButton({ provider, index }: { provider: ClientSafeProvider, index: number }): JSX.Element {
+function ProviderButton({ provider, index }: { provider: ClientSafeProvider, index: number }): React.JSX.Element {
 	return (
 		<div style={{ animation: `1s ease-in-out ${1 + .2 * index}s forwards appear` }} className="provider-buttons group flex flex-row items-center text-black">
 
@@ -48,7 +48,7 @@ function ProviderButton({ provider, index }: { provider: ClientSafeProvider, ind
 
 function Home(): JSX.Element {
 
-	const [ providers, setProviders ] = useState<ClientSafeProvider[] | JSX.Element>(<Loading />)
+	const [ providers, setProviders ] = useState<ClientSafeProvider[] | React.JSX.Element>(<Loading />)
 
 	useEffect(() => {
 		getProviders().then(p => p ? setProviders(Object.values(p)) : setProviders(<p>no provider</p>))
