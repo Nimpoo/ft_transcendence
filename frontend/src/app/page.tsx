@@ -1,14 +1,21 @@
 "use strict"
 "use client"
 
-import { Roboto } from "next/font/google"
+import { Roboto, Ubuntu } from "next/font/google"
 import { useEffect, useState } from "react"
-import { ClientSafeProvider, getProviders, signIn } from "next-auth/react"
+import { ClientSafeProvider, getProviders, signIn, useSession } from "next-auth/react"
 
 import Image from "next/image"
 
 import "@/styles/Home.css"
+import "@/styles/Rainbow.css"
+
 import Loading from "./loading"
+
+const ubu = Ubuntu ({
+	subsets: ["latin"],
+	weight: "700"
+})
 
 const rob = Roboto({
 	subsets: ['latin'],
@@ -45,15 +52,51 @@ function ProviderButton({ provider, index }: { provider: ClientSafeProvider, ind
 	)
 }
 
-
 function Home(): JSX.Element {
 
 	const [ providers, setProviders ] = useState<ClientSafeProvider[] | React.JSX.Element>(<Loading />)
+
+	const { data: session, status } = useSession()
 
 	useEffect(() => {
 		getProviders().then(p => p ? setProviders(Object.values(p)) : setProviders(<p>no provider</p>))
 	}, [])
 
+	if (status === "loading") {
+		return <Loading />
+	}
+
+	if (1 || session) {
+		return (
+			<main className="flex flex-row w-full h-[39rem] items-center justify-between">
+				<div className="flex flex-col flex-nowrap items-stretch justify-start p-3 space-y-3 w-[350px] h-full rounded-3xl bg-[#D9D9D9] shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)]">
+					<div className="bg-red-500 h-[18.35%] justify-center items-center">1</div>
+					<div className="bg-blue-500 h-[18.35%] justify-center items-center">2</div>
+					<div className="bg-purple-500 h-[18.35%] justify-center items-center">3</div>
+					<div className="bg-pink-500 h-[18.35%] justify-center items-center">4</div>
+					<div className="bg-cyan-500 h-[18.35%] justify-center items-center">5</div>
+				</div>
+
+				<button className={ "w-80 h-[175px] rounded-3xl bg-[#D9D9D9]/10 shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)] text-8xl hover:bg-[#D9D9D9]/30 active:bg-[#D9D9D9]/60 transition-all text-transparent " + ubu.className }>
+					<span className="stroke rainbow-text">PLAY</span>
+				</button>
+
+				<div className="flex flex-col w-[350px] justify-between h-full">
+					<div className="w-full h-[25%] rounded-3xl bg-[#D9D9D9] shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)]">
+						
+					</div>
+					<div className="flex flex-col flex-nowrap items-stretch justify-start p-3 space-y-3 w-full h-[69%] rounded-3xl bg-[#D9D9D9] shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)]">
+						<div className="bg-red-500 h-[17.65%] justify-center items-center">1</div>
+						<div className="bg-blue-500 h-[17.65%] justify-center items-center">2</div>
+						<div className="bg-purple-500 h-[17.65%] justify-center items-center">3</div>
+						<div className="bg-pink-500 h-[17.65%] justify-center items-center">4</div>
+						<div className="bg-cyan-500 h-[17.65%] justify-center items-center">5</div>
+					</div>
+				</div>
+			</main>
+		)
+	}
+	
 	return (
 		<main className="pt-4">
 
