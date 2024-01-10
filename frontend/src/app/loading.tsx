@@ -1,4 +1,4 @@
-function Loading(): JSX.Element {
+function Loading(): React.JSX.Element {
 	return (
 		<div>
 			<svg width="32" height="32" viewBox="0 0 16 16" fill="none" data-view-component="true" className="animate-spin font-bold">

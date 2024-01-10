@@ -1,21 +1,33 @@
-"use strict"
 "use client"
 
-import { Roboto } from "next/font/google"
+import { Roboto, Ubuntu } from "next/font/google"
 import { useEffect, useState } from "react"
-import { ClientSafeProvider, getProviders, signIn } from "next-auth/react"
+import { ClientSafeProvider, getProviders, signIn, useSession } from "next-auth/react"
 
 import Image from "next/image"
+import Link from "next/link"
+import CountUp from "react-countup"
 
 import "@/styles/Home.css"
+import "@/styles/Rainbow.css"
+
 import Loading from "./loading"
 
-const rob = Roboto({
-	subsets: ['latin'],
-	weight: '400'
+const ubu = Ubuntu ({
+	subsets: ["latin"],
+	weight: "700"
 })
 
-function ProviderButton({ provider, index }: { provider: ClientSafeProvider, index: number }): JSX.Element {
+const rob = Roboto({
+	subsets: ["latin"],
+	weight: "400"
+})
+
+function ProviderButton({
+	provider, index
+}: {
+	provider: ClientSafeProvider, index: number
+}): React.JSX.Element {
 	return (
 		<div style={{ animation: `1s ease-in-out ${1 + .2 * index}s forwards appear` }} className="provider-buttons group flex flex-row items-center text-black">
 
@@ -45,16 +57,74 @@ function ProviderButton({ provider, index }: { provider: ClientSafeProvider, ind
 	)
 }
 
-
 function Home(): JSX.Element {
+	const { data: session } = useSession()
 
-	const [ providers, setProviders ] = useState<ClientSafeProvider[] | JSX.Element>(<Loading />)
+	const [ providers, setProviders ] = useState<ClientSafeProvider[] | React.JSX.Element>(<Loading />)
+
+	const { data: session, status } = useSession()
 
 	useEffect(() => {
 		getProviders().then(p => p ? setProviders(Object.values(p)) : setProviders(<p>no provider</p>))
 	}, [])
 
+	if (status === "loading") {
+		return <Loading />
+	}
+
+	if (session || 1) {
+		return (
+			<main className="flex flex-row w-full h-[39rem] items-center justify-between">
+				<div className="flex flex-col flex-nowrap items-stretch justify-start p-3 space-y-3 w-[350px] h-full rounded-3xl bg-[#D9D9D9] shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)]">
+
+				</div>
+
+				<button className={ "w-80 h-[175px] rounded-3xl bg-[#D9D9D9]/10 shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)] text-8xl hover:bg-[#D9D9D9]/30 active:bg-[#D9D9D9]/60 transition-all text-transparent " + ubu.className }>
+					<span className="stroke rainbow-text">PLAY</span>
+				</button>
+
+				<div className="flex flex-col w-[350px] justify-between h-full">
+					<div className="flex flex-row justify-between w-full h-[15%] p-3 rounded-3xl text-black bg-[#D9D9D9] shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)] space-x-2">
+						<div className="relative h-full w-[70px]">
+							<Link href="/profile">
+								<Image className="rounded-full hover:rotate-[10deg] transition"
+									src={"https://thispersondoesnotexist.com"}
+									width={70}
+									height={70}
+									alt="Your Profile Picture">
+								</Image>
+							</Link>
+							<Image className="absolute -bottom-1 -right-1"
+								src={"/assets_ranking/challenger_1.png"}
+								width={31}
+								height={31}
+								alt="Challenger 1"
+							/>
+						</div>
+						<div className="flex flex-col justify-between flex-grow overflow-hidden">
+							<h3 className="text-2xl truncate">{session?.user?.name}</h3>
+							<div className="flex flex-row items-center justify-end flex-grow text-xl">
+								<CountUp duration={5} className="px-2 truncate" end={0} />
+								<Image
+									src={"/assets_ranking/trophy.png"}
+									width={35}
+									height={35}
+									alt="Trophy"
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div className="flex flex-col flex-nowrap items-stretch justify-start p-3 space-y-3 w-full h-[79%] rounded-3xl bg-[#D9D9D9] shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)]">
+
+					</div>
+				</div>
+			</main>
+		)
+	}
+	
 	return (
+
 		<main className="pt-4">
 
 			<div className="flex items-center justify-between">

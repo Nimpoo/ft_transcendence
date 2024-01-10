@@ -9,10 +9,10 @@ def random_username():
 class User(models.Model):
   nickname = models.CharField(max_length=30, default=random_username)
 
-  fortytwo_id = models.CharField(max_length=40, null=True)
-  github_id = models.CharField(max_length=40, null=True)
-  discord_id = models.CharField(max_length=40, null=True)
+  fortytwo_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+  github_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+  discord_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
 
   dfa_secret = models.CharField(max_length=50, null=True)
 
-  created_at = models.DateTimeField("date published", default=timezone.now)
+  created_at = models.DateTimeField(auto_now_add=True)
