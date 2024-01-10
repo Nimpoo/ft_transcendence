@@ -15,18 +15,20 @@ import Loading from "./loading"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
-	weight: "700"
+	weight: "700",
 })
 
 const rob = Roboto({
 	subsets: ["latin"],
-	weight: "400"
+	weight: "400",
 })
 
 function ProviderButton({
-	provider, index
+	provider,
+	index,
 }: {
-	provider: ClientSafeProvider, index: number
+	provider: ClientSafeProvider,
+	index: number,
 }): React.JSX.Element {
 	return (
 		<div style={{ animation: `1s ease-in-out ${1 + .2 * index}s forwards appear` }} className="provider-buttons group flex flex-row items-center text-black">
@@ -58,8 +60,6 @@ function ProviderButton({
 }
 
 function Home(): JSX.Element {
-	const { data: session } = useSession()
-
 	const [ providers, setProviders ] = useState<ClientSafeProvider[] | React.JSX.Element>(<Loading />)
 
 	const { data: session, status } = useSession()
@@ -72,7 +72,7 @@ function Home(): JSX.Element {
 		return <Loading />
 	}
 
-	if (session || 1) {
+	if (session) {
 		return (
 			<main className="flex flex-row w-full h-[39rem] items-center justify-between">
 				<div className="flex flex-col flex-nowrap items-stretch justify-start p-3 space-y-3 w-[350px] h-full rounded-3xl bg-[#D9D9D9] shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)]">

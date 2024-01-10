@@ -1,4 +1,3 @@
-"use strict"
 "use client"
 
 import Image from "next/image"
@@ -20,7 +19,7 @@ function Header(): React.JSX.Element {
 	const usoppModal =
 	<div className="flex justify-between w-[900px]">
 		<Image className="h-auto w-auto rounded-md shadow-[4px_4px_4px_rgba(0,0,0,0.25)]"
-			src={"/Louis.jpg"}
+			src={"/assets_bogoss/Louis.jpg"}
 			width={400}
 			height={400}
 			alt="Louis Sylvestre"
@@ -51,7 +50,7 @@ function Header(): React.JSX.Element {
 				<Link target="_blank" href="mailto:losylves@student.42nice.fr"
 						className="flex flex-row items-center hover:bg-black/10 active:bg-black/25 transition-all rounded-lg">
 					<Image className="m-1"
-						src={"/svg/mail.svg"}
+						src={"/svg/mail_logo.svg"}
 						width={32}
 						height={32}
 						alt="LinkedIn's logo"
@@ -67,7 +66,7 @@ function Header(): React.JSX.Element {
 	const namiModal = 
 	<div className="flex justify-between w-[700px]">
 		<Image className="h-auto w-auto rounded-md shadow-[4px_4px_4px_rgba(0,0,0,0.25)]"
-			src={"/Justine.jpg"}
+			src={"/assets_bogoss/Justine.jpg"}
 			width={195}
 			height={195}
 			alt="Justine Munoz"
@@ -98,7 +97,7 @@ function Header(): React.JSX.Element {
 				<Link target="_blank" href="mailto:jumunoz@student.42nice.fr"
 						className="flex flex-row items-center hover:bg-black/10 active:bg-black/25 transition-all rounded-lg">
 					<Image className="m-1"
-						src={"/svg/mail.svg"}
+						src={"/svg/mail_logo.svg"}
 						width={32}
 						height={32}
 						alt="LinkedIn's logo"
@@ -114,7 +113,7 @@ function Header(): React.JSX.Element {
 	const zoroModal =
 	<div className="flex justify-between w-[700px]">
 		<Image className="h-auto w-auto rounded-md shadow-[4px_4px_4px_rgba(0,0,0,0.25)]"
-			src={"/NBG.jpg"}
+			src={"/assets_bogoss/NBG.jpg"}
 			width={195}
 			height={195}
 			alt="Noah Alexandre"
@@ -145,7 +144,7 @@ function Header(): React.JSX.Element {
 				<Link target="_blank" href="mailto:noalexan@student.42nice.fr"
 						className="flex flex-row items-center hover:bg-black/10 active:bg-black/25 transition-all rounded-lg">
 					<Image className="m-1"
-						src={"/svg/mail.svg"}
+						src={"/svg/mail_logo.svg"}
 						width={32}
 						height={32}
 						alt="LinkedIn's logo"
@@ -161,7 +160,7 @@ function Header(): React.JSX.Element {
 	const luffyModal =
 	<div className="flex justify-between w-[900px]">
 		<Image className="h-auto w-auto rounded-md shadow-[4px_4px_4px_rgba(0,0,0,0.25)]"
-			src={"/Marwan.jpg"}
+			src={"/assets_bogoss/Marwan.jpg"}
 			width={195}
 			height={195}
 			alt="Marwan Ayoub"
@@ -192,7 +191,7 @@ function Header(): React.JSX.Element {
 				<Link target="_blank" href="mailto:marwan.ayoub.pro@gmail.com"
 						className="flex flex-row items-center hover:bg-black/10 active:bg-black/25 transition-all rounded-lg">
 					<Image className="m-1"
-						src={"/svg/mail.svg"}
+						src={"/svg/mail_logo.svg"}
 						width={32}
 						height={32}
 						alt="LinkedIn's logo"

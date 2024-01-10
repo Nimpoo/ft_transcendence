@@ -11,7 +11,7 @@ import { ModalProvider } from "@/providers/Modal"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
-	weight: "500"
+	weight: "500",
 })
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 }
 
 function RootLayout({
-	children
+	children,
 }: {
 	children: React.ReactNode
 }): React.JSX.Element {
