@@ -1,4 +1,3 @@
-"use strict"
 "use client"
 
 import { Roboto, Ubuntu } from "next/font/google"
@@ -59,6 +58,7 @@ function ProviderButton({
 }
 
 function Home(): JSX.Element {
+	const { data: session } = useSession()
 
 	const [ providers, setProviders ] = useState<ClientSafeProvider[] | React.JSX.Element>(<Loading />)
 
@@ -124,6 +124,7 @@ function Home(): JSX.Element {
 	}
 	
 	return (
+
 		<main className="pt-4">
 
 			<div className="flex items-center justify-between">
