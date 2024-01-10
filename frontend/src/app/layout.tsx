@@ -7,6 +7,7 @@ import "tailwindcss/tailwind.css"
 import "@/styles/Background.css"
 
 import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 import { ModalProvider } from "@/providers/Modal"
 
 const ubu = Ubuntu ({
@@ -30,12 +31,9 @@ function RootLayout({
 			</head>
 			<body className={ "bg-[url('/bg.png')] bg-cover bg-fixed bg-center bg-no-repeat text-white " + ubu.className }>
 
-				<ModalProvider>
-					<div className="m-auto max-w-7xl">
-						<Header />
-						{children}
-					</div>
-				</ModalProvider>
+				<div className="m-auto max-w-7xl">
+					{children}
+				</div>
 
 				<div id="gradient-bg">
 					<div id="gradient-container">
