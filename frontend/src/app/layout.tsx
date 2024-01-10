@@ -6,10 +6,6 @@ import { Ubuntu } from "next/font/google"
 import "tailwindcss/tailwind.css"
 import "@/styles/Background.css"
 
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import { ModalProvider } from "@/providers/Modal"
-
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "500",
