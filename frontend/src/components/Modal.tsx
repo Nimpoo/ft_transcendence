@@ -1,4 +1,3 @@
-"use strict"
 "use client"
 
 import React from "react"
@@ -10,7 +9,7 @@ function Modal({
 	closeModal,
 	width,
 	height,
-	children
+	children,
 }: {
 	closeModal: () => void,
 	width?: number,
