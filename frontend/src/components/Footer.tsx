@@ -17,7 +17,7 @@ function Footer(): React.JSX.Element | null {
 		<footer className="flex flex-row justify-center mt-4 opacity-[0.66]">
 			<Link href={"/chat"} className="flex flex-row mr-3 items-center hover:scale-110 active:scale-105 transition duration-300 group">
 				<Image className="mr-2 group-hover:rotate-[360deg] transition duration-1000"
-					src={"/chat.svg"}
+					src={"/svg/chat.svg"}
 					width={30}
 					height={30}
 					alt="Chat"
@@ -27,7 +27,7 @@ function Footer(): React.JSX.Element | null {
 
 			<Link href={"/settings"} className="flex flex-row ml-3 items-center hover:scale-110 active:scale-105 transition duration-300 group">
 				<Image className="mr-2 group-hover:rotate-[360deg] transition duration-1000"
-					src={"/settings.svg"}
+					src={"/svg/settings.svg"}
 					width={30}
 					height={30}
 					alt="Settings"
