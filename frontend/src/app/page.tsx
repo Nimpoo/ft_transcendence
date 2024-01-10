@@ -7,6 +7,7 @@ import { ClientSafeProvider, getProviders, signIn, useSession } from "next-auth/
 
 import Image from "next/image"
 import Link from "next/link"
+import CountUp from "react-countup"
 
 import "@/styles/Home.css"
 import "@/styles/Rainbow.css"
@@ -86,12 +87,12 @@ function Home(): JSX.Element {
 					<div className="flex flex-row justify-between w-full h-[15%] p-3 rounded-3xl text-black bg-[#D9D9D9] shadow-[5px_5px_0_1px_rgba(0,0,0,0.25)] space-x-2">
 						<div className="relative h-full w-[70px]">
 							<Link href="/profile">
-								<Image className="rounded-full"
+								<Image className="rounded-full hover:rotate-[10deg] transition"
 									src={"https://thispersondoesnotexist.com"}
 									width={70}
 									height={70}
-									alt="Your Profile Picture"
-								/>
+									alt="Your Profile Picture">
+								</Image>
 							</Link>
 							<Image className="absolute -bottom-1 -right-1"
 								src={"/assets_ranking/challenger_1.png"}
@@ -103,7 +104,7 @@ function Home(): JSX.Element {
 						<div className="flex flex-col justify-between flex-grow overflow-hidden">
 							<h3 className="text-2xl truncate">{session?.user?.name}</h3>
 							<div className="flex flex-row items-center justify-end flex-grow text-xl">
-								<span className="px-2 truncate">0</span>
+								<CountUp duration={5} className="px-2 truncate" end={0} />
 								<Image
 									src={"/assets_ranking/trophy.png"}
 									width={35}
