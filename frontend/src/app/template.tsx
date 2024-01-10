@@ -1,19 +1,20 @@
 "use client"
 
-import { SessionProvider } from "next-auth/react";
+import { ModalProvider } from "@/providers/Modal"
+import { SessionProvider } from "next-auth/react"
 
 function Template({
 	children,
 }: {
 	children: React.ReactNode,
-}): React.JSX.Element {
-
+}) : React.JSX.Element {
 	return (
 		<SessionProvider>
-			{children}
+			<ModalProvider>
+				{children}
+			</ModalProvider>
 		</SessionProvider>
 	)
-
 }
 
 export default Template
