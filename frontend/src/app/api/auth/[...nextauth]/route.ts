@@ -26,10 +26,21 @@ const handler = NextAuth({
 	callbacks: {
 		async signIn({ user, account }) {
 			const jwt_secret = process.env["JWT_SECRET"]
-			if (account && jwt_secret) {
-				const response = await fetch("http://pong:8000/users/connect/", { method: "POST", body: jwt.sign(account, jwt_secret) })
-				if (response.status !== 200)
+			const api_key = process.env["API_KEY"]
+			if (account && jwt_secret && api_key) {
+				const token = jwt.sign({
+					token: account.access_token,
+					provider: account.provider === '42-school' ? 'fortytwo' : account.provider,
+					providerId: account.providerAccountId,
+				}, jwt_secret)
+				const response = await fetch("http://pong:8000/users/", { method: "POST", headers: {
+					"X-API-KEY": api_key,
+					"Authorization": `Bearer ${token}`,
+			 	}})
+
+				if (response.status !== 200) {
 					return false
+				}
 
 				const data = await response.json()
 				user.name = data.nickname

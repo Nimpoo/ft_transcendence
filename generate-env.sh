@@ -44,20 +44,29 @@ EOF
 printf "\n\e[34;1minfo: the \`host\` is your main page. this will be used to redirect\n\e[0m"
 printf "\e[33;1mwarning: you have to set \`redirect_uri\` in your api settings at your \`host\` (e.g. http://localhost:3000)\n\e[0m"
 
+HOST="$(printf "Write your host: " 1>&2; read host; echo $host)"
+PORT="$(printf "Write your port: " 1>&2; read port; echo $port)"
+
 cat << EOF >> .env
 # Frontend
-NEXTAUTH_URL="$(printf "Write your host: " 1>&2; read host; echo $host)"
+NEXTAUTH_URL="http://$HOST:$PORT"
 NEXTAUTH_SECRET="$(openssl rand -base64 32)"
 
 EOF
 
 printf "\n"
 
+ADMIN_URI="$(openssl rand -hex 15)"
+
 cat << EOF >> .env
-# Requests Encoding
+# Backend
 JWT_SECRET="$(openssl rand -base64 32)"
+API_KEY="$(openssl rand -base64 32)"
+ADMIN_URI=$ADMIN_URI/
 
 EOF
+
+printf "Backend admin URL: http://$HOST:8000/$ADMIN_URI/\n"
 
 PASSWORD="$(openssl rand -base64 32)"
 

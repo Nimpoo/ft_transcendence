@@ -1,6 +1,8 @@
 from django.urls import path
+
 from . import views
 
+
 urlpatterns = [
-  path('connect/', views.connect, name='connect'),
+  path('', views.Index.as_view(), name='index'),
 ]

@@ -14,12 +14,12 @@ function RootLayout({
 	children
 }: {
 	children: React.ReactNode
-}): JSX.Element {
+}): React.JSX.Element {
 	return (
 		<html lang="en">
 			<head>
 			</head>
-			<body className={ "bg-[url('/bg.png')] bg-cover bg-fixed bg-center bg-no-repeat text-white" }>
+			<body className={"bg-[url('/bg.png')] bg-cover bg-fixed bg-center bg-no-repeat text-white"}>
 				<div className="m-auto max-w-7xl">
 					{children}
 					<div id="gradient-bg">

@@ -1,64 +1,57 @@
-from django.http import JsonResponse, HttpRequest
-from django.views.decorators.http import require_POST
-from .models import User
-import jwt
-import requests
-import os
+from django.forms import model_to_dict
+from django.http import HttpRequest, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views import View
 
-# Constants for provider names and URLs
+import requests
+
+from users.models import User
+from utils.decorators import apiKey_verify, jwt_verify
+
+
 PROVIDER_URLS = {
-  '42-school': 'https://api.intra.42.fr/v2/me',
+  'fortytwo': 'https://api.intra.42.fr/v2/me',
   'github': 'https://api.github.com/user',
   'discord': 'https://discord.com/api/users/@me',
 }
 
-@require_POST
-def connect(request: HttpRequest) -> JsonResponse:
-  # Is jwt valid
-  try:
-    data = jwt.decode(request.body, os.environ['JWT_SECRET'], algorithms=['HS256'])
-  except jwt.DecodeError:
-    return JsonResponse({'error': 'Forbidden', 'message': 'The given JWT is not valid.'}, status=403)
+class Index(View):
 
-  # Check for required fields in the decoded JWT payload
-  token, provider, provider_id = data.get('access_token'), data.get('provider'), data.get('providerAccountId')
-  if None in [token, provider, provider_id]:
-    return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+  def get(self, request: HttpRequest): # Get X users
+    # todo: make parameters adjustable by the client
+    page = 0
+    page_size = 5
+    # todo: add more params like: sort, range, filter
+    return JsonResponse(list(User.objects.values())[page*page_size:page*page_size+page_size], safe=False)
 
-  # Validate provider and get URL
-  provider_url = PROVIDER_URLS.get(provider)
-  if not provider_url:
-    return JsonResponse({'error': 'Forbidden', 'message': 'The given provider is not valid.'}, status=403)
+  @method_decorator((apiKey_verify, jwt_verify), name='dispatch')
+  def post(self, request: HttpRequest): # Create user
+    token, provider, provider_id = request.payload.get('token'), request.payload.get('provider'), request.payload.get('providerId')
+    print({'provider':provider, 'provider_id': provider_id})
 
-  # Validate token and get user data
-  response = requests.get(provider_url, headers={'Authorization': f'Bearer {token}'})
-  if response.status_code != 200:
-    return JsonResponse({'error': 'Forbidden', 'message': 'The given token is not valid.'}, status=403)
+    if None in [token, provider, provider_id]:
+      return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
 
-  try:
-    data = response.json()
-  except ValueError:
-    return JsonResponse({'error': 'Gone', 'message': 'Something went wrong, try again later.'}, status=410)
+    provider_url = PROVIDER_URLS.get(provider)
+    if not provider_url:
+      return JsonResponse({'error': 'Forbidden', 'message': 'The given provider is not valid.'}, status=403)
 
-  # Check if the given ID is valid
-  if str(data.get('id')) != provider_id:
-    return JsonResponse({'error': 'Forbidden', 'message': 'Given ID not valid.'}, status=403)
+    response = requests.get(provider_url, headers={'Authorization': f'Bearer {token}'})
+    if response.status_code != 200:
+      return JsonResponse({'error': 'Forbidden', 'message': 'The given token is not valid.'}, status=403)
 
-  # Get or create user object
-  if provider == '42-school':
-    field_name = 'fortytwo_id'
-  elif provider == 'github':
-    field_name = 'github_id'
-  elif provider == 'discord':
-    field_name = 'discord_id'
-  else:
-    return JsonResponse({'error': 'Forbidden', 'message': 'Invalid provider.'}, status=403)
+    try:
+      data = response.json()
+    except ValueError:
+      return JsonResponse({'error': 'Gone', 'message': 'Something went wrong, try again later.'}, status=410)
 
-  try:
-    user = User.objects.get(**{field_name: provider_id})
-  except User.DoesNotExist:
-    user = User(**{field_name: provider_id})
-    user.save()
+    if str(data.get('id')) != provider_id:
+      return JsonResponse({'error': 'Forbidden', 'message': 'Given ID not valid.'}, status=403)
 
-  # Send back the nickname
-  return JsonResponse({'nickname': user.nickname})
+    try:
+      user = User.objects.get(**{f'{provider}_id': provider_id})
+    except User.DoesNotExist:
+      user = User(**{f'{provider}_id': provider_id})
+      user.save()
+
+    return JsonResponse(model_to_dict(user))
