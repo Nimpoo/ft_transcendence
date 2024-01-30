@@ -102,3 +102,12 @@ class DFA(View):
     user.save()
 
     return JsonResponse({'message': 'dfa disabled'})
+
+class Friends(View):
+
+  def get(self, request: HttpRequest, user_id: int):
+    user = User.objects.get(pk=user_id)
+    return JsonResponse(list(user.friends.values()), safe=False)
+
+  def post(self, request: HttpRequest):
+    pass
