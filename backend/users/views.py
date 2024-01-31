@@ -1,6 +1,7 @@
 from django.forms import model_to_dict
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST, require_GET
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET
 from django.views import View
@@ -11,7 +12,7 @@ import jwt
 import pyotp
 
 from backend import settings
-from users.models import User
+from users.models import FriendRequest, User
 from utils.decorators import need_user
 from random_username.generate import generate_username
 
@@ -103,11 +104,58 @@ class DFA(View):
 
     return JsonResponse({'message': 'dfa disabled'})
 
-class Friends(View):
+@require_GET
+def get_user(request: HttpRequest, user_id: int) -> JsonResponse:
+  user = User.objects.get(pk=user_id)
+  return JsonResponse(model_to_dict(user))
 
-  def get(self, request: HttpRequest, user_id: int):
-    user = User.objects.get(pk=user_id)
-    return JsonResponse(list(user.friends.values()), safe=False)
+@require_GET
+def get_user_friends_list(request: HttpRequest, user_id: int) -> JsonResponse:
+  user = User.objects.get(pk=user_id)
+  return JsonResponse(list(user.friends.values()), safe=False)
 
-  def post(self, request: HttpRequest):
+@require_POST
+@jwt_verify
+def add_friend(request: HttpRequest) -> JsonResponse:
+  from_user, to_user = request.payload.get('from_user'), request.payload.get('to_user')
+
+  if None in [from_user, to_user]:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+
+  sender = get_object_or_404(User, pk=from_user)
+  receiver = get_object_or_404(User, pk=to_user)
+
+  try: # has receiver already sent friend request
+    friend_request = FriendRequest.objects.get(sender=receiver, receiver=sender)
+  except FriendRequest.DoesNotExist: # else create it
+    friend_request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=receiver)
+
+    if friend_request.status == 'rejected': # if receiver have rejected it
+      friend_request.status = 'pending'
+      friend_request.save()
+
+    return JsonResponse(model_to_dict(friend_request))
+
+  if friend_request.status == 'pending': # if you never accepted it
+    friend_request.status = 'accepted'
+    sender.friends.add(receiver)
+    friend_request.save()
+  elif friend_request.status == 'accepted': # if you have already accepted it
     pass
+  elif friend_request.status == 'rejected': # if you have already rejected it
+    friend_request = FriendRequest(sender=sender, receiver=receiver)
+    friend_request.save()
+
+  print(friend_request)
+
+  return JsonResponse(model_to_dict(friend_request))
+
+@require_POST
+@jwt_verify
+def reject_friend(request: HttpRequest) -> JsonResponse:
+  return JsonResponse({ 'coming': 'soon' })
+
+@require_POST
+@jwt_verify
+def remove_friend(request: HttpRequest) -> JsonResponse:
+  return JsonResponse({ 'coming': 'soon' })
