@@ -107,7 +107,7 @@ class DFA(View):
 @require_GET
 def get_user(request: HttpRequest, user_id: int) -> JsonResponse:
   user = User.objects.get(pk=user_id)
-  return JsonResponse(model_to_dict(user))
+  return JsonResponse(model_to_dict(user, exclude=['friends', 'blocked']))
 
 @require_GET
 def get_user_friends_list(request: HttpRequest, user_id: int) -> JsonResponse:
@@ -130,22 +130,27 @@ def add_friend(request: HttpRequest) -> JsonResponse:
   except FriendRequest.DoesNotExist: # else create it
     friend_request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=receiver)
 
-    if friend_request.status == 'rejected': # if receiver have rejected it
+    if friend_request.status == 'rejected': # if receiver has rejected it
       friend_request.status = 'pending'
       friend_request.save()
+    elif friend_request.status == 'accepted': # if receiver has accepted it
+      if not receiver.friends.contains(sender): # did someone break this friendship
+        friend_request.status = 'pending'
 
     return JsonResponse(model_to_dict(friend_request))
 
   if friend_request.status == 'pending': # if you never accepted it
     friend_request.status = 'accepted'
     sender.friends.add(receiver)
-    friend_request.save()
   elif friend_request.status == 'accepted': # if you have already accepted it
-    pass
+    if not receiver.friends.contains(sender): # did someone break this friendship
+      friend_request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=receiver)
+      friend_request.status = 'pending'
   elif friend_request.status == 'rejected': # if you have already rejected it
-    friend_request = FriendRequest(sender=sender, receiver=receiver)
-    friend_request.save()
+    friend_request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=receiver)
+    friend_request.status = 'pending'
 
+  friend_request.save()
   print(friend_request)
 
   return JsonResponse(model_to_dict(friend_request))
@@ -174,4 +179,14 @@ def reject_friend(request: HttpRequest) -> JsonResponse:
 @require_POST
 @jwt_verify
 def remove_friend(request: HttpRequest) -> JsonResponse:
-  return JsonResponse({ 'coming': 'soon' })
+  from_user, to_user = request.payload.get('from_user'), request.payload.get('to_user')
+
+  if None in [from_user, to_user]:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+
+  sender = get_object_or_404(User, pk=from_user)
+  receiver = get_object_or_404(User, pk=to_user)
+
+  sender.friends.remove(receiver)
+
+  return JsonResponse(list(sender.friends.values()), safe=False)
