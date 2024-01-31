@@ -153,7 +153,23 @@ def add_friend(request: HttpRequest) -> JsonResponse:
 @require_POST
 @jwt_verify
 def reject_friend(request: HttpRequest) -> JsonResponse:
-  return JsonResponse({ 'coming': 'soon' })
+  from_user, to_user = request.payload.get('from_user'), request.payload.get('to_user')
+
+  if None in [from_user, to_user]:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+
+  sender = get_object_or_404(User, pk=from_user)
+  receiver = get_object_or_404(User, pk=to_user)
+
+  friend_request = get_object_or_404(FriendRequest, sender=receiver, receiver=sender)
+
+  if friend_request.status != 'rejected':
+    friend_request.status = 'rejected'
+    friend_request.save()
+
+  print(friend_request)
+
+  return JsonResponse(model_to_dict(friend_request))
 
 @require_POST
 @jwt_verify
