@@ -18,11 +18,20 @@ def get_user_friends_list(request: HttpRequest, user_id: int) -> JsonResponse:
 @require_POST
 @jwt_verify
 def add_friend(request: HttpRequest) -> JsonResponse:
-  body_payload = json.loads(request.body.decode('utf-8'))
-  sender_id, receiver_id = int(request.payload.get('id')), int(body_payload['user_id'])
+  if len(request.body) == 0:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Missing body.'}, status=400)
+
+  try:
+    body_payload = json.loads(request.body.decode('utf-8'))
+  except json.JSONDecodeError:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Body must be JSON.'}, status=400)
+
+  sender_id, receiver_id = request.payload.get('id'), body_payload.get('user_id')
 
   if None in [sender_id, receiver_id]:
     return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+
+  sender_id, receiver_id = int(sender_id), int(receiver_id)
 
   if sender_id == receiver_id:
     return JsonResponse({'error': 'Bad Request', 'message': 'IDs are equal.'}, status=400)
@@ -34,12 +43,12 @@ def add_friend(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'error': 'Bad Request', 'message': 'Already friend.'}, status=400)
 
   try: # has receiver already sent friend request
-    friend_request = FriendRequest.objects.get(sender=receiver, receiver=sender, status='pending')
+    friend_request = FriendRequest.objects.get(sender=receiver, receiver=sender, status=FriendRequest.STATUS_PENDING)
   except FriendRequest.DoesNotExist: # else create it
-    friend_request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=receiver, status='pending')
+    friend_request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=receiver, status=FriendRequest.STATUS_PENDING)
     return JsonResponse(model_to_dict(friend_request))
 
-  friend_request.status = 'accepted'
+  friend_request.status = FriendRequest.STATUS_ACCEPTED
   friend_request.save()
 
   sender.friends.add(receiver)
@@ -50,11 +59,20 @@ def add_friend(request: HttpRequest) -> JsonResponse:
 @require_POST
 @jwt_verify
 def reject_friend(request: HttpRequest) -> JsonResponse:
-  body_payload = json.loads(request.body.decode('utf-8'))
-  sender_id, receiver_id = int(request.payload.get('id')), int(body_payload['user_id'])
+  if len(request.body) == 0:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Missing body.'}, status=400)
+
+  try:
+    body_payload = json.loads(request.body.decode('utf-8'))
+  except json.JSONDecodeError:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Body must be JSON.'}, status=400)
+
+  sender_id, receiver_id = request.payload.get('id'), body_payload.get('user_id')
 
   if None in [sender_id, receiver_id]:
     return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+
+  sender_id, receiver_id = int(sender_id), int(receiver_id)
 
   if sender_id == receiver_id:
     return JsonResponse({'error': 'Bad Request', 'message': 'IDs are equal.'}, status=400)
@@ -62,8 +80,8 @@ def reject_friend(request: HttpRequest) -> JsonResponse:
   sender = get_object_or_404(User, pk=sender_id)
   receiver = get_object_or_404(User, pk=receiver_id)
 
-  friend_request = get_object_or_404(FriendRequest, sender=receiver, receiver=sender, status='pending')
-  friend_request.status = 'rejected'
+  friend_request = get_object_or_404(FriendRequest, sender=receiver, receiver=sender, status=FriendRequest.STATUS_PENDING)
+  friend_request.status = FriendRequest.STATUS_REJECTED
   friend_request.save()
 
   print(friend_request)
@@ -73,11 +91,20 @@ def reject_friend(request: HttpRequest) -> JsonResponse:
 @require_POST
 @jwt_verify
 def remove_friend(request: HttpRequest) -> JsonResponse:
-  body_payload = json.loads(request.body.decode('utf-8'))
-  sender_id, receiver_id = int(request.payload.get('id')), int(body_payload['user_id'])
+  if len(request.body) == 0:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Missing body.'}, status=400)
+
+  try:
+    body_payload = json.loads(request.body.decode('utf-8'))
+  except json.JSONDecodeError:
+    return JsonResponse({'error': 'Bad Request', 'message': 'Body must be JSON.'}, status=400)
+
+  sender_id, receiver_id = request.payload.get('id'), body_payload.get('user_id')
 
   if None in [sender_id, receiver_id]:
     return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+
+  sender_id, receiver_id = int(sender_id), int(receiver_id)
 
   if sender_id == receiver_id:
     return JsonResponse({'error': 'Bad Request', 'message': 'IDs are equal.'}, status=400)

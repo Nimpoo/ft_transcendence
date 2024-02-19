@@ -8,7 +8,6 @@ class User(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
 
   friends = models.ManyToManyField('self', blank=True)
-  blocked = models.ManyToManyField('self', blank=True)
 
-  def __str__(self):
+  def __str__(self) -> str:
     return self.nickname
