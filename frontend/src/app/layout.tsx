@@ -16,9 +16,9 @@ function RootLayout({
 		<html lang="en">
 			<head>
 			</head>
-			<body className={ "bg-[url('/bg.png')] bg-cover bg-fixed bg-center bg-no-repeat text-white "}>
+			<body>
 
-				<div className="m-auto max-w-7xl">
+				<div id="div">
 					{children}
 				</div>
 

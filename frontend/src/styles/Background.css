@@ -6,6 +6,11 @@ body {
 	background-repeat: no-repeat;
 }
 
+#div {
+	margin: auto;
+	max-width: 80rem;
+}
+
 :root {
 	--color1: 146, 71, 212;
 	--color2: 153, 21, 21;
