@@ -1,31 +1,22 @@
-"use strict"
+import type { Metadata } from "next";
 
-import { Metadata } from "next"
-import { Ubuntu } from "next/font/google"
-
-import "tailwindcss/tailwind.css"
 import "@/styles/Background.css"
-
-const ubu = Ubuntu ({
-	subsets: ["latin"],
-	weight: "500",
-})
 
 export const metadata: Metadata = {
 	title: "ft_transcendence",
-	description: "a 42 project",
-}
+	description: "Our final project",
+};
 
 function RootLayout({
 	children,
 }: {
-	children: React.ReactNode
+	children: React.ReactNode;
 }): React.JSX.Element {
 	return (
 		<html lang="en">
 			<head>
 			</head>
-			<body className={ "bg-[url('/bg.png')] bg-cover bg-fixed bg-center bg-no-repeat text-white " + ubu.className }>
+			<body className={ "bg-[url('/bg.png')] bg-cover bg-fixed bg-center bg-no-repeat text-white "}>
 
 				<div className="m-auto max-w-7xl">
 					{children}

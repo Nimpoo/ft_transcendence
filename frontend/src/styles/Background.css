@@ -1,3 +1,11 @@
+body {
+	background-image: url('/bg.png');
+	background-size: cover;
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
 :root {
 	--color1: 146, 71, 212;
 	--color2: 153, 21, 21;
