@@ -1,0 +1,42 @@
+button {
+	padding: 0;
+	margin: 0rem 0.425rem 0rem 0.425rem;
+}
+
+a {
+	text-decoration: none;
+}
+
+h1 {
+	margin: 0;
+}
+
+header {
+	display: flex;
+
+	height: 5rem;
+	background-color: rgba(10, 10, 10, 0.08);
+	margin-top: 2.75rem;
+	margin-bottom: 2.75rem;
+	align-items: center;
+	justify-content: center;
+}
+
+.title {
+	font-size: 3.75rem;
+	line-height: 1;
+	color: white;
+	text-align: center;
+	filter: drop-shadow(4px 3px 1px rgba(0,0,0,0.25))
+}
+
+.mugiwara {
+	background: none;
+	border: none;
+	filter: drop-shadow(4px 4px 2px rgba(0,0,0,0.25));
+}
+
+.luffy-zoro {
+	height: auto;
+	width: auto;
+}

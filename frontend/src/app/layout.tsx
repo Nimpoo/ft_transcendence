@@ -1,16 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata } from "next"
+import { Ubuntu } from "next/font/google"
 
 import "@/styles/Background.css"
+
+const ubu = Ubuntu ({
+	subsets: ["latin"],
+	weight: "500",
+})
 
 export const metadata: Metadata = {
 	title: "ft_transcendence",
 	description: "Our final project",
-};
+}
 
 function RootLayout({
 	children,
 }: {
-	children: React.ReactNode;
+	children: React.ReactNode
 }): React.JSX.Element {
 	return (
 		<html lang="en">
@@ -18,7 +24,7 @@ function RootLayout({
 			</head>
 			<body>
 
-				<div id="div">
+				<div id="div" className={ubu.className}>
 					{children}
 				</div>
 
