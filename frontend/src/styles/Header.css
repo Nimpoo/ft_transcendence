@@ -27,7 +27,7 @@ header {
 	line-height: 1;
 	color: white;
 	text-align: center;
-	filter: drop-shadow(4px 3px 1px rgba(0,0,0,0.25))
+	filter: drop-shadow(4px 3px 1px rgba(0,0,0,0.25));
 }
 
 .mugiwara {
