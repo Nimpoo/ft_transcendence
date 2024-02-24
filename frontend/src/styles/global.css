@@ -7,8 +7,16 @@ p {
 	margin-bottom: 0rem;
 }
 
-.space-between-btn > *:not(:first-child) {
-    margin-top: 1rem;
+.spaceY-between-btn-4 > *:not(:first-child) {
+	margin-top: 1rem;
+}
+
+.spaceY-between-btn-3 > *:not(:first-child) {
+	margin-top: 0.75rem;
+}
+
+.spaceX-between-btn-2 > *:not(:last-child) {
+	margin-right: 0.5rem;
 }
 
 .button-selector {
@@ -18,8 +26,8 @@ p {
 	align-items: center;
 	border-radius: 0.5rem;
 	transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
 	background-color: transparent;
 }
 
@@ -36,6 +44,33 @@ p {
 
 	text-align: center;
 	font-size: 1.125rem;
-    line-height: 1.75rem;
+	line-height: 1.75rem;
 	color: white;
+}
+
+.big-button {
+	width: 20rem;
+	height: 175px;
+
+	border-radius: 1.5rem;
+	border: none;
+
+	color: transparent;
+	font-size: 6rem;
+	line-height: 1;
+
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+
+	background-color: rgb(217 217 217 / 0.1);
+	box-shadow: 5px 5px 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.big-button:hover {
+	background-color: rgb(217 217 217 / 0.3);
+}
+
+.big-button:active {
+	background-color: rgb(217 217 217 / 0.6);
 }

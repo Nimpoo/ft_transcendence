@@ -29,9 +29,9 @@ function Header(): React.JSX.Element {
 			height={400}
 			alt="Louis Sylvestre"
 		/>
-		<div className="modal-info-wrapper space-between-btn">
+		<div className="modal-info-wrapper spaceY-between-btn-4">
 			<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", textAlign: "center"}}>Louis Sylvestre</h1>
-			<div className="space-between-btn">
+			<div className="spaceY-between-btn-4">
 				<Link
 					target="_blank"
 					href="https://www.linkedin.com/in/louis-sylvestre-093264280/"
@@ -88,9 +88,9 @@ function Header(): React.JSX.Element {
 			height={400}
 			alt="Justine Munoz"
 		/>
-		<div className="modal-info-wrapper space-between-btn">
+		<div className="modal-info-wrapper spaceY-between-btn-4">
 			<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", textAlign: "center"}}>Justine Munoz</h1>
-			<div className="space-between-btn">
+			<div className="spaceY-between-btn-4">
 				<Link
 					target="_blank"
 					href="https://fr.wikipedia.org/wiki/Arctic_Monkeys"
@@ -147,9 +147,9 @@ function Header(): React.JSX.Element {
 			height={400}
 			alt="Noah Alexandre"
 		/>
-		<div className="modal-info-wrapper space-between-btn">
+		<div className="modal-info-wrapper spaceY-between-btn-4">
 			<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", textAlign: "center"}}>Noah Alexandre</h1>
-			<div className="space-between-btn">
+			<div className="spaceY-between-btn-4">
 				<Link
 					target="_blank"
 					href="https://linkedin.com/in/noahalexandre"
@@ -206,9 +206,9 @@ function Header(): React.JSX.Element {
 			height={400}
 			alt="Marwan Ayoub"
 		/>
-		<div className="modal-info-wrapper space-between-btn">
+		<div className="modal-info-wrapper spaceY-between-btn-4">
 			<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", textAlign: "center"}}>Marwan Ayoub</h1>
-			<div className="space-between-btn">
+			<div className="spaceY-between-btn-4">
 				<Link
 					target="_blank"
 					href="https://www.linkedin.com/in/mar-ayb/"
