@@ -17,6 +17,15 @@
 	height: 100%;
 }
 
+.pseudo-trophy-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	flex-grow: 1;
+
+	overflow: hidden;
+}
+
 .history-bento {
 	display: flex;
 	flex-direction: column;
@@ -67,7 +76,19 @@
 }
 
 .rank {
-	position: relative;
+	position: absolute;
 
+	bottom: -0.25rem;
+	right: -0.25rem;
+}
 
+.trophies {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	flex-grow: 1;
+
+	align-items: center;
+	font-size: 1.25rem;
+	line-height: 1.75rem;
 }

@@ -74,3 +74,9 @@ p {
 .big-button:active {
 	background-color: rgb(217 217 217 / 0.6);
 }
+
+.truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
