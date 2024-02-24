@@ -3,6 +3,7 @@
 import { ModalProvider } from "@/providers/Modal"
 
 import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 
 function Template({
 	children,
@@ -13,6 +14,7 @@ function Template({
 		<ModalProvider>
 			<Header />
 			{children}
+			<Footer />
 		</ModalProvider>
 	)
 }

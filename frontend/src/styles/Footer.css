@@ -1,0 +1,38 @@
+.footer-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 1rem;
+    opacity: 0.66;
+}
+
+.footer-wrapper .link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 1.5rem;
+    transition: transform 300ms;
+	color: white;
+}
+
+.footer-wrapper .link:last-child {
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+}
+
+.footer-wrapper .link:hover {
+    transform: scale(1.10);
+}
+
+.footer-wrapper .link:active {
+    transform: scale(1.05);
+}
+
+.footer-wrapper .image {
+    margin-right: 0.5rem;
+    transition: transform 1s;
+}
+
+.footer-wrapper .link:hover .image {
+    transform: rotate(360deg);
+}
