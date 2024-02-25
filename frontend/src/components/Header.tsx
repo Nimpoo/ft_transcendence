@@ -84,8 +84,8 @@ function Header(): React.JSX.Element {
 	<div className="modal-wrapper-lg">
 		<Image className="modal-pfp"
 			src={"/assets_bogoss/Justine.jpg"}
-			width={400}
-			height={400}
+			width={250}
+			height={250}
 			alt="Justine Munoz"
 		/>
 		<div className="modal-info-wrapper spaceY-between-btn-4">
@@ -143,8 +143,8 @@ function Header(): React.JSX.Element {
 	<div className="modal-wrapper-lg">
 		<Image className="modal-pfp"
 			src={"/assets_bogoss/NBG.jpg"}
-			width={400}
-			height={400}
+			width={250}
+			height={250}
 			alt="Noah Alexandre"
 		/>
 		<div className="modal-info-wrapper spaceY-between-btn-4">
