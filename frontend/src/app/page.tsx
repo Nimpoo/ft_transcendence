@@ -37,7 +37,7 @@ function Home(): React.JSX.Element {
 					<div className="profile-bento spaceX-between-btn-2">
 						<div className="pfp-ranking">
 							<Link href="/profile">
-								<Image className="pfp"
+								<Image className="pfp" priority
 									src={"https://thispersondoesnotexist.com"}
 									width={70}
 									height={70}

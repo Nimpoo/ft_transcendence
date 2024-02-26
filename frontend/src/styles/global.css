@@ -2,9 +2,33 @@ body {
 	color: white;
 }
 
+button {
+	padding: 0;
+	margin: 0rem 0.425rem 0rem 0.425rem;
+}
+
+h1 {
+	margin: 0;
+}
+
+header {
+	display: flex;
+
+	height: 5rem;
+	background-color: rgba(10, 10, 10, 0.08);
+	margin-top: 2.75rem;
+	margin-bottom: 2.75rem;
+	align-items: center;
+	justify-content: center;
+}
+
 p {
 	margin-top: 0rem;
 	margin-bottom: 0rem;
+}
+
+a {
+	text-decoration: none;
 }
 
 .spaceY-between-btn-4 > *:not(:first-child) {
