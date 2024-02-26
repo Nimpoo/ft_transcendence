@@ -1,0 +1,14 @@
+.custom-font-size {
+    font-size: 130px;
+}
+
+.btn-with-logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}

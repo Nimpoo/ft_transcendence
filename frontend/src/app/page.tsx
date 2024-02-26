@@ -10,13 +10,14 @@ import "bootstrap/dist/css/bootstrap.css"
 import "@/styles/global.css"
 import "@/styles/Homepage.css"
 import "@/styles/Rainbow.css"
+import "@/styles/Text.css"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
 })
 
-const session = 1 //! 1 for CONNECTED, 0 for NOT CONNECTED (placeholder for waiting the authentification)
+const session = 0 //! 1 for CONNECTED, 0 for NOT CONNECTED (placeholder for waiting the authentification)
 
 function Home(): React.JSX.Element {
 
@@ -79,7 +80,20 @@ function Home(): React.JSX.Element {
 	{/* ------------------------ NOT CONNECTED ------------------------- */}
 	return (
 		<main>
-			not connected
+			<div className="container-fluid">
+				<div className="row">
+					<div className="col-9 mt-lg-5">
+						<h1 className="fw-bold custom-font-size text-light">Welcome</h1>
+						<h1 className="fw-bold custom-font-size text-light">to our</h1>
+						<h1 className="fw-bold custom-font-size text-light">Final Project.</h1>
+					</div>
+					<div className="col-3 align-items-center align-self-center mt-5">
+						<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
+							<img src="./svg/42-school_logo.svg" alt="Logo" className="logo" />Continue with 42
+						</button>
+					</div>
+				</div>
+			</div>
 		</main>
 	)
 	{/* ---------------------------------------------------------------- */}
