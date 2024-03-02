@@ -7,13 +7,8 @@ def random_username():
 
 class User(models.Model):
   nickname = models.CharField(max_length=30, default=random_username)
-
-  fortytwo_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
-  github_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
-  discord_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
-
-  dfa_secret = models.CharField(max_length=50, blank=True, null=True)
-
+  fortytwo_id = models.IntegerField(unique=True)
+  dfa_secret = models.CharField(max_length=50, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
 
   def __str__(self):

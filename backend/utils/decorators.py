@@ -1,8 +1,10 @@
 from django.http import HttpRequest, JsonResponse
+from django.shortcuts import get_object_or_404
 
 import jwt
 
 from backend import settings
+from users.models import User
 
 
 def jwt_verify(view):
@@ -16,7 +18,7 @@ def jwt_verify(view):
     print('Authorization:', token_type, token)
 
     try:
-      payload = jwt.decode(token, settings.JWT_SECRET, algorithms=['HS256'])
+      payload = jwt.decode(token, settings.JWT_SECRET, algorithms=['HS256'], verify=True)
     except jwt.PyJWTError:
       return JsonResponse({ 'error': 'Invalid JWT', 'message': 'The provided JWT is not valid.' }, status=401)
 
@@ -25,12 +27,9 @@ def jwt_verify(view):
 
   return wrapper
 
-def apiKey_verify(view):
+def need_user(view):
+  @jwt_verify
   def wrapper(request: HttpRequest, *args, **kwargs):
-    api_key = request.headers.get('X-API-KEY')
-    print('X-API-KEY:', api_key)
-    if api_key != settings.API_KEY:
-      return JsonResponse({ 'error': 'Invalid API key', 'message': 'The provided API key is not valid.' }, status=401)
-    return view(request, *args, **kwargs)
+    return view(request, get_object_or_404(User, pk=request.payload.get('id')), *args, **kwargs)
 
   return wrapper

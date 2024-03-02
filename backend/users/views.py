@@ -1,19 +1,16 @@
 from django.forms import model_to_dict
 from django.http import HttpRequest, JsonResponse
-from django.utils.decorators import method_decorator
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_GET
 from django.views import View
 
 import requests
+import json
+import jwt
 
+from backend import settings
 from users.models import User
-from utils.decorators import apiKey_verify, jwt_verify
 
-
-PROVIDER_URLS = {
-  'fortytwo': 'https://api.intra.42.fr/v2/me',
-  'github': 'https://api.github.com/user',
-  'discord': 'https://discord.com/api/users/@me',
-}
 
 class Index(View):
 
@@ -24,20 +21,23 @@ class Index(View):
     # todo: add more params like: sort, range, filter
     return JsonResponse(list(User.objects.values())[page*page_size:page*page_size+page_size], safe=False)
 
-  @method_decorator((apiKey_verify, jwt_verify), name='dispatch')
   def post(self, request: HttpRequest): # Create user
-    token, provider, provider_id = request.payload.get('token'), request.payload.get('provider'), request.payload.get('providerId')
-    print({'provider':provider, 'provider_id': provider_id})
+    if len(request.body) == 0:
+      return JsonResponse({'error': 'Bad Request', 'message': 'Missing body.'}, status=400)
 
-    if None in [token, provider, provider_id]:
+    try:
+      body_payload = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+      return JsonResponse({'error': 'Bad Request', 'message': 'Body must be JSON.'}, status=400)
+
+    token = body_payload.get('token')
+
+    if token is None:
       return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
 
-    provider_url = PROVIDER_URLS.get(provider)
-    if not provider_url:
-      return JsonResponse({'error': 'Forbidden', 'message': 'The given provider is not valid.'}, status=403)
-
-    response = requests.get(provider_url, headers={'Authorization': f'Bearer {token}'})
+    response = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {token}'})
     if response.status_code != 200:
+      print({ 'status': response.status_code, "token": token })
       return JsonResponse({'error': 'Forbidden', 'message': 'The given token is not valid.'}, status=403)
 
     try:
@@ -45,13 +45,15 @@ class Index(View):
     except ValueError:
       return JsonResponse({'error': 'Gone', 'message': 'Something went wrong, try again later.'}, status=410)
 
-    if str(data.get('id')) != provider_id:
-      return JsonResponse({'error': 'Forbidden', 'message': 'Given ID not valid.'}, status=403)
+    fortytwo_id = data.get('id')
+    if fortytwo_id is None:
+      return JsonResponse({'error': 'WTF??', 'message': 'no id were given in fortytwo response'}, status=403)
 
-    try:
-      user = User.objects.get(**{f'{provider}_id': provider_id})
-    except User.DoesNotExist:
-      user = User(**{f'{provider}_id': provider_id})
-      user.save()
+    user, create = User.objects.get_or_create(fortytwo_id=fortytwo_id)
 
-    return JsonResponse(model_to_dict(user))
+    return JsonResponse({'access_token': jwt.encode(model_to_dict(user, exclude=['friends', 'blocked']), settings.JWT_SECRET)})
+
+@require_GET
+def get_user(request: HttpRequest, user_id: int) -> JsonResponse:
+  user = get_object_or_404(User, pk=user_id)
+  return JsonResponse(model_to_dict(user))

@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-uarg)$h98*zy5c_%68q38u@!7nde$@b#*kn926jg90*ye9v@&r'
+SECRET_KEY = 'ueiLjOp3qsjEIbSg6YWphGnmh8g0lFNp0pDHxMoYJRKgB8xi88QUTUPBMNCsjzWzaUmz9x2xIzk1tEZdHzk6kg=='
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -30,11 +30,10 @@ ALLOWED_HOSTS = [
     '*'
 ]
 
+JWT_SECRET: str = os.environ.get('JWT_SECRET')
 
-ADMIN_URI = os.environ.get('ADMIN_URI', 'admin/')
-
-JWT_SECRET = os.environ.get('JWT_SECRET', '')
-API_KEY = os.environ.get('API_KEY', '')
+if JWT_SECRET is None:
+    raise "no jwt secret"
 
 # Application definition
 
