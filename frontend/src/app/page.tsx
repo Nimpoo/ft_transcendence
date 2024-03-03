@@ -89,7 +89,13 @@ function Home(): React.JSX.Element {
 					</div>
 					<div className="col-3 align-items-center align-self-center mt-5">
 						<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
-							<img src="./svg/42-school_logo.svg" alt="Logo" className="logo" />Continue with 42
+							<Image className="logo"
+								src="./svg/42-school_logo.svg"
+								width={24}
+								height={24}
+								alt="42's Logo"
+							/>
+							Continue with 42
 						</button>
 					</div>
 				</div>
