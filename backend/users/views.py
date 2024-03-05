@@ -10,6 +10,8 @@ import jwt
 
 from backend import settings
 from users.models import User
+from utils.decorators import need_user
+from random_username.generate import generate_username
 
 
 class Index(View):
@@ -49,11 +51,16 @@ class Index(View):
     if fortytwo_id is None:
       return JsonResponse({'error': 'WTF??', 'message': 'no id were given in fortytwo response'}, status=403)
 
-    user, create = User.objects.get_or_create(fortytwo_id=fortytwo_id)
+    user, create = User.objects.get_or_create(nickname=data.get('login') or generate_username()[0], fortytwo_id=fortytwo_id)
 
     return JsonResponse({'access_token': jwt.encode(model_to_dict(user, exclude=['friends', 'blocked']), settings.JWT_SECRET)})
 
 @require_GET
 def get_user(request: HttpRequest, user_id: int) -> JsonResponse:
   user = get_object_or_404(User, pk=user_id)
+  return JsonResponse(model_to_dict(user))
+
+@require_GET
+@need_user
+def me(request: HttpRequest, user: User) -> JsonResponse:
   return JsonResponse(model_to_dict(user))

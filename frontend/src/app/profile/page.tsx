@@ -3,11 +3,28 @@
 import Image from "next/image"
 import CountUp from "react-countup"
 
-import "bootstrap/dist/css/bootstrap.css"
 import "@/styles/global.css"
 import "@/styles/profile/Profile.css"
+import { useSession } from "@/providers/Session"
+import { useRouter } from "next/navigation"
+import toast from "react-hot-toast"
+import { useEffect } from "react"
 
 function Profile(): React.JSX.Element {
+	const router = useRouter()
+	const { session, status } = useSession()
+
+	useEffect(() => {
+		if (status == "disconnected") {
+			toast.error("You are not connected")
+			router.push("/")
+		}
+	}, [router, status])
+
+	if (session == null || status != "connected") {
+		return <></> // todo loading
+	}
+
 	return (
 		<main className="profilepage-wrapper">
 			<div className="pfp-stats-wrapper">
@@ -20,7 +37,7 @@ function Profile(): React.JSX.Element {
 							height={200}
 							alt="Your profile picture"
 						/>
-						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>Nimpô</h1>
+						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>{session.nickname}</h1>
 					</div>
 				</div>
 

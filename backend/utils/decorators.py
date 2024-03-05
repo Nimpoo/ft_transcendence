@@ -15,7 +15,6 @@ def jwt_verify(view):
       return JsonResponse({ 'error': 'Unauthorized', 'message': 'Authorization header is missing.' }, status=401)
 
     token_type, token = authorization.split()
-    print('Authorization:', token_type, token)
 
     try:
       payload = jwt.decode(token, settings.JWT_SECRET, algorithms=['HS256'], verify=True)

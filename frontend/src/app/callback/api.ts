@@ -16,6 +16,10 @@ async function getAccessToken(code: string): Promise<string> {
 		},
 	)
 
+	if (response.status != 200) {
+		throw new Error(`api.intra.42.fr returned ${response.status}`)
+	}
+
 	const data = await response.json()
 	const token = data["access_token"]
 

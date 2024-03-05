@@ -6,23 +6,24 @@ import Link from "next/link"
 import Image from "next/image"
 import CountUp from "react-countup"
 
-import "bootstrap/dist/css/bootstrap.css"
 import "@/styles/global.css"
 import "@/styles/Homepage.css"
 import "@/styles/Rainbow.css"
 import "@/styles/Text.css"
+import { useSession } from "@/providers/Session"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
 })
 
-const session = 0 //! 1 for CONNECTED, 0 for NOT CONNECTED (placeholder for waiting the authentification)
-
 function Home(): React.JSX.Element {
+	const { session, status } = useSession()
 
 	{/* --------------------------- CONNECTED -------------------------- */}
-	if (session) {
+	if (status == 'loading') {
+		return <></> // todo loading
+	} else if (status == 'connected' && session) {
 		return (
 			<main className="homepage-left-wrapper">
 
@@ -53,7 +54,7 @@ function Home(): React.JSX.Element {
 							/>
 						</div>
 						<div className="pseudo-trophy-wrapper truncate">
-							<h3 style={{fontSize: "1.5rem", lineHeight: "2rem"}}>Nimpô</h3>
+							<h3 style={{fontSize: "1.5rem", lineHeight: "2rem"}}>{session.nickname}</h3>
 							<div className="trophies">
 								<CountUp duration={5} className="truncate" style={{paddingLeft: "0.5rem", paddingRight: "0.5rem"}} end={0} />
 								<Image
@@ -88,15 +89,17 @@ function Home(): React.JSX.Element {
 						<h1 className="fw-bold custom-font-size text-light">Final Project.</h1>
 					</div>
 					<div className="col-3 align-items-center align-self-center mt-5">
-						<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
-							<Image className="logo"
-								src="./svg/42-school_logo.svg"
-								width={24}
-								height={24}
-								alt="42's Logo"
-							/>
-							Continue with 42
-						</button>
+						<Link href={`https://api.intra.42.fr/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI as string)}&response_type=code`}>
+    						<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
+	    						<Image className="logo"
+		    						src="/svg/42-school_logo.svg"
+			    					width={24}
+				    				height={24}
+								    alt="42's Logo"
+							    />
+						    	Continue with 42
+                            </button>
+						</Link>
 					</div>
 				</div>
 			</div>
