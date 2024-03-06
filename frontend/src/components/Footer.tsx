@@ -4,15 +4,25 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { useModal } from "@/providers/Modal"
+import { useSession } from "@/providers/Session"
+import { useCookies } from "react-cookie"
 
 import "@/styles/global.css"
 import "@/styles/Footer.css"
 import "@/styles/Settings.css"
-import {JSX } from "react"
+import toast from "react-hot-toast"
 
 function Footer(): React.JSX.Element | null {
+	const { session, status } = useSession()
+	const [cookies, setCookie, removeCookie] = useCookies(["session"])
 
-	const { createModal } = useModal();
+	const { createModal, clearModal } = useModal()
+
+	function play(value: "mario") {
+		let audioObject:HTMLAudioElement = new Audio(`sound/${value}.wav`)
+		audioObject.volume = 0.3
+		audioObject.autoplay = true
+	}
 
 	const settingsModal =
 	<div className="modal-wrapper">
@@ -88,14 +98,14 @@ function Footer(): React.JSX.Element | null {
 				<button type="button" className="btn btn-success btn-size">Change pseudo</button>
 			</li>
 		</ul>
-		<div className="justify-content-center d-flex align-items-center">
+		<div onClick={() => {removeCookie("session"); clearModal(); toast("See you soon", {icon:"👋"}); play("mario")}} className="justify-content-center d-flex align-items-center">
 			<button type="button" className="btn btn-danger">Log out</button>
 		</div>
 	</div>
 
-	const session = 1 //! 1 for CONNECTED, 0 for NOT CONNECTED (placeholder for waiting the authentification)
-
-	if (session) {
+if (status === "loading") {
+	return <></> // todo loading
+} else if (status === "connected" && session) {
 		return (
 			<footer className="footer-wrapper">
 				<Link href="/chat" className="link">
@@ -108,7 +118,7 @@ function Footer(): React.JSX.Element | null {
 					Chat
 				</Link>
 
-				<button className="btn shadow-none" onClick={() => { createModal(settingsModal, 500, 400); } }>
+				<button className="btn shadow-none" onClick={() => { createModal(settingsModal, 500, 400) } }>
 					<Link href="" className="link">
 						<Image className="image"
 							src={"/svg/settings.svg"}

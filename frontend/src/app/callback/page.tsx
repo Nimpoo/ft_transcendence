@@ -9,7 +9,7 @@ import toast from "react-hot-toast"
 function Callback(): React.JSX.Element {
 	const searchParams = useSearchParams()
 	const router = useRouter()
-	const [cookies, setCookie] = useCookies(['session'])
+	const [cookies, setCookie] = useCookies(["session"])
 
 	useEffect(() => {
 		const code = searchParams.get("code")
