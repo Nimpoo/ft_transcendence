@@ -69,45 +69,52 @@ function Footer(): React.JSX.Element | null {
 				</div>
 			</li>
 		</ul>
-		<ul style={{justifyContent: "space-between", display: "flex"}} className="list-inline">
-			<div className="d-flex align-items-center">
-				<li className="list-inline-item">
-					<Image className="modal-icon"
-						src={"/svg/2fa-setting.svg"}
-						width={30}
-						height={30}
-						alt="2fa">
-					</Image>
-				</li>
-				<li className="list-inline-item">Two factor authentication</li>
-			</div>
-			<li className="list-inline-item">
-				<div className="btn-group" role="group">
-					<input type="radio" className="btn-check" name="options-outlined" id="success-outlined" autoComplete="on"></input>
-					<label className="btn btn-outline-success" htmlFor="success-outlined">ON</label>
-					<input type="radio" className="btn-check" name="options-outlined" id="danger-outlined" autoComplete="on"></input>
-					<label className="btn btn-outline-danger" htmlFor="danger-outlined">OFF</label>
+		{ session &&
+			<div>
+				<ul style={{justifyContent: "space-between", display: "flex"}} className="list-inline">
+					<div className="d-flex align-items-center">
+						<li className="list-inline-item">
+							<Image className="modal-icon"
+								src={"/svg/2fa-setting.svg"}
+								width={30}
+								height={30}
+								alt="2fa">
+							</Image>
+						</li>
+						<li className="list-inline-item">Two factor authentication</li>
+					</div>
+					<li className="list-inline-item">
+						<div className="btn-group" role="group">
+							<input type="radio" className="btn-check" name="options-outlined" id="success-outlined" autoComplete="on"></input>
+							<label className="btn btn-outline-success" htmlFor="success-outlined">ON</label>
+							<input type="radio" className="btn-check" name="options-outlined" id="danger-outlined" autoComplete="on"></input>
+							<label className="btn btn-outline-danger" htmlFor="danger-outlined">OFF</label>
+						</div>
+					</li>
+				</ul>
+				<ul style={{justifyContent: "space-between", display: "flex"}} className="list-inline mt-4">
+					<li className="list-inline-item">
+						<button type="button" className="btn btn-primary">Change profile picture</button>
+					</li>
+					<li className="list-inline-item">
+						<button type="button" className="btn btn-success btn-size">Change pseudo</button>
+					</li>
+				</ul>
+				<div onClick={() => {removeCookie("session"); clearModal(); toast("See you soon", {icon:"👋"}); play("mario")}} className="justify-content-center d-flex align-items-center">
+					<button type="button" className="btn btn-danger">Log out</button>
 				</div>
-			</li>
-		</ul>
-		<ul style={{justifyContent: "space-between", display: "flex"}} className="list-inline mt-4">
-			<li className="list-inline-item">
-				<button type="button" className="btn btn-primary">Change profile picture</button>
-			</li>
-			<li className="list-inline-item">
-				<button type="button" className="btn btn-success btn-size">Change pseudo</button>
-			</li>
-		</ul>
-		<div onClick={() => {removeCookie("session"); clearModal(); toast("See you soon", {icon:"👋"}); play("mario")}} className="justify-content-center d-flex align-items-center">
-			<button type="button" className="btn btn-danger">Log out</button>
-		</div>
+			</div>
+		}
 	</div>
 
 if (status === "loading") {
 	return <></> // todo loading
-} else if (status === "connected" && session) {
-		return (
-			<footer className="footer-wrapper">
+} 
+
+
+	return (
+		<footer className="footer-wrapper">
+			{ session &&
 				<Link href="/chat" className="link">
 					<Image className="image"
 						src={"/svg/chat.svg"}
@@ -117,23 +124,21 @@ if (status === "loading") {
 					/>
 					Chat
 				</Link>
+			}
 
-				<button className="btn shadow-none" onClick={() => { createModal(settingsModal, 500, 400) } }>
-					<Link href="" className="link">
-						<Image className="image"
-							src={"/svg/settings.svg"}
-							width={30}
-							height={30}
-							alt="Settings"
-						/>
-						Settings
-					</Link>
-				</button>
-			</footer>
-		)
-	}
-
-	return null
+			<button className="btn shadow-none" onClick={() => { createModal(settingsModal, 500, 400) } }>
+				<Link href="" className="link">
+					<Image className="image"
+						src={"/svg/settings.svg"}
+						width={30}
+						height={30}
+						alt="Settings"
+					/>
+					Settings
+				</Link>
+			</button>
+		</footer>
+	)
 }
 
 export default Footer

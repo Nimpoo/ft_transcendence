@@ -52,11 +52,13 @@ export function SessionProvider({
 				})
 				.catch(error => {
 					setStatus('disconnected')
+					setSession(null)
 				})
 		} else {
 			setStatus('disconnected')
+			setSession(null)
 		}
-	}, [setSession, setStatus, cookies])
+	}, [cookies])
 
 	return (
 		<SessionContext.Provider value={{ session, status }}>
