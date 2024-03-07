@@ -5,8 +5,6 @@ import Link from "next/link"
 
 import { useModal } from "@/providers/Modal"
 
-import "bootstrap/dist/css/bootstrap.css"
-import "@/styles/global.css"
 import "@/styles/Header.css"
 import "@/styles/Modal.css"
 

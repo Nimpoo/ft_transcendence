@@ -2,15 +2,14 @@
 
 import Image from "next/image"
 import Link from "next/link"
-
+import toast from "react-hot-toast"
 import { useModal } from "@/providers/Modal"
 import { useSession } from "@/providers/Session"
 import { useCookies } from "react-cookie"
+import { redirect } from "next/navigation"
 
-import "@/styles/global.css"
 import "@/styles/Footer.css"
 import "@/styles/Settings.css"
-import toast from "react-hot-toast"
 
 function Footer(): React.JSX.Element | null {
 	const { session, status } = useSession()
@@ -100,7 +99,7 @@ function Footer(): React.JSX.Element | null {
 						<button type="button" className="btn btn-success btn-size">Change pseudo</button>
 					</li>
 				</ul>
-				<div onClick={() => {removeCookie("session"); clearModal(); toast("See you soon", {icon:"👋"}); play("mario")}} className="justify-content-center d-flex align-items-center">
+				<div onClick={() => {removeCookie("session"); clearModal(); toast("See you soon", {icon:"👋"}); play("mario"); redirect("/")}} className="justify-content-center d-flex align-items-center">
 					<button type="button" className="btn btn-danger">Log out</button>
 				</div>
 			</div>

@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast"
 
 import "bootstrap/dist/css/bootstrap.css"
 import "@/styles/Background.css"
+import "@/styles/global.css"
 
 import { ModalProvider } from "@/providers/Modal"
 import Header from "@/components/Header"

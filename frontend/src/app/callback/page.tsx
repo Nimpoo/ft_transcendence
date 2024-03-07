@@ -38,7 +38,13 @@ function Callback(): React.JSX.Element {
 							error: "Something went wrong, try again",
 						}
 					)
-						.then(response => response.json())
+						.then(response => {
+							if (response.status == 406) { // todo dfa handling
+								alert('dfa required.')
+							}
+
+							return response.json()
+						})
 						.then(data => {
 							setCookie(
 								'session',

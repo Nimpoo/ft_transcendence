@@ -1,12 +1,14 @@
 from django.forms import model_to_dict
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET
 from django.views import View
 
 import requests
 import json
 import jwt
+import pyotp
 
 from backend import settings
 from users.models import User
@@ -21,7 +23,7 @@ class Index(View):
     page = 0
     page_size = 5
     # todo: add more params like: sort, range, filter
-    return JsonResponse(list(User.objects.values())[page*page_size:page*page_size+page_size], safe=False)
+    return JsonResponse(list(User.objects.values('id', 'nickname', 'created_at'))[page*page_size:page*page_size+page_size], safe=False)
 
   def post(self, request: HttpRequest): # Create user
     if len(request.body) == 0:
@@ -53,14 +55,50 @@ class Index(View):
 
     user, create = User.objects.get_or_create(nickname=data.get('login') or generate_username()[0], fortytwo_id=fortytwo_id)
 
-    return JsonResponse({'access_token': jwt.encode(model_to_dict(user, exclude=['friends', 'blocked']), settings.JWT_SECRET)})
+    if user.dfa_secret is not None:
+      dfa = body_payload.get('dfa')
+      if dfa is None:
+        return JsonResponse({'error': 'dfa', 'message': 'DFA required for this account.'}, status=406)
+
+      if not pyotp.TOTP(user.dfa_secret).verify(dfa):
+        return JsonResponse({'error': 'dfa', 'message': 'Digits not correct.'}, status=401)
+
+    return JsonResponse({'access_token': jwt.encode(model_to_dict(user, exclude=['friends', 'blocked', 'dfa_secret']), settings.JWT_SECRET)})
 
 @require_GET
 def get_user(request: HttpRequest, user_id: int) -> JsonResponse:
   user = get_object_or_404(User, pk=user_id)
-  return JsonResponse(model_to_dict(user))
+  return JsonResponse(model_to_dict(user, exclude=['dfa_secret']))
 
 @require_GET
 @need_user
 def me(request: HttpRequest, user: User) -> JsonResponse:
-  return JsonResponse(model_to_dict(user))
+  return JsonResponse(model_to_dict(user, exclude=['dfa_secret']))
+
+class DFA(View):
+
+  @method_decorator((need_user), name='dispatch')
+  def get(self, request: HttpRequest, user: User) -> JsonResponse: # todo return qr code
+    return JsonResponse({'coucou': 'ethienne'})
+
+  @method_decorator((need_user), name='dispatch')
+  def post(self, request: HttpRequest, user: User) -> JsonResponse:
+
+    if user.dfa_secret is not None:
+      return JsonResponse({'error': 'Forbidden', 'message': 'You have already enabled dfa.'}, status=403)
+
+    user.dfa_secret = pyotp.random_base32()
+    user.save()
+
+    return JsonResponse({'message': 'dfa enabled'})
+
+  @method_decorator((need_user), name='dispatch')
+  def delete(self, request: HttpRequest, user: User) -> JsonResponse:
+
+    if user.dfa_secret is None:
+      return JsonResponse({'error': 'Forbidden', 'message': 'You have already disabled dfa.'}, status=403)
+
+    user.dfa_secret = None
+    user.save()
+
+    return JsonResponse({'message': 'dfa disabled'})

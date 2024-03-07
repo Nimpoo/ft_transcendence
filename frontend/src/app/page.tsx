@@ -6,7 +6,6 @@ import Link from "next/link"
 import Image from "next/image"
 import CountUp from "react-countup"
 
-import "@/styles/global.css"
 import "@/styles/Homepage.css"
 import "@/styles/Rainbow.css"
 import "@/styles/Text.css"

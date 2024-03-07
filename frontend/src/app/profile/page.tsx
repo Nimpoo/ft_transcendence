@@ -3,7 +3,6 @@
 import Image from "next/image"
 import CountUp from "react-countup"
 
-import "@/styles/global.css"
 import "@/styles/profile/Profile.css"
 import { useSession } from "@/providers/Session"
 import { useRouter } from "next/navigation"

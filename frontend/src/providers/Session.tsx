@@ -2,20 +2,21 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useCookies } from "react-cookie"
+import toast from "react-hot-toast"
 
 interface Session {
 	id: number,
 	nickname: string,
 }
 
-type Status = 'loading'|'connected'|'disconnected'
+type Status = "loading"|"connected"|"disconnected"
 
 const SessionContext = createContext<{
 	session: Session|null,
 	status: Status
 }>({
 	session: null,
-	status: 'loading'
+	status: "loading"
 })
 
 export function useSession() {
@@ -28,37 +29,53 @@ export function SessionProvider({
 	children: React.ReactNode,
 }): React.JSX.Element {
 	const [session, setSession] = useState<Session|null>(null)
-	const [status, setStatus] = useState<Status>('loading')
-	const [cookies] = useCookies(["session"])
+	const [status, setStatus] = useState<Status>("loading")
+	const [cookies, setCookie, removeCookie] = useCookies(["session"])
 
 	useEffect(() => {
-		if (cookies.session) {
-			fetch(
-				'/api/users/me',
-				{
-					headers: {
-						Authorization: `Bearer ${cookies.session}`
+
+		const handleFetch = async () => {
+
+			const response = await toast.promise(
+				fetch(
+					"/api/users/me",
+					{
+						headers: {
+							Authorization: `Bearer ${cookies.session}`
+						}
 					}
+				),
+				{
+					loading: "fetching /api/users/me",
+					success: "/api/users/me fetched",
+					error: "unable to fetch /api/users/me"
 				}
 			)
-				.then(response => {
-					if (response.status != 200)
-						throw new Error(`/api/users/me returned ${response.status}`)
-					return response.json()
-				})
-				.then((data: Session) => {
-					setSession(data)
-					setStatus('connected')
-				})
-				.catch(error => {
-					setStatus('disconnected')
-					setSession(null)
-				})
+
+			if (response.status != 200) {
+				toast.error("Invalid session token")
+				removeCookie("session")
+				setStatus("disconnected")
+				setSession(null)
+			}
+
+			else {
+				const data: Session = await response.json()
+				
+				setStatus("connected")
+				setSession(data)
+			}
+
+		}
+
+		if (cookies.session) {
+			handleFetch()
 		} else {
-			setStatus('disconnected')
+			setStatus("disconnected")
 			setSession(null)
 		}
-	}, [cookies])
+
+	}, [cookies, removeCookie])
 
 	return (
 		<SessionContext.Provider value={{ session, status }}>
