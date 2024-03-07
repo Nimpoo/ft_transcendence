@@ -99,8 +99,16 @@ function Footer(): React.JSX.Element | null {
 						<button type="button" className="btn btn-success btn-size">Change pseudo</button>
 					</li>
 				</ul>
-				<div onClick={() => {removeCookie("session"); clearModal(); toast("See you soon", {icon:"👋"}); play("mario"); redirect("/")}} className="justify-content-center d-flex align-items-center">
-					<button type="button" className="btn btn-danger">Log out</button>
+				<div className="justify-content-center d-flex align-items-center">
+					<button type="button" className="btn btn-danger"
+							onClick={() => {
+								removeCookie("session");
+								clearModal();
+								toast("See you soon", {icon:"👋"});
+								play("mario");
+								redirect("/")
+							}}
+						>Log out</button>
 				</div>
 			</div>
 		}
