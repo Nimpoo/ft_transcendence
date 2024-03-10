@@ -5,7 +5,7 @@ import React from "react"
 import { useState, useEffect } from "react"
 
 import "bootstrap/dist/css/bootstrap.css"
-import "@/styles/Modal.css"
+import "@/styles/components/Modal.css"
 
 function Modal({
 	closeModal,

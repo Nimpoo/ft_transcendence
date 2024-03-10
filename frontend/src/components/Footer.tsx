@@ -6,9 +6,8 @@ import Link from "next/link"
 import { useModal } from "@/providers/Modal"
 
 import "@/styles/global.css"
-import "@/styles/Footer.css"
-import "@/styles/Settings.css"
-import {JSX } from "react"
+import "@/styles/components/Footer/Footer.css"
+import "@/styles/components/Footer/Settings.css"
 
 function Footer(): React.JSX.Element | null {
 

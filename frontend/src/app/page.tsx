@@ -45,8 +45,8 @@ function Home(): React.JSX.Element {
 									alt="Your Profile Picture">
 								</Image>
 							</Link>
-							<Image className="rank"
-								src={"/assets_ranking/challenger_1.png"}
+							<Image priority className="rank"
+								src={"/assets/ranking/challenger_1.png"}
 								width={31}
 								height={31}
 								alt="Challenger 1"
@@ -56,8 +56,8 @@ function Home(): React.JSX.Element {
 							<h3 style={{fontSize: "1.5rem", lineHeight: "2rem"}}>Nimpô</h3>
 							<div className="trophies">
 								<CountUp duration={5} className="truncate" style={{paddingLeft: "0.5rem", paddingRight: "0.5rem"}} end={0} />
-								<Image
-									src={"/assets_ranking/trophy.png"}
+								<Image priority
+									src={"/assets/ranking/trophy.png"}
 									width={35}
 									height={35}
 									alt="Trophy"
@@ -96,6 +96,9 @@ function Home(): React.JSX.Element {
 								alt="42's Logo"
 							/>
 							Continue with 42
+						</button>
+						<button className={ "big-button " + ubu.className }>
+							<span className="stroke rainbow-text text-xl">PLAY</span>
 						</button>
 					</div>
 				</div>
