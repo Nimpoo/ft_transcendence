@@ -6,18 +6,16 @@ import Link from "next/link"
 import Image from "next/image"
 import CountUp from "react-countup"
 
-import "bootstrap/dist/css/bootstrap.css"
-import "@/styles/global.css"
 import "@/styles/Homepage.css"
-import "@/styles/Rainbow.css"
 import "@/styles/Text.css"
+import "@/styles/Rainbow.css"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
 })
 
-const session = 0 //! 1 for CONNECTED, 0 for NOT CONNECTED (placeholder for waiting the authentification)
+const session = 1 //! 1 for CONNECTED, 0 for NOT CONNECTED (placeholder for waiting the authentification)
 
 function Home(): React.JSX.Element {
 

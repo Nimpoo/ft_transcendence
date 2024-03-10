@@ -5,10 +5,7 @@ import Link from "next/link"
 
 import { useModal } from "@/providers/Modal"
 
-import "bootstrap/dist/css/bootstrap.css"
-import "@/styles/global.css"
 import "@/styles/components/Header.css"
-import "@/styles/components/Modal.css"
 
 function Header(): React.JSX.Element {
 

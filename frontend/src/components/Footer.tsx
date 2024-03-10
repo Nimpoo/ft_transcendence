@@ -5,7 +5,6 @@ import Link from "next/link"
 
 import { useModal } from "@/providers/Modal"
 
-import "@/styles/global.css"
 import "@/styles/components/Footer/Footer.css"
 import "@/styles/components/Footer/Settings.css"
 

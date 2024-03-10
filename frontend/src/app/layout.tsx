@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { Ubuntu } from "next/font/google"
 
+import "bootstrap/dist/css/bootstrap.css"
+import "@/styles/global.css"
 import "@/styles/Background.css"
 
 const ubu = Ubuntu ({

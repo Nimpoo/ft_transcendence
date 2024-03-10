@@ -3,8 +3,6 @@
 import Image from "next/image"
 import CountUp from "react-countup"
 
-import "bootstrap/dist/css/bootstrap.css"
-import "@/styles/global.css"
 import "@/styles/profile/Profile.css"
 
 function Profile(): React.JSX.Element {
