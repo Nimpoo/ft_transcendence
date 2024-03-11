@@ -2,23 +2,42 @@
 
 import Image from "next/image"
 import CountUp from "react-countup"
+import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+
+import { useSession } from "@/providers/Session"
 
 import "@/styles/profile/Profile.css"
 
 function Profile(): React.JSX.Element {
+	const router = useRouter()
+	const { session, status } = useSession()
+
+	useEffect(() => {
+		if (status == "disconnected") {
+			toast.error("You are not connected")
+			router.push("/")
+		}
+	}, [router, status])
+
+	if (session == null || status != "connected") {
+		return <></> // todo loading
+	}
+
 	return (
 		<main className="profilepage-wrapper">
 			<div className="pfp-stats-wrapper">
 
 				<div className="bento" style={{height: "48%"}}>
 					<div className="default-wrapper">
-						<Image style={{borderRadius: "9999px"}} priority
+						<Image style={{borderRadius: "50%"}} priority
 							src={"https://thispersondoesnotexist.com"}
 							width={200}
 							height={200}
 							alt="Your profile picture"
 						/>
-						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>Nimpô</h1>
+						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>{session.nickname}</h1>
 					</div>
 				</div>
 

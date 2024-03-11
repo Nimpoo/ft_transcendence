@@ -1,64 +1,104 @@
-from django.http import JsonResponse, HttpRequest
-from django.views.decorators.http import require_POST
-from .models import User
-import jwt
+from django.forms import model_to_dict
+from django.http import HttpRequest, JsonResponse
+from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_GET
+from django.views import View
+
 import requests
-import os
+import json
+import jwt
+import pyotp
 
-# Constants for provider names and URLs
-PROVIDER_URLS = {
-  '42-school': 'https://api.intra.42.fr/v2/me',
-  'github': 'https://api.github.com/user',
-  'discord': 'https://discord.com/api/users/@me',
-}
+from backend import settings
+from users.models import User
+from utils.decorators import need_user
+from random_username.generate import generate_username
 
-@require_POST
-def connect(request: HttpRequest) -> JsonResponse:
-  # Is jwt valid
-  try:
-    data = jwt.decode(request.body, os.environ['JWT_SECRET'], algorithms=['HS256'])
-  except jwt.DecodeError:
-    return JsonResponse({'error': 'Forbidden', 'message': 'The given JWT is not valid.'}, status=403)
 
-  # Check for required fields in the decoded JWT payload
-  token, provider, provider_id = data.get('access_token'), data.get('provider'), data.get('providerAccountId')
-  if None in [token, provider, provider_id]:
-    return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+class Index(View):
 
-  # Validate provider and get URL
-  provider_url = PROVIDER_URLS.get(provider)
-  if not provider_url:
-    return JsonResponse({'error': 'Forbidden', 'message': 'The given provider is not valid.'}, status=403)
+  def get(self, request: HttpRequest): # Get X users
+    # todo: make parameters adjustable by the client
+    page = 0
+    page_size = 5
+    # todo: add more params like: sort, range, filter
+    return JsonResponse(list(User.objects.values('id', 'nickname', 'created_at'))[page*page_size:page*page_size+page_size], safe=False)
 
-  # Validate token and get user data
-  response = requests.get(provider_url, headers={'Authorization': f'Bearer {token}'})
-  if response.status_code != 200:
-    return JsonResponse({'error': 'Forbidden', 'message': 'The given token is not valid.'}, status=403)
+  def post(self, request: HttpRequest): # Create user
+    if len(request.body) == 0:
+      return JsonResponse({'error': 'Bad Request', 'message': 'Missing body.'}, status=400)
 
-  try:
-    data = response.json()
-  except ValueError:
-    return JsonResponse({'error': 'Gone', 'message': 'Something went wrong, try again later.'}, status=410)
+    try:
+      body_payload = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+      return JsonResponse({'error': 'Bad Request', 'message': 'Body must be JSON.'}, status=400)
 
-  # Check if the given ID is valid
-  if str(data.get('id')) != provider_id:
-    return JsonResponse({'error': 'Forbidden', 'message': 'Given ID not valid.'}, status=403)
+    token = body_payload.get('token')
 
-  # Get or create user object
-  if provider == '42-school':
-    field_name = 'fortytwo_id'
-  elif provider == 'github':
-    field_name = 'github_id'
-  elif provider == 'discord':
-    field_name = 'discord_id'
-  else:
-    return JsonResponse({'error': 'Forbidden', 'message': 'Invalid provider.'}, status=403)
+    if token is None:
+      return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
 
-  try:
-    user = User.objects.get(**{field_name: provider_id})
-  except User.DoesNotExist:
-    user = User(**{field_name: provider_id})
+    response = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {token}'})
+    if response.status_code != 200:
+      print({ 'status': response.status_code, "token": token })
+      return JsonResponse({'error': 'Forbidden', 'message': 'The given token is not valid.'}, status=403)
+
+    try:
+      data = response.json()
+    except ValueError:
+      return JsonResponse({'error': 'Gone', 'message': 'Something went wrong, try again later.'}, status=410)
+
+    fortytwo_id = data.get('id')
+    if fortytwo_id is None:
+      return JsonResponse({'error': 'WTF??', 'message': 'no id were given in fortytwo response'}, status=403)
+
+    user, create = User.objects.get_or_create(nickname=data.get('login') or generate_username()[0], fortytwo_id=fortytwo_id)
+
+    if user.dfa_secret:
+      dfa = body_payload.get('dfa')
+      if dfa is None:
+        return JsonResponse({'error': 'dfa', 'message': 'DFA required for this account.'}, status=406)
+
+      if not pyotp.TOTP(user.dfa_secret).verify(dfa):
+        return JsonResponse({'error': 'dfa', 'message': 'Digits not correct.'}, status=401)
+
+    return JsonResponse({'access_token': jwt.encode(model_to_dict(user, exclude=['friends', 'blocked', 'dfa_secret']), settings.JWT_SECRET)})
+
+@require_GET
+def get_user(request: HttpRequest, user_id: int) -> JsonResponse:
+  user = get_object_or_404(User, pk=user_id)
+  return JsonResponse(model_to_dict(user, exclude=['dfa_secret']))
+
+@require_GET
+@need_user
+def me(request: HttpRequest, user: User) -> JsonResponse:
+  return JsonResponse(model_to_dict(user, exclude=['dfa_secret']))
+
+class DFA(View):
+
+  @method_decorator((need_user), name='dispatch')
+  def get(self, request: HttpRequest, user: User) -> JsonResponse: # todo return qr code
+    return JsonResponse({'coucou': 'ethienne'})
+
+  @method_decorator((need_user), name='dispatch')
+  def post(self, request: HttpRequest, user: User) -> JsonResponse:
+
+    if user.dfa_secret is not None:
+      return JsonResponse({'error': 'Forbidden', 'message': 'You have already enabled dfa.'}, status=403)
+
+    user.dfa_secret = pyotp.random_base32()
     user.save()
 
-  # Send back the nickname
-  return JsonResponse({'nickname': user.nickname})
+    return JsonResponse({'message': 'dfa enabled'})
+
+  @method_decorator((need_user), name='dispatch')
+  def delete(self, request: HttpRequest, user: User) -> JsonResponse:
+
+    if user.dfa_secret is None:
+      return JsonResponse({'error': 'Forbidden', 'message': 'You have already disabled dfa.'}, status=403)
+
+    user.dfa_secret = None
+    user.save()
+
+    return JsonResponse({'message': 'dfa disabled'})

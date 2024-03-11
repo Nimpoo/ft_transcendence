@@ -1,9 +1,17 @@
 import type { Metadata } from "next"
 import { Ubuntu } from "next/font/google"
+import { Toaster } from "react-hot-toast"
+import { Suspense } from "react"
 
 import "bootstrap/dist/css/bootstrap.css"
 import "@/styles/global.css"
 import "@/styles/Background.css"
+import "@/styles/global.css"
+
+import Header from "@/components/Header"
+import Footer from "@/components/Footer"
+import { ModalProvider } from "@/providers/Modal"
+import { SessionProvider } from "@/providers/Session"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -22,12 +30,19 @@ function RootLayout({
 }): React.JSX.Element {
 	return (
 		<html lang="en">
-			<head>
-			</head>
 			<body>
+				<Toaster position="bottom-right" reverseOrder />
 
 				<div id="div" className={ubu.className}>
-					{children}
+					<Suspense fallback={<h1>Loading... ⏳</h1>}>
+						<SessionProvider>
+							<ModalProvider>
+								<Header />
+								{children}
+								<Footer />
+							</ModalProvider>
+						</SessionProvider>
+					</Suspense>
 				</div>
 
 				<div id="gradient-bg">
