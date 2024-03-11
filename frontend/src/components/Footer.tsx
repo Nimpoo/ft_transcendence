@@ -3,13 +3,14 @@
 import Image from "next/image"
 import Link from "next/link"
 import toast from "react-hot-toast"
-import { useModal } from "@/providers/Modal"
-import { useSession } from "@/providers/Session"
-import { useCookies } from "react-cookie"
 import { redirect } from "next/navigation"
+import { useCookies } from "react-cookie"
 
-import "@/styles/Footer.css"
-import "@/styles/Settings.css"
+import { useSession } from "@/providers/Session"
+import { useModal } from "@/providers/Modal"
+
+import "@/styles/components/Footer/Footer.css"
+import "@/styles/components/Footer/Settings.css"
 
 function Footer(): React.JSX.Element | null {
 	const { session, status } = useSession()
@@ -122,27 +123,27 @@ if (status === "loading") {
 	return (
 		<footer className="footer-wrapper">
 			{ session &&
-				<Link href="/chat" className="link">
-					<Image className="image"
-						src={"/svg/chat.svg"}
-						width={30}
-						height={30}
-						alt="Chat"
-					/>
-					Chat
+				<Link href="/chat">
+					<button className="btn shadow-none ">
+						<Image className="image"
+							src={"/svg/chat.svg"}
+							width={30}
+							height={30}
+							alt="Chat"
+							/>
+						Chat
+					</button>
 				</Link>
 			}
 
 			<button className="btn shadow-none" onClick={() => { createModal(settingsModal, 500, 400) } }>
-				<Link href="" className="link">
-					<Image className="image"
-						src={"/svg/settings.svg"}
-						width={30}
-						height={30}
-						alt="Settings"
-					/>
-					Settings
-				</Link>
+				<Image className="image"
+					src={"/svg/settings.svg"}
+					width={30}
+					height={30}
+					alt="Settings"
+				/>
+				Settings
 			</button>
 		</footer>
 	)

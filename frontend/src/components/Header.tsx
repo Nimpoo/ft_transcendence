@@ -5,8 +5,7 @@ import Link from "next/link"
 
 import { useModal } from "@/providers/Modal"
 
-import "@/styles/Header.css"
-import "@/styles/Modal.css"
+import "@/styles/components/Header.css"
 
 function Header(): React.JSX.Element {
 
@@ -21,8 +20,8 @@ function Header(): React.JSX.Element {
 	{/* ------------------------ USOPP - LOUIS ------------------------- */}
 	const usoppModal =
 	<div className="modal-wrapper-lg">
-		<Image className="modal-pfp"
-			src={"/assets_bogoss/Louis.jpg"}
+		<Image priority className="modal-pfp"
+			src={"/assets/bogoss/Louis.jpg"}
 			width={400}
 			height={400}
 			alt="Louis Sylvestre"
@@ -80,8 +79,8 @@ function Header(): React.JSX.Element {
 	{/* ------------------------ NAMI - JUSTINE ------------------------ */}
 	const namiModal =
 	<div className="modal-wrapper-lg">
-		<Image className="modal-pfp"
-			src={"/assets_bogoss/Justine.jpg"}
+		<Image priority className="modal-pfp"
+			src={"/assets/bogoss/Justine.jpg"}
 			width={250}
 			height={250}
 			alt="Justine Munoz"
@@ -139,8 +138,8 @@ function Header(): React.JSX.Element {
 	{/* ------------------------- ZORO - NOAH -------------------------- */}
 	const zoroModal =
 	<div className="modal-wrapper-lg">
-		<Image className="modal-pfp"
-			src={"/assets_bogoss/NBG.jpg"}
+		<Image priority className="modal-pfp"
+			src={"/assets/bogoss/NBG.jpg"}
 			width={250}
 			height={250}
 			alt="Noah Alexandre"
@@ -198,8 +197,8 @@ function Header(): React.JSX.Element {
 	{/* ------------------------ LUFFY - MARWAN ------------------------ */}
 	const luffyModal =
 	<div className="modal-wrapper-lg">
-		<Image className="modal-pfp"
-			src={"/assets_bogoss/Marwan.jpg"}
+		<Image priority className="modal-pfp"
+			src={"/assets/bogoss/Marwan.jpg"}
 			width={400}
 			height={400}
 			alt="Marwan Ayoub"
@@ -260,8 +259,8 @@ function Header(): React.JSX.Element {
 
 			{/* ------------------------ USOPP - LOUIS ------------------------- */}
 			<button onClick={() => { createModal(usoppModal, 900); play("usopp"); }} className="mugiwara">
-				<Image
-					src={"/mugiwara/ussop.png"}
+				<Image priority
+					src={"/assets/mugiwara/ussop.png"}
 					width={68}
 					height={68}
 					alt="Sniperking !"
@@ -271,8 +270,8 @@ function Header(): React.JSX.Element {
 
 			{/* ------------------------ NAMI - JUSTINE ------------------------ */}
 			<button onClick={() => { createModal(namiModal, 700); play("nami"); }} className="mugiwara">
-				<Image
-					src={"/mugiwara/nami.png"}
+				<Image priority
+					src={"/assets/mugiwara/nami.png"}
 					width={68}
 					height={68}
 					alt="Tangarine !"
@@ -288,8 +287,8 @@ function Header(): React.JSX.Element {
 
 			{/* ------------------------- ZORO - NOAH -------------------------- */}
 			<button onClick={() => { createModal(zoroModal, 700); play("zoro"); }} className="mugiwara">
-				<Image className="luffy-zoro"
-					src={"/mugiwara/zoro.png"}
+				<Image priority className="luffy-zoro"
+					src={"/assets/mugiwara/zoro.png"}
 					width={60}
 					height={60}
 					alt="Saber !"
@@ -299,8 +298,8 @@ function Header(): React.JSX.Element {
 
 			{/* ------------------------ LUFFY - MARWAN ------------------------ */}
 			<button onClick={() => { createModal(luffyModal, 900); play("luffy"); }} className="mugiwara">
-				<Image className="luffy-zoro"
-					src={"/mugiwara/luffy.png"}
+				<Image priority className="luffy-zoro"
+					src={"/assets/mugiwara/luffy.png"}
 					width={60}
 					height={60}
 					alt="Meat !"

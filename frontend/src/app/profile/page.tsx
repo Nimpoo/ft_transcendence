@@ -2,12 +2,13 @@
 
 import Image from "next/image"
 import CountUp from "react-countup"
+import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+
+import { useSession } from "@/providers/Session"
 
 import "@/styles/profile/Profile.css"
-import { useSession } from "@/providers/Session"
-import { useRouter } from "next/navigation"
-import toast from "react-hot-toast"
-import { useEffect } from "react"
 
 function Profile(): React.JSX.Element {
 	const router = useRouter()
@@ -44,8 +45,8 @@ function Profile(): React.JSX.Element {
 					<div className="stats-wrapper">
 						<div className="trophies-ranking">
 							<CountUp duration={5} className="trophies-number truncate" end={0} />
-							<Image
-								src={"/assets_ranking/trophy.png"}
+							<Image priority
+								src={"/assets/ranking/trophy.png"}
 								width={72}
 								height={72}
 								alt="Trophy"
@@ -53,8 +54,8 @@ function Profile(): React.JSX.Element {
 						</div>
 						<div className="trophies-ranking" style={{marginTop: "0.25rem"}}>
 						<h3 className="ranking-ladder">Challenger - I</h3>
-						<Image
-							src={"/assets_ranking/challenger_1.png"}
+						<Image priority
+							src={"/assets/ranking/challenger_1.png"}
 							width={45}
 							height={45}
 							alt="Challenger - I"
@@ -67,8 +68,8 @@ function Profile(): React.JSX.Element {
 					<div className="stats-info">
 						<div style={{display: "flex", alignItems: "center"}}>
 							<span style={{paddingRight: "0.5rem"}}>Highest Trophies</span>
-							<Image
-								src={"/assets_ranking/trophy.png"}
+							<Image priority
+								src={"/assets/ranking/trophy.png"}
 								width={28}
 								height={28}
 								alt="Trophy"

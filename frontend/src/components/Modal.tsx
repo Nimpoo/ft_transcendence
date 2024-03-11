@@ -4,7 +4,7 @@ import React from "react"
 
 import { useState, useEffect } from "react"
 
-import "@/styles/Modal.css"
+import "@/styles/components/Modal.css"
 
 function Modal({
 	closeModal,

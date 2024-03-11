@@ -80,7 +80,7 @@ function Callback(): React.JSX.Element {
 		const code = searchParams.get("code")
 
 		if (code) {
-			handleCallback(code).catch(e => toast.error("Something went wrong, try again. (" + e.message + ")"))
+			handleCallback(code).catch(e => toast.error("Something went wrong, try again."))
 		}
 
 		router.push("/")

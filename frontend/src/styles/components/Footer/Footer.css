@@ -7,7 +7,7 @@
 	background: none;
 }
 
-.footer-wrapper .link {
+.footer-wrapper button {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -16,16 +16,15 @@
 	color: white;
 }
 
-.footer-wrapper .link:last-child {
-	margin-right: 0.5rem;
-	margin-left: 0.5rem;
+.footer-wrapper button:last-child {
+	margin: 0.5rem 0;
 }
 
-.footer-wrapper .link:hover {
+.footer-wrapper button:hover {
 	transform: scale(1.10);
 }
 
-.footer-wrapper .link:active {
+.footer-wrapper button:focus {
 	transform: scale(1.05);
 }
 
@@ -34,6 +33,6 @@
 	transition: transform 1s;
 }
 
-.footer-wrapper .link:hover .image {
+.footer-wrapper button:hover .image {
 	transform: rotate(360deg);
 }

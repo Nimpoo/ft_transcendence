@@ -4,12 +4,13 @@ import { Toaster } from "react-hot-toast"
 import { Suspense } from "react"
 
 import "bootstrap/dist/css/bootstrap.css"
+import "@/styles/global.css"
 import "@/styles/Background.css"
 import "@/styles/global.css"
 
-import { ModalProvider } from "@/providers/Modal"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import { ModalProvider } from "@/providers/Modal"
 import { SessionProvider } from "@/providers/Session"
 
 const ubu = Ubuntu ({

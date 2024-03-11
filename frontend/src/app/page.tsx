@@ -7,8 +7,10 @@ import Image from "next/image"
 import CountUp from "react-countup"
 
 import "@/styles/Homepage.css"
+import "@/styles/Text.css"
 import "@/styles/Rainbow.css"
 import "@/styles/Text.css"
+
 import { useSession } from "@/providers/Session"
 
 const ubu = Ubuntu ({
@@ -45,8 +47,8 @@ function Home(): React.JSX.Element {
 									alt="Your Profile Picture">
 								</Image>
 							</Link>
-							<Image className="rank"
-								src={"/assets_ranking/challenger_1.png"}
+							<Image priority className="rank"
+								src={"/assets/ranking/challenger_1.png"}
 								width={31}
 								height={31}
 								alt="Challenger 1"
@@ -56,8 +58,8 @@ function Home(): React.JSX.Element {
 							<h3 style={{fontSize: "1.5rem", lineHeight: "2rem"}}>{session.nickname}</h3>
 							<div className="trophies">
 								<CountUp duration={5} className="truncate" style={{paddingLeft: "0.5rem", paddingRight: "0.5rem"}} end={0} />
-								<Image
-									src={"/assets_ranking/trophy.png"}
+								<Image priority
+									src={"/assets/ranking/trophy.png"}
 									width={35}
 									height={35}
 									alt="Trophy"
