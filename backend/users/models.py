@@ -7,7 +7,8 @@ class User(models.Model):
   dfa_secret = models.CharField(max_length=50, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
 
-  friends = models.ManyToManyField('self', blank=True)
+  friends = models.ManyToManyField('self', blank=True, symmetrical=True)
+  blocked = models.ManyToManyField('self', blank=True, symmetrical=False)
 
   def __str__(self) -> str:
     return self.nickname
