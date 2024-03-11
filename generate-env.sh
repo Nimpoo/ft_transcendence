@@ -18,64 +18,36 @@ printf "Some variables will be asked, press \`enter\` for none.\n\n"
 
 cat << EOF > .env
 # 42's api keys
-AUTH_FORTYTWO_ID="$(printf "Write your 42 uid api: " 1>&2; read api; echo $api)"
-AUTH_FORTYTWO_SECRET="$(printf "Write your 42 secret api: " 1>&2; read api; echo $api)"
+NEXT_PUBLIC_CLIENT_ID=$(printf "Write your 42 uid api: " 1>&2; read api; echo $api)
+CLIENT_SECRET=$(printf "Write your 42 secret api: " 1>&2; read api; echo $api)
+
+EOF
+
+printf "\n\e[0;32mWrite the \`redirect_uri\` that you've configured in your api's settings\e[0m\n"
+
+cat << EOF >> .env
+NEXT_PUBLIC_REDIRECT_URI=$(printf "Write your \`redirect_uri\`: " 1>&2; read api; echo $api)
 
 EOF
 
 printf "\n"
 
+ADMIN_URI=$(openssl rand -hex 15)
+
 cat << EOF >> .env
-# GitHub's api keys
-AUTH_GITHUB_ID="$(printf "Write your GitHub uid api: " 1>&2; read api; echo $api)"
-AUTH_GITHUB_SECRET="$(printf "Write your GitHub secret api: " 1>&2; read api; echo $api)"
+JWT_SECRET=$(openssl rand -base64 32)
 
 EOF
 
-printf "\n"
-
-cat << EOF >> .env
-# Discord's api keys
-AUTH_DISCORD_ID="$(printf "Write your Discord uid api: " 1>&2; read api; echo $api)"
-AUTH_DISCORD_SECRET="$(printf "Write your Discord secret api: " 1>&2; read api; echo $api)"
-
-EOF
-
-printf "\n\e[34;1minfo: the \`host\` is your main page. this will be used to redirect\n\e[0m"
-printf "\e[33;1mwarning: you have to set \`redirect_uri\` in your api settings at your \`host\` (e.g. http://localhost:3000)\n\e[0m"
-
-HOST="$(printf "Write your host: " 1>&2; read host; echo $host)"
-PORT="$(printf "Write your port: " 1>&2; read port; echo $port)"
-
-cat << EOF >> .env
-# Frontend
-NEXTAUTH_URL="http://$HOST:$PORT"
-NEXTAUTH_SECRET="$(openssl rand -base64 32)"
-
-EOF
-
-printf "\n"
-
-ADMIN_URI="$(openssl rand -hex 15)"
-
-cat << EOF >> .env
-# Backend
-JWT_SECRET="$(openssl rand -base64 32)"
-API_KEY="$(openssl rand -base64 32)"
-ADMIN_URI=$ADMIN_URI/
-
-EOF
-
-printf "Backend admin URL: http://$HOST:8000/$ADMIN_URI/\n"
-
-PASSWORD="$(openssl rand -base64 32)"
+printf "Write your postgres username: " 1>&2; read PG_USER
+PG_PASSWORD=$(openssl rand -base64 32)
 
 cat << EOF >> .env
 # Postgres
-POSTGRES_HOST="postgres"
-POSTGRES_DB="ft_transcendence"
-POSTGRES_USER="$(printf "Write your postgres username: " 1>&2; read api; echo $api)"
-POSTGRES_PASSWORD="$PASSWORD"
+POSTGRES_HOST=postgres
+POSTGRES_DB=ft_transcendence
+POSTGRES_USER=$PG_USER
+POSTGRES_PASSWORD=$PG_PASSWORD
 EOF
 
-printf "Your postgres password: $PASSWORD\n\n"
+printf "Your generated PostgreSQL password for '$PG_USER' is '$PG_PASSWORD'\n"

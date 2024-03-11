@@ -43,7 +43,7 @@ export function SessionProvider({
 
 			const response = await toast.promise(
 				fetch(
-					"http://127.0.0.1:8000/users/me/",
+					"http://pong:8000/users/me/",
 					{
 						headers: {
 							Authorization: `Bearer ${cookies.session}`
