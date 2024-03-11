@@ -60,13 +60,17 @@ def add_friend(request: HttpRequest) -> JsonResponse:
     friend_request = FriendRequest.objects.get(sender=receiver, receiver=sender, status=FriendRequest.STATUS_PENDING)
   except FriendRequest.DoesNotExist: # else create it
     friend_request, created = FriendRequest.objects.get_or_create(sender=sender, receiver=receiver, status=FriendRequest.STATUS_PENDING)
+
+    print(f'${sender.nickname} asked ${receiver.nickname} as friend')
+
     return JsonResponse(model_to_dict(friend_request))
 
   friend_request.status = FriendRequest.STATUS_ACCEPTED
   friend_request.save()
 
   sender.friends.add(receiver)
-  print(friend_request)
+
+  print(f'${sender.nickname} accepted ${receiver.nickname} as friend')
 
   return JsonResponse(model_to_dict(friend_request))
 
