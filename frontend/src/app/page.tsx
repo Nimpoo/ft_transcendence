@@ -20,9 +20,9 @@ function Home(): React.JSX.Element {
 	const { session, status } = useSession()
 
 	{/* --------------------------- CONNECTED -------------------------- */}
-	if (status == 'loading') {
+	if (status == "loading") {
 		return <></> // todo loading
-	} else if (status == 'connected' && session) {
+	} else if (status == "connected" && session) {
 		return (
 			<main className="homepage-left-wrapper">
 
@@ -89,15 +89,15 @@ function Home(): React.JSX.Element {
 					</div>
 					<div className="col-3 align-items-center align-self-center mt-5">
 						<Link href={`https://api.intra.42.fr/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI as string)}&response_type=code`}>
-    						<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
-	    						<Image className="logo"
-		    						src="/svg/42-school_logo.svg"
-			    					width={24}
-				    				height={24}
-								    alt="42's Logo"
-							    />
-						    	Continue with 42
-                            </button>
+								<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
+									<Image className="logo"
+										src="/svg/42-school_logo.svg"
+										width={24}
+										height={24}
+										alt="42 Logo"
+									/>
+									Continue with 42
+								</button>
 						</Link>
 					</div>
 				</div>

@@ -39,7 +39,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/linkedin_logo.svg"}
 						width={40}
 						height={40}
-						alt="LinkedIn's logo"
+						alt="LinkedIn logo"
 					/>
 					<p className="text-for-button">Louis Sylvestre</p>
 				</Link>
@@ -53,7 +53,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/github_logo.svg"}
 						width={32}
 						height={32}
-						alt="GitHub's logo"
+						alt="GitHub logo"
 					/>
 					<p className="text-for-button">Vodki</p>
 				</Link>
@@ -67,7 +67,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/mail_logo.svg"}
 						width={32}
 						height={32}
-						alt="Mail's logo"
+						alt="Mail logo"
 					/>
 					<p className="text-for-button">losylves@student.42nice.fr</p>
 				</Link>
@@ -98,7 +98,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/linkedin_logo.svg"}
 						width={40}
 						height={40}
-						alt="LinkedIn's logo"
+						alt="LinkedIn logo"
 					/>
 					<p className="text-for-button">Justine Munoz</p>
 				</Link>
@@ -112,7 +112,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/github_logo.svg"}
 						width={32}
 						height={32}
-						alt="GitHub's logo"
+						alt="GitHub logo"
 					/>
 					<p className="text-for-button">jumunozz</p>
 				</Link>
@@ -126,7 +126,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/mail_logo.svg"}
 						width={32}
 						height={32}
-						alt="Mail's logo"
+						alt="Mail logo"
 					/>
 					<p className="text-for-button">jumunoz@student.42nice.fr</p>
 				</Link>
@@ -157,7 +157,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/linkedin_logo.svg"}
 						width={40}
 						height={40}
-						alt="LinkedIn's logo"
+						alt="LinkedIn logo"
 					/>
 					<p className="text-for-button">Noah Alexandre</p>
 				</Link>
@@ -171,7 +171,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/github_logo.svg"}
 						width={32}
 						height={32}
-						alt="GitHub's logo"
+						alt="GitHub logo"
 					/>
 					<p className="text-for-button">noalexan</p>
 				</Link>
@@ -185,7 +185,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/mail_logo.svg"}
 						width={32}
 						height={32}
-						alt="Mail's logo"
+						alt="Mail logo"
 					/>
 					<p className="text-for-button">noalexan@student.42nice.fr</p>
 				</Link>
@@ -216,7 +216,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/linkedin_logo.svg"}
 						width={40}
 						height={40}
-						alt="LinkedIn's logo"
+						alt="LinkedIn logo"
 					/>
 					<p className="text-for-button">Marwan Ayoub</p>
 				</Link>
@@ -230,7 +230,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/github_logo.svg"}
 						width={32}
 						height={32}
-						alt="GitHub's logo"
+						alt="GitHub logo"
 					/>
 					<p className="text-for-button">Nimpoo</p>
 				</Link>
@@ -244,7 +244,7 @@ function Header(): React.JSX.Element {
 						src={"/svg/mail_logo.svg"}
 						width={32}
 						height={32}
-						alt="Mail's logo"
+						alt="Mail logo"
 					/>
 					<p className="text-for-button">mayoub@student.42nice.fr</p>
 				</Link>

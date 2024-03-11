@@ -30,7 +30,7 @@ function Profile(): React.JSX.Element {
 
 				<div className="bento" style={{height: "48%"}}>
 					<div className="default-wrapper">
-						<Image style={{borderRadius: "9999px"}} priority
+						<Image style={{borderRadius: "50%"}} priority
 							src={"https://thispersondoesnotexist.com"}
 							width={200}
 							height={200}

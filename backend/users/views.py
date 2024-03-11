@@ -55,7 +55,7 @@ class Index(View):
 
     user, create = User.objects.get_or_create(nickname=data.get('login') or generate_username()[0], fortytwo_id=fortytwo_id)
 
-    if user.dfa_secret is not None:
+    if user.dfa_secret:
       dfa = body_payload.get('dfa')
       if dfa is None:
         return JsonResponse({'error': 'dfa', 'message': 'DFA required for this account.'}, status=406)

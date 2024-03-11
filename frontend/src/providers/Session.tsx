@@ -6,7 +6,12 @@ import toast from "react-hot-toast"
 
 interface Session {
 	id: number,
-	nickname: string,
+	nickname: string
+}
+
+interface Error {
+	error: string,
+	message: string
 }
 
 type Status = "loading"|"connected"|"disconnected"
@@ -38,7 +43,7 @@ export function SessionProvider({
 
 			const response = await toast.promise(
 				fetch(
-					"/api/users/me",
+					"http://127.0.0.1:8000/users/me/",
 					{
 						headers: {
 							Authorization: `Bearer ${cookies.session}`
@@ -46,30 +51,35 @@ export function SessionProvider({
 					}
 				),
 				{
-					loading: "fetching /api/users/me",
-					success: "/api/users/me fetched",
-					error: "unable to fetch /api/users/me"
+					loading: "Fetching /users/me",
+					success: "/users/me fetched",
+					error: "Unable to fetch /users/me"
 				}
 			)
 
+			const data = await response.json()
+
 			if (response.status != 200) {
-				toast.error("Invalid session token")
+				toast.error(data.message)
 				removeCookie("session")
 				setStatus("disconnected")
 				setSession(null)
 			}
 
 			else {
-				const data: Session = await response.json()
-				
 				setStatus("connected")
 				setSession(data)
+				toast(`Hi, ${data.nickname}!`, {icon: "👋"})
 			}
 
 		}
 
 		if (cookies.session) {
-			handleFetch()
+			handleFetch().catch(e => {
+				toast.error("Something went wrong, try again.")
+				setStatus("disconnected")
+				setSession(null)
+			})
 		} else {
 			setStatus("disconnected")
 			setSession(null)
