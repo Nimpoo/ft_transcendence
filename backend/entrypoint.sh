@@ -9,4 +9,4 @@ done
 python manage.py makemigrations users
 python manage.py migrate
 
-daphne backend.asgi:application
+daphne backend.asgi:application -b pong

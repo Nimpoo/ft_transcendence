@@ -28,7 +28,7 @@ function Callback(): React.JSX.Element {
 
 			let response = await toast.promise(
 				fetch(
-					"http://pong:8000/users/",
+					"/api/users",
 					{
 						method: "POST",
 						body: JSON.stringify({token})
@@ -52,7 +52,7 @@ function Callback(): React.JSX.Element {
 
 				response = await toast.promise(
 					fetch(
-						"http://pong:8000/users/",
+						"/api/users",
 						{
 							method: "POST",
 							body: JSON.stringify({token, dfa})

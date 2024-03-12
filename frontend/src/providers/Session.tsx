@@ -38,12 +38,11 @@ export function SessionProvider({
 	const [cookies, setCookie, removeCookie] = useCookies(["session"])
 
 	useEffect(() => {
-
 		const handleFetch = async () => {
 
 			const response = await toast.promise(
 				fetch(
-					"http://pong:8000/users/me/",
+					"/api/users/me",
 					{
 						headers: {
 							Authorization: `Bearer ${cookies.session}`
