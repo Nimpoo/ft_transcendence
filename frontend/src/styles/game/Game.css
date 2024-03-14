@@ -1,0 +1,7 @@
+.game {
+	position: relative;
+
+	width: 100%;
+	height: 38rem;
+	align-items: center;
+}
