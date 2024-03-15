@@ -12,6 +12,8 @@ import "@/styles/Rainbow.css"
 import "@/styles/Text.css"
 
 import { useSession } from "@/providers/Session"
+import FriendsList from "@/components/FriendsList"
+import UserSearchBar from "@/components/UserSearchBar"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -55,7 +57,7 @@ function Home(): React.JSX.Element {
 							/>
 						</div>
 						<div className="pseudo-trophy-wrapper truncate">
-							<h3 style={{fontSize: "1.5rem", lineHeight: "2rem"}}>{session.nickname}</h3>
+							<h3 style={{fontSize: "1.5rem", lineHeight: "2rem"}}>{session.display_name}</h3>
 							<div className="trophies">
 								<CountUp duration={5} className="truncate" style={{paddingLeft: "0.5rem", paddingRight: "0.5rem"}} end={0} />
 								<Image priority
@@ -69,7 +71,8 @@ function Home(): React.JSX.Element {
 					</div>
 
 					<div className="friends-bento spaceY-between-btn-3">
-						{/* FRIENDS LIST HERE */}
+						<UserSearchBar />
+						<FriendsList />
 					</div>
 
 				</div>

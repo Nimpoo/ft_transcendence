@@ -9,7 +9,7 @@ class ChatRoom(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
 
   def __str__(self) -> str:
-    return f"{self.name} ({','.join([user.nickname for user in self.members.all()])})"
+    return f"{self.name} ({','.join([user.login for user in self.members.all()])})"
 
 class Chat(models.Model):
   content = models.TextField()

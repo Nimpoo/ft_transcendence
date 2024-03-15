@@ -1,9 +1,11 @@
 from django.forms import model_to_dict
 from django.http import HttpRequest, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET
 from django.views import View
+from django.db.models import Q
 
 import requests
 import json
@@ -23,7 +25,7 @@ class Index(View):
     page = 0
     page_size = 5
     # todo: add more params like: sort, range, filter
-    return JsonResponse(list(User.objects.values('id', 'nickname', 'created_at'))[page*page_size:page*page_size+page_size], safe=False)
+    return JsonResponse(list(User.objects.values('id', 'login', 'display_name', 'created_at'))[page*page_size:page*page_size+page_size], safe=False)
 
   def post(self, request: HttpRequest): # Create user
     if len(request.body) == 0:
@@ -53,7 +55,11 @@ class Index(View):
     if fortytwo_id is None:
       return JsonResponse({'error': 'WTF??', 'message': 'no id were given in fortytwo response'}, status=403)
 
-    user, create = User.objects.get_or_create(nickname=data.get('login') or generate_username()[0], fortytwo_id=fortytwo_id)
+    user, created = User.objects.get_or_create(login=data.get('login') or generate_username()[0], fortytwo_id=fortytwo_id)
+
+    if (created):
+      user.display_name = user.login
+      user.save()
 
     if user.dfa_secret:
       dfa = body_payload.get('dfa')
@@ -63,17 +69,32 @@ class Index(View):
       if not pyotp.TOTP(user.dfa_secret).verify(dfa):
         return JsonResponse({'error': 'dfa', 'message': 'Digits not correct.'}, status=401)
 
-    return JsonResponse({'access_token': jwt.encode(model_to_dict(user, exclude=['friends', 'blocked', 'dfa_secret']), settings.JWT_SECRET)})
+    return JsonResponse({'access_token': jwt.encode(model_to_dict(user, fields=['id', 'login', 'display_name', 'created_at']), settings.JWT_SECRET)})
 
 @require_GET
-def get_user(request: HttpRequest, user_id: int) -> JsonResponse:
-  user = get_object_or_404(User, pk=user_id)
-  return JsonResponse(model_to_dict(user, exclude=['dfa_secret']))
+def get_user(request: HttpRequest) -> JsonResponse:
+  query_id, query_login = request.GET.get('id'), request.GET.get('login')
+
+  if (query_id is not None):
+    if (query_login is not None):
+      query = {'pk': query_id, 'login': query_login}
+    else:
+      query = {'pk': query_id}
+  elif (query_login is not None):
+      query = {'login': query_login}
+
+  return JsonResponse(model_to_dict(get_object_or_404(User, **query), fields=['id', 'login', 'display_name', 'created_at']))
+
+@require_GET
+def search(request: HttpRequest) -> JsonResponse:
+  query = request.GET.get('q')
+  results = User.objects.filter(Q(login__contains=query) | Q(display_name__contains=query)).values() # todo: make blocked status on fr
+  return JsonResponse(list(results), safe=False)
 
 @require_GET
 @need_user
 def me(request: HttpRequest, user: User) -> JsonResponse:
-  return JsonResponse(model_to_dict(user, exclude=['dfa_secret']))
+  return JsonResponse(model_to_dict(user, fields=['id', 'login', 'display_name', 'created_at']))
 
 class DFA(View):
 
@@ -90,7 +111,7 @@ class DFA(View):
     user.dfa_secret = pyotp.random_base32()
     user.save()
 
-    return JsonResponse({'message': 'dfa enabled'})
+    return JsonResponse({'dfa_secret': user.dfa_secret})
 
   @method_decorator((need_user), name='dispatch')
   def delete(self, request: HttpRequest, user: User) -> JsonResponse:
@@ -102,8 +123,3 @@ class DFA(View):
     user.save()
 
     return JsonResponse({'message': 'dfa disabled'})
-
-@require_GET
-def get_user(request: HttpRequest, user_id: int) -> JsonResponse:
-  user = User.objects.get(pk=user_id)
-  return JsonResponse(model_to_dict(user, exclude=['friends', 'blocked']))

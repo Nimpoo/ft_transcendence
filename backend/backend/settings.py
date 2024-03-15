@@ -83,22 +83,29 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
-POSTGRES_DB = os.environ.get('POSTGRES_DB')
-POSTGRES_USER = os.environ.get('POSTGRES_USER')
-POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+# POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
+# POSTGRES_DB = os.environ.get('POSTGRES_DB')
+# POSTGRES_USER = os.environ.get('POSTGRES_USER')
+# POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
 
-if None in [POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD]:
-    raise "Missing mandatory variable for PostgreSQL"
+# if None in [POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD]:
+#     raise "Missing mandatory variable for PostgreSQL"
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": POSTGRES_DB,
+#         "USER": POSTGRES_USER,
+#         "PASSWORD": POSTGRES_PASSWORD,
+#         "HOST": POSTGRES_HOST,
+#         "PORT": "5432",
+#     }
+# }
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": POSTGRES_DB,
-        "USER": POSTGRES_USER,
-        "PASSWORD": POSTGRES_PASSWORD,
-        "HOST": POSTGRES_HOST,
-        "PORT": "5432",
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 

@@ -4,9 +4,8 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useCookies } from "react-cookie"
 import toast from "react-hot-toast"
 
-interface Session {
-	id: number,
-	nickname: string
+interface Session extends User {
+	api: (url: string | URL | Request, method?: "GET"|"POST"|"DELETE", body?: BodyInit) => Promise<Response>
 }
 
 interface Error {
@@ -40,21 +39,12 @@ export function SessionProvider({
 	useEffect(() => {
 		const handleFetch = async () => {
 
-			const response = await toast.promise(
-				fetch(
-					"/api/users/me",
-					{
-						headers: {
-							Authorization: `Bearer ${cookies.session}`
-						}
-					}
-				),
-				{
-					loading: "Fetching /users/me",
-					success: "/users/me fetched",
-					error: "Unable to fetch /users/me"
-				}
+			const api = (url: string | URL | Request, method: "GET"|"POST"|"DELETE" = "GET", body?: BodyInit) => toast.promise(
+				fetch(`/api${url}`, { headers: { Authorization: `Bearer ${cookies.session}` }, method, body }),
+				{loading: `Fetching ${url}`, success: `${url} fetched`, error: `Unable to fetch ${url}`}
 			)
+
+			const response = await api("/users/me")
 
 			const data = await response.json()
 
@@ -67,8 +57,8 @@ export function SessionProvider({
 
 			else {
 				setStatus("connected")
-				setSession(data)
-				toast(`Hi, ${data.nickname}!`, {icon: "👋"})
+				setSession({...data, api})
+				toast(`Hi, ${data.login}!`, {icon: "👋"})
 			}
 
 		}

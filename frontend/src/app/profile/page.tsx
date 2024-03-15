@@ -9,6 +9,7 @@ import { useEffect } from "react"
 import { useSession } from "@/providers/Session"
 
 import "@/styles/profile/Profile.css"
+import FriendsList from "@/components/FriendsList"
 
 function Profile(): React.JSX.Element {
 	const router = useRouter()
@@ -37,7 +38,7 @@ function Profile(): React.JSX.Element {
 							height={200}
 							alt="Your profile picture"
 						/>
-						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>{session.nickname}</h1>
+						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>{session.display_name}</h1>
 					</div>
 				</div>
 
@@ -101,7 +102,7 @@ function Profile(): React.JSX.Element {
 			</div>
 
 			<div className="bento" style={{width: "310px"}}>
-				{/* FRIENDS */}
+				<FriendsList />
 			</div>
 		</main>
 	)

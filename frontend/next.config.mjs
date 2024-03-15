@@ -1,6 +1,6 @@
 /** @type {import("next").NextConfig} */
 
-export default {
+const nextConfig = {
 	images: {
 		remotePatterns: [
 			{
@@ -14,8 +14,10 @@ export default {
 		return [
 			{
 				source: "/api/:path*",
-				destination: "http://pong:8000/:path*/"
+				destination: "http://localhost:8000/:path*/"
 			}
 		]
 	}
 }
+
+export default nextConfig

@@ -43,7 +43,7 @@ def block(request: HttpRequest) -> JsonResponse:
     sender.blocked.add(receiver)
     if sender.friends.contains(receiver):
         sender.friends.remove(receiver)
-    print(receiver.nickname, 'is blocked')
+    print(receiver.login, 'is blocked')
     
     return JsonResponse(list(sender.blocked.values()), safe=False)
     
@@ -74,6 +74,6 @@ def unblock(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'error': 'Bad Request', 'message': 'Already unblocked.'}, status=400)
     
     sender.blocked.remove(receiver)
-    print(receiver.nickname, 'is unblocked')
+    print(receiver.login, 'is unblocked')
     
     return JsonResponse(list(sender.blocked.values()), safe=False)
