@@ -5,3 +5,8 @@
 	height: 38rem;
 	align-items: center;
 }
+
+@font-face {
+	font-family: "Pong";
+	src: url("../../../public/fonts/pong-score.ttf");
+}

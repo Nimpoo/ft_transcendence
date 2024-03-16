@@ -2,6 +2,9 @@ import { useEffect, useRef } from "react"
 
 import "@/styles/game/Game.css"
 
+let score1 = 0
+let score2 = 0
+
 interface Ball {
 	coord: {
 		x: number,
@@ -92,6 +95,9 @@ function Canvas({
 					context.strokeStyle = "white"
 					context.stroke()
 
+					context.font = "100px Pong"
+					context.fillStyle = "white"
+
 					// ? The ball
 					square.draw()
 
@@ -106,6 +112,8 @@ function Canvas({
 						square.dir.vx += Math.random() + (0.500 - 0.0200) + 0.200
 					}
 
+					context.fillText(`${score1}`, width / 5, height / 3.75)
+					context.fillText(`${score2}`, width * 4 / 5, height / 3.75)
 					square.coord.x += square.dir.vx
 					square.coord.y += square.dir.vy
 				}
