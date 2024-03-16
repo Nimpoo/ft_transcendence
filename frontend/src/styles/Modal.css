@@ -1,0 +1,111 @@
+.modal-transition {
+	display: flex;
+
+	justify-content: center;
+	align-items: center;
+	z-index: 10;
+	position: fixed;
+	inset: 0px;
+	backdrop-filter: blur(8px);
+	background-color: rgb(0 0 0 / 0.2);
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+}
+
+.modal-appear {
+	opacity: 1;
+	visibility: visible;
+}
+
+.modal-disappear {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.modal-pop-up {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.modal-pop-down {
+	opacity: 0;
+	transform: scale(1.1);
+}
+
+.modal-wrapper-lg {
+	display: flex;
+	justify-content: space-between;
+	width: 900px;
+}
+
+.modal-wrapper-sm {
+	display: flex;
+	justify-content: space-between;
+	width: 700px;
+}
+
+.modal-intern {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+
+	max-width: 48rem;
+	padding: 1.5rem;
+	border: solid;
+	border-width: 4px;
+	border-radius: 2.5rem;
+	border-color: rgb(38 38 38 / 1);
+	transform-origin: center;
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 200ms;
+	background-image: linear-gradient(
+		to top right, 
+		rgba(139, 92, 246, 0.7), /* violet with 70% opacity */
+		rgba(239, 68, 68, 0.7), /* red with 70% opacity */
+		rgba(67, 56, 202, 0.7) /* purple with 70% opacity */
+	);
+}
+
+.modal-pfp {
+	height: auto;
+	width: auto;
+	border-radius: 0.375rem;
+	box-shadow: 4px 4px 4px rgba(0,0,0,0.25);
+}
+
+.modal-info-wrapper {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	text-align: center;
+	
+	padding-left: 1rem;
+}
+
+.modal-cross {
+	position: absolute;
+
+	top: 0.5rem;
+	right: 0.5rem;
+	padding: 0.5rem;
+	border-radius: 9999px;
+	outline: none;
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+	background-color: rgb(0, 0, 0, 0);
+}
+
+.modal-cross-bg {
+	background-color: rgb(0, 0, 0, 0);
+}
+
+.modal-cross-bg:hover {
+	background-color: rgb(0, 0, 0, 0.5);
+}
+
+.modal-cross-bg:active {
+	background-color: rgb(0, 0, 0, 0.9);
+}

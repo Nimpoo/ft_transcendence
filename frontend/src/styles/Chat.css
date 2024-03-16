@@ -1,0 +1,97 @@
+.box-1-wrap {
+    width: 382px;
+    height: 511px;
+    border-radius: 1.5rem;
+	background-color: #d9d9d935;
+    opacity: 0.25rem;
+	box-shadow: 5px 5px 0 1px rgba(0, 0, 0, 0.25);
+    overflow-y: auto;
+}
+
+.box-1-title {
+    align-items: center;
+    text-align: end;
+}
+
+.btn-1-conv {
+    width: 320px;
+    height: 80px;
+    border-radius: 1rem;
+    background-color: rgba(153, 61, 169, 0.479);
+    margin-left: 20px;
+    display: flex;
+    flex: row;
+    align-items: center;
+}
+
+.change-trunc {
+    width: 240px;
+    color: rgba(255, 255, 255, 0.39);
+}
+
+.text-place {
+    margin-right: 165px;
+}
+
+.box-2-wrap {
+    width: 892px;
+    height: 511px;
+    border-radius: 1.5rem;
+	background-color: #d9d9d935;
+	box-shadow: 5px 5px 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.box-2-title {
+    width: 892px;
+    height: 65px;
+    background-color: rgba(255, 255, 255, 0.423);
+    border-radius: 1.5rem;
+}
+
+.input-style {
+    background-color: transparent; 
+    width: 813px;
+    height: 65px;
+    border-radius: 1.5rem;
+    border-color: transparent;
+}
+
+.input-style:focus {
+    border-color: transparent;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.conv-box {
+    height: 395px;
+}
+
+.text-box-style {
+    border-radius: 2rem;
+    border-color: transparent;
+    box-shadow: none;
+    height: 40px;
+    background-color: white;
+}
+
+.text-box-style:focus {
+    box-shadow: none;
+    border-color: transparent;
+    background-color: white;
+}
+
+.text-box-style::placeholder {
+    color: rgba(0, 0, 0, 0.674);
+}
+
+.btn-text-style {
+    border-radius: 2rem;
+    background-color: white;
+    border-color: transparent;
+    height: 37.5px;
+    align-self: center;
+}
+
+.btn-text-style:hover {
+    background-color: white;
+}
