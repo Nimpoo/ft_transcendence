@@ -123,7 +123,7 @@ if (status === "loading") {
 	return (
 		<footer className="footer-wrapper">
 			{ session &&
-				<Link href="/chat">
+				<Link className="link-light" href="/chat">
 					<button className="btn shadow-none ">
 						<Image className="image"
 							src={"/svg/chat.svg"}

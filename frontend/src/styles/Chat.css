@@ -5,6 +5,9 @@
 	background-color: #d9d9d935;
     opacity: 0.25rem;
 	box-shadow: 5px 5px 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.scrollab {
     overflow-y: auto;
 }
 
@@ -22,6 +25,10 @@
     display: flex;
     flex: row;
     align-items: center;
+}
+
+.btn-1-conv:hover {
+    background-color: rgba(153, 61, 169, 0.479);
 }
 
 .change-trunc {
@@ -62,6 +69,13 @@
     box-shadow: none;
 }
 
+.conv-name {
+    color: black;
+    margin-top: 20px;
+    margin-left: 15px;
+    width: 100px;
+}
+
 .conv-box {
     height: 395px;
 }
@@ -94,4 +108,32 @@
 
 .btn-text-style:hover {
     background-color: white;
+}
+
+.dropplace {
+    margin-top: 18px;
+    margin-left: 650px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: transparent;
+    color: transparent;
+    border: none;
+}
+
+.dropdown-content {
+    background-color: transparent;
+    min-width: 10rem;
+    position: absolute;
+    top: 100%;
+    right: 0;
+}
+
+.link-color {
+    color: black;
 }
