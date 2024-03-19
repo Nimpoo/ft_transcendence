@@ -3,16 +3,28 @@ version: '3'
 services:
 
   ping:
-    build: frontend/
+    build:
+      context: frontend/
+      args:
+        - NEXT_PUBLIC_REDIRECT_URI=${NEXT_PUBLIC_REDIRECT_URI}
+        - NEXT_PUBLIC_CLIENT_ID=${NEXT_PUBLIC_CLIENT_ID}
+        - CLIENT_SECRET=${CLIENT_SECRET}
     ports:
-      - 80:3000
+      - 3000:3000
     env_file: .env
     depends_on:
       - pong
     restart: unless-stopped
 
   pong:
-    build: backend/
+    build:
+      context: backend/
+      args:
+        - JWT_SECRET=${JWT_SECRET}
+        - POSTGRES_HOST=${POSTGRES_HOST}
+        - POSTGRES_DB=${POSTGRES_DB}
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - 8000:8000
     env_file: .env

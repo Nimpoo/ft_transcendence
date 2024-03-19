@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { getAccessToken } from "./api"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useCookies } from "react-cookie"
 import toast from "react-hot-toast"
 
@@ -28,7 +28,7 @@ function Callback(): React.JSX.Element {
 
 			let response = await toast.promise(
 				fetch(
-					"http://127.0.0.1:8000/users/",
+					"/api/users",
 					{
 						method: "POST",
 						body: JSON.stringify({token})
@@ -52,7 +52,7 @@ function Callback(): React.JSX.Element {
 
 				response = await toast.promise(
 					fetch(
-						"http://127.0.0.1:8000/users/",
+						"/api/users",
 						{
 							method: "POST",
 							body: JSON.stringify({token, dfa})
