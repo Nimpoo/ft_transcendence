@@ -20,6 +20,6 @@ from backend.routing import websocket_urlpatterns
 
 
 application = ProtocolTypeRouter({
-  'http': django_asgi_app,
+  'http': get_asgi_application(),
   'websocket': QueryAuthMiddleware(URLRouter(websocket_urlpatterns))
 })

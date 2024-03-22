@@ -40,16 +40,16 @@ if JWT_SECRET is None:
 INSTALLED_APPS = [
     'daphne',
 
+    'users',
+    'friends',
+    'chat',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'users',
-    'friends',
-    'chat',
 ]
 
 MIDDLEWARE = [
