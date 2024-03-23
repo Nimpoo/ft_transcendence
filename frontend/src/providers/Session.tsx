@@ -6,6 +6,8 @@ import toast from "react-hot-toast"
 
 interface Session extends User {
 	api: (url: string | URL | Request, method?: "GET"|"POST"|"DELETE", body?: BodyInit) => Promise<Response>
+	token: string
+	friends: User[]
 }
 
 interface Error {
@@ -56,8 +58,11 @@ export function SessionProvider({
 			}
 
 			else {
+				const response = await api(`/users/friends/${data.id}`)
+				const friends = await response.json()
+				
+				setSession({...data, api, token: cookies.session, friends})
 				setStatus("connected")
-				setSession({...data, api})
 				toast(`Hi, ${data.login}!`, {icon: "👋"})
 			}
 

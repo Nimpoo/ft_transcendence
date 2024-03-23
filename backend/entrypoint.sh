@@ -6,6 +6,13 @@ do
   sleep 1
 done
 
-python manage.py makemigrations users
+until nc -z -w30 redis 6379
+do
+  echo "Waiting for Redis..."
+  sleep 1
+done
+
+
+python manage.py makemigrations users chat friends
 python manage.py migrate
 daphne backend.asgi:application -b pong

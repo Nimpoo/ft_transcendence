@@ -1,49 +1,43 @@
 import { useSession } from "@/providers/Session"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 
 function FriendsList(): React.JSX.Element {
 	const { session } = useSession()
-	const [friends, setFriends] = useState<User[]>([])
 
-	useEffect(() => {
-		if (session) {
-
-			const fetchFriendsList = async () => {
-				const response = await session.api(`/users/friends/${session.id}`)
-				setFriends(await response.json())
+	if (session) {
+		const FriendsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
+			const handleRemove = () => {
+				session.api("/users/friends/remove", "POST", JSON.stringify({ user_id: user.id })).catch(() => toast.error('Remove failed, try again'))
+				session.friends = session.friends.slice(index, index)
 			}
 
-			fetchFriendsList()
-		}
-	}, [session])
+			const handleBlock = () => {
+				session.api("/chat/block", "POST", JSON.stringify({ user_id: user.id })).catch(() => toast.error('Remove failed, try again'))
+			}
 
-	function FriendsListItem({ user }: { user: User }): React.JSX.Element {
-		console.log(user)
-
-		const handleRemove = () => {
-			session?.api("/users/friends/remove", "POST", JSON.stringify({ user_id: user.id })).catch(console.error)
-		}
-
-		const handleBlock = () => {
-			session?.api("/chat/block", "POST", JSON.stringify({ user_id: user.id })).catch(console.error)
+			return (
+				<li style={{display: "flex", flexDirection: "column"}}>
+					<Link href={`/users/${user.login}`}>
+						<h5>{user.login}</h5>
+					</Link>
+					<div className="btn-group">
+						<button className="btn btn-success" onClick={handleRemove}>remove</button>
+						<button className="btn btn-danger" onClick={handleBlock}>block</button>
+					</div>
+				</li>
+			)
 		}
 
 		return (
-			<li style={{display: "flex", flexDirection: "column"}}>
-				<Link href={`/users/${user.login}`}>
-					<div></div>
-					<div>
-						<h5>{user.login}</h5>
-						<button onClick={handleRemove}>remove</button>
-						<button onClick={handleBlock}>block</button>
-					</div>
-				</Link>
-			</li>
+			<ul className="list-unstyled">
+				{session.friends.map((friend, key) => <FriendsListItem key={key} user={friend} index={key} />)}
+			</ul>
 		)
 	}
 
-	return <ul className="list-unstyled">{friends.map((friend, key) => <FriendsListItem key={key} user={friend} />)}</ul>
+	else
+		return <></>
 }
 
 export default FriendsList

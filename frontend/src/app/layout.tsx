@@ -12,6 +12,7 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { ModalProvider } from "@/providers/Modal"
 import { SessionProvider } from "@/providers/Session"
+import { SocketProvider } from "@/providers/Socket"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -36,11 +37,13 @@ function RootLayout({
 				<div id="div" className={ubu.className}>
 					<Suspense fallback={<h1>Loading... ⏳</h1>}>
 						<SessionProvider>
-							<ModalProvider>
-								<Header />
-								{children}
-								<Footer />
-							</ModalProvider>
+							<SocketProvider>
+								<ModalProvider>
+									<Header />
+									{children}
+									<Footer />
+								</ModalProvider>
+							</SocketProvider>
 						</SessionProvider>
 					</Suspense>
 				</div>

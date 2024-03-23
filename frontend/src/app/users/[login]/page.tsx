@@ -37,7 +37,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 		if (session && user) {
 			const handleFetch = async () => {
 				const response = await session.api(`/users/friends/get?id=${user.id}`)
-				setRelation(await response.json())
+				response.json().then(data => setRelation(data)).catch(error => setRelation(null))
 			}
 
 			handleFetch()
@@ -53,22 +53,23 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 			{user.display_name}
 			{session && session.id != user.id && (
 				<div>
-					{relation && (
-						relation.status === "pending" && ( // ? Is there a pending request
-							relation.sender === session.id && ( // You sent
-								<button disabled>pending...</button>
-							) || ( // You received
-								<div>
-									<button onClick={async () => setRelation(await (await session.api("/users/friends/add", "POST", JSON.stringify({user_id: user.id}))).json())}>accept</button>
-									<button onClick={async () => setRelation(await (await session.api("/users/friends/reject", "POST", JSON.stringify({user_id: user.id}))).json())}>reject</button>
-								</div>
+					{relation &&
+						(
+							relation.status === "pending" && ( // ? Is there a pending request
+								relation.sender === session.id && ( // You sent
+									<button disabled>pending...</button>
+								) || ( // You received
+									<div>
+										<button onClick={async () => setRelation(await (await session.api("/users/friends/add", "POST", JSON.stringify({user_id: user.id}))).json())}>accept</button>
+										<button onClick={async () => setRelation(await (await session.api("/users/friends/reject", "POST", JSON.stringify({user_id: user.id}))).json())}>reject</button>
+									</div>
+								)
+							) || relation.status === "accepted" && ( // ? Is he my friend ?
+								<button onClick={async () => setRelation(await (await session.api("/users/friends/remove", "POST", JSON.stringify({user_id: user.id}))).json())}>remove</button>
 							)
-						) || relation.status === "accepted" && ( // ? Is he my friend ?
-							<button onClick={async () => setRelation(await (await session.api("/users/friends/remove", "POST", JSON.stringify({user_id: user.id}))).json())}>remove</button>
+						) || ( // else
+							<button onClick={async () => setRelation(await (await session.api("/users/friends/add", "POST", JSON.stringify({user_id: user.id}))).json())}>add</button>
 						)
-					) || ( // else
-						<button onClick={async () => setRelation(await (await session.api("/users/friends/add", "POST", JSON.stringify({user_id: user.id}))).json())}>add</button>
-					)
 					}
 				</div>
 			)}
