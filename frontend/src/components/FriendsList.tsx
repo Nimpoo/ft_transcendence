@@ -1,15 +1,29 @@
 import { useSession } from "@/providers/Session"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 
 function FriendsList(): React.JSX.Element {
 	const { session } = useSession()
+	const [friendsList, setFriendsList] = useState<User[]>([])
+
+	useEffect(() => {
+		if (session) {
+			const fetchFriendsList = async () => {
+				const response = await session.api(`/users/friends`)
+				const data = await response.json()
+				setFriendsList(data)
+			}
+
+			fetchFriendsList().catch(e => toast.error("Something went wrong. Try again later"))
+		}
+	}, [session])
 
 	if (session) {
 		const FriendsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
 			const handleRemove = () => {
-				session.api("/users/friends/remove", "POST", JSON.stringify({ user_id: user.id })).catch(() => toast.error('Remove failed, try again'))
-				session.friends = session.friends.slice(index, index)
+				session.api("/users/friends", "DELETE", JSON.stringify({ user_id: user.id })).catch(() => toast.error('Remove failed, try again'))
+				setFriendsList(friendsList.slice(index, index))
 			}
 
 			const handleBlock = () => {
@@ -31,7 +45,7 @@ function FriendsList(): React.JSX.Element {
 
 		return (
 			<ul className="list-unstyled">
-				{session.friends.map((friend, key) => <FriendsListItem key={key} user={friend} index={key} />)}
+				{friendsList.map((friend, key) => <FriendsListItem key={key} user={friend} index={key} />)}
 			</ul>
 		)
 	}

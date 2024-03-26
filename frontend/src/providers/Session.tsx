@@ -4,15 +4,10 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useCookies } from "react-cookie"
 import toast from "react-hot-toast"
 
+
 interface Session extends User {
 	api: (url: string | URL | Request, method?: "GET"|"POST"|"DELETE", body?: BodyInit) => Promise<Response>
 	token: string
-	friends: User[]
-}
-
-interface Error {
-	error: string,
-	message: string
 }
 
 type Status = "loading"|"connected"|"disconnected"
@@ -39,36 +34,27 @@ export function SessionProvider({
 	const [cookies, setCookie, removeCookie] = useCookies(["session"])
 
 	useEffect(() => {
-		const handleFetch = async () => {
-
-			const api = (url: string | URL | Request, method: "GET"|"POST"|"DELETE" = "GET", body?: BodyInit) => toast.promise(
-				fetch(`/api${url}`, { headers: { Authorization: `Bearer ${cookies.session}` }, method, body }),
-				{loading: `Fetching ${url}`, success: `${url} fetched`, error: `Unable to fetch ${url}`}
-			)
-
-			const response = await api("/users/me")
-
-			const data = await response.json()
-
-			if (response.status != 200) {
-				toast.error(data.message)
-				removeCookie("session")
-				setStatus("disconnected")
-				setSession(null)
-			}
-
-			else {
-				const response = await api(`/users/friends/${data.id}`)
-				const friends = await response.json()
-				
-				setSession({...data, api, token: cookies.session, friends})
-				setStatus("connected")
-				toast(`Hi, ${data.login}!`, {icon: "👋"})
-			}
-
-		}
-
 		if (cookies.session) {
+			const handleFetch = async () => {
+				const api = (url: string | URL | Request, method: "GET"|"POST"|"DELETE" = "GET", body?: BodyInit) => toast.promise(
+					fetch(`/api${url}`, { headers: { Authorization: `Bearer ${cookies.session}` }, method, body }),
+					{loading: `Fetching ${url}`, success: `${url} fetched`, error: `Unable to fetch ${url}`}
+				)
+
+				const response = await api("/users/me")
+
+				if (response.status != 200) {
+					removeCookie("session")
+					setStatus("disconnected")
+					setSession(null)
+					return
+				}
+
+				const data = await response.json()
+				setSession({...data, api, token: cookies.session})
+				setStatus("connected")
+			}
+
 			handleFetch().catch(e => {
 				toast.error("Something went wrong, try again.")
 				setStatus("disconnected")
@@ -78,7 +64,6 @@ export function SessionProvider({
 			setStatus("disconnected")
 			setSession(null)
 		}
-
 	}, [cookies, removeCookie])
 
 	return (

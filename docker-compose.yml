@@ -37,5 +37,13 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:7.2.4-alpine3.19
+    image: redis
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
     restart: unless-stopped

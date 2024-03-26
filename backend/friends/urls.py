@@ -4,9 +4,11 @@ from friends import views
 
 
 urlpatterns = [
-  path('<int:user_id>/', views.get_user_friends_list, name='get-friends-list'),
-  path('get/', views.get_friend_request, name='get-friend-request'),
-  path('add/', views.add_friend, name='add-friend'),
-  path('reject/', views.reject_friend, name='reject-friend'),
-  path('remove/', views.remove_friend, name='remove-friend'),
+  # / - GET    - get friends list
+  # / - POST   - add/accept friend {user_id: 2}
+  # / - DELETE - delete/reject/cancel friend
+  path('', views.Friend.as_view()),
+
+  # /requests - GET - get friend request(s) [user_id]
+	path('requests/', views.get_friend_request)
 ]

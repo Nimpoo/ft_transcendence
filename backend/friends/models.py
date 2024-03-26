@@ -9,12 +9,14 @@ class FriendRequest(models.Model):
   STATUS_ACCEPTED = 'accepted'
   STATUS_REJECTED = 'rejected'
   STATUS_REMOVED = 'removed'
+  STATUS_CANCELED = 'canceled'
 
   STATUS_CHOICES = [
     (STATUS_PENDING, 'Pending'),
     (STATUS_ACCEPTED, 'Accepted'),
     (STATUS_REJECTED, 'Rejected'),
     (STATUS_REMOVED, 'Removed'),
+    (STATUS_CANCELED, 'Canceled'),
   ]
 
   sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_friend_requests')

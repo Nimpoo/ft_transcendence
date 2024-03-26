@@ -32,32 +32,54 @@ export function SocketProvider({
 				}
 
 				socket.onmessage = e => {
-					console.log('from socket:', e.data)
+					let data
+					try {
+						data = JSON.parse(e.data)
+					} catch (e) {
+						return
+					}
 
-					const sender: User = JSON.parse(e.data)['from']
-					toast(t => (
-						<span>
-							Friend Request from {sender.display_name}
+					const sender: User = data['from']
 
-							<div className="btn-group">
-								<button onClick={async () => {
-									session.api("/users/friends/add", "POST", JSON.stringify({user_id: sender.id}))
-									toast.dismiss(t.id)
-								}}>accept</button>
-								<button onClick={async () => {
-									session.api("/users/friends/reject", "POST", JSON.stringify({user_id: sender.id}))
-									toast.dismiss(t.id)
-								}}>reject</button>
-							</div>
+					switch (data["type"]) {
+						case "friendrequest.ask":
+							toast(t => (
+								<span>
+									Friend Request from {sender.display_name}
 
-							<button onClick={() => toast.dismiss(t.id)}>
-								X
-							</button>
+									<div className="btn-group">
+										<button onClick={async () => {
+											session.api("/users/friends", "POST", JSON.stringify({user_id: sender.id}))
+											toast.dismiss(t.id)
+										}}>accept</button>
+										<button onClick={async () => {
+											session.api("/users/friends", "DELETE", JSON.stringify({user_id: sender.id}))
+											toast.dismiss(t.id)
+										}}>reject</button>
+									</div>
 
-						</span>
-					), {
-						duration: 20000
-					})
+									<button onClick={() => toast.dismiss(t.id)}>
+										X
+									</button>
+
+								</span>
+							), {
+								duration: 20000
+							})
+							break
+
+						case "friendrequest.accept":
+							toast(`${sender.display_name} accepted your friend request`)
+							break
+
+						case "friendrequest.reject":
+							toast(`${sender.display_name} rejected your friend request`)
+							break
+
+						case "friendrequest.remove":
+							toast(`${sender.display_name} removed you from friends`)
+							break
+					}
 				}
 
 				socket.onopen = e => {

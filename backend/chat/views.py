@@ -1,79 +1,130 @@
-from django.shortcuts import render
-
-from django.views.decorators.http import require_POST, require_GET
+from django.views import View
 from django.shortcuts import get_object_or_404
 from django.http import HttpRequest, JsonResponse
+from django.utils.decorators import method_decorator
 
+from friends.models import FriendRequest
 from users.models import User
-from utils.decorators import jwt_verify
+from utils.decorators import need_user
 
 import json
 
-@require_GET
-def get_user_blocked_list(request: HttpRequest, user_id: int) -> JsonResponse:
-    user = get_object_or_404(User, pk=user_id)
-    return JsonResponse(list(user.blocked.values()), safe=False)
 
-@require_POST
-@jwt_verify
-def block(request: HttpRequest) -> JsonResponse:
-    if len(request.body) == 0:
-        return JsonResponse({'error': 'Bad Request', 'message': 'Missing body.'}, status=400)
-    try:
-        body_payload = json.loads(request.body.decode('utf-8'))
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Bad Request', 'message': 'Body must be JSON.'}, status=400)
+class Block(View):
 
-    sender_id, receiver_id = request.payload.get('id'), body_payload.get('user_id')
+    @method_decorator((need_user), name="dispatch")
+    def get(self, request: HttpRequest, user: User) -> JsonResponse:
+        return JsonResponse(list(user.blocked.values()), safe=False)
 
-    if None in [sender_id, receiver_id]:
-        return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+    @method_decorator((need_user), name="dispatch")
+    def post(self, request: HttpRequest, user: User) -> JsonResponse:
+        if len(request.body) == 0:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "Missing body."}, status=400
+            )
 
-    sender_id, receiver_id = int(sender_id), int(receiver_id)
+        try:
+            body_payload = json.loads(request.body.decode("utf-8"))
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "Body must be JSON."}, status=400
+            )
 
-    if sender_id == receiver_id:
-        return JsonResponse({'error': 'Bad Request', 'message': 'IDs are equal.'}, status=400)
+        receiver_id = body_payload.get("user_id")
 
-    sender = get_object_or_404(User, pk=sender_id)
-    receiver = get_object_or_404(User, pk=receiver_id)
+        if receiver_id is None:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "No 'user_id' provided."},
+                status=400,
+            )
 
-    if sender.blocked.contains(receiver):
-        return JsonResponse({'error': 'Bad Request', 'message': 'Already blocked.'}, status=400)
-    
-    sender.blocked.add(receiver)
-    if sender.friends.contains(receiver):
-        sender.friends.remove(receiver)
-    print(receiver.login, 'is blocked')
-    
-    return JsonResponse(list(sender.blocked.values()), safe=False)
-    
-@require_POST
-@jwt_verify
-def unblock(request: HttpRequest) -> JsonResponse:
-    if len(request.body) == 0:
-        return JsonResponse({'error': 'Bad Request', 'message': 'Missing body.'}, status=400)
-    try:
-        body_payload = json.loads(request.body.decode('utf-8'))
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Bad Request', 'message': 'Body must be JSON.'}, status=400)
+        receiver = get_object_or_404(User, id=receiver_id)
 
-    sender_id, receiver_id = request.payload.get('id'), body_payload.get('user_id')
+        if user is receiver:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "IDs are equal."}, status=400
+            )
 
-    if None in [sender_id, receiver_id]:
-        return JsonResponse({'error': 'Bad Request', 'message': 'Missing required fields.'}, status=400)
+        if user.blocked.contains(receiver):
+            return JsonResponse(
+                {
+                    "error": "Bad Request",
+                    "message": f"'{receiver.login}' is already in your blocked list.",
+                },
+                status=400,
+            )
 
-    sender_id, receiver_id = int(sender_id), int(receiver_id)
+        if user.friends.contains(receiver):
+            user.friends.remove(receiver)
 
-    if sender_id == receiver_id:
-        return JsonResponse({'error': 'Bad Request', 'message': 'IDs are equal.'}, status=400)
+            try:
+                friend_request = FriendRequest.objects.get(
+                    sender=user,
+                    receiver=receiver,
+                    status__in=[
+                        FriendRequest.STATUS_PENDING,
+                        FriendRequest.STATUS_ACCEPTED,
+                    ],
+                )
+            except FriendRequest.DoesNotExist:
+                friend_request = get_object_or_404(
+                    FriendRequest,
+                    sender=receiver,
+                    receiver=user,
+                    status__in=[
+                        FriendRequest.STATUS_PENDING,
+                        FriendRequest.STATUS_ACCEPTED,
+                    ],
+                )
 
-    sender = get_object_or_404(User, pk=sender_id)
-    receiver = get_object_or_404(User, pk=receiver_id)
+            friend_request.status = FriendRequest.STATUS_REMOVED
+            friend_request.save()
 
-    if not sender.blocked.contains(receiver):
-        return JsonResponse({'error': 'Bad Request', 'message': 'Already unblocked.'}, status=400)
-    
-    sender.blocked.remove(receiver)
-    print(receiver.login, 'is unblocked')
-    
-    return JsonResponse(list(sender.blocked.values()), safe=False)
+        user.blocked.add(receiver)
+
+        print(f"{user.login} just blocked {receiver.login}")
+
+        return JsonResponse(list(user.blocked.values()), safe=False)
+
+    @method_decorator((need_user), name="dispatch")
+    def delete(self, request: HttpRequest, user: User) -> JsonResponse:
+        if len(request.body) == 0:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "Missing body."}, status=400
+            )
+
+        try:
+            body_payload = json.loads(request.body.decode("utf-8"))
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "Body must be JSON."}, status=400
+            )
+
+        receiver_id = body_payload.get("user_id")
+
+        if receiver_id is None:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "Missing required fields."},
+                status=400,
+            )
+
+        receiver = get_object_or_404(User, id=receiver_id)
+
+        if user is receiver:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "IDs are equal."}, status=400
+            )
+
+        if not user.blocked.contains(receiver):
+            return JsonResponse(
+                {
+                    "error": "Bad Request",
+                    "message": f"'{receiver.login}' isn't in your blocked list.",
+                },
+                status=400,
+            )
+
+        user.blocked.remove(receiver)
+        print(f"{user.login} just unblocked {receiver.login}")
+
+        return JsonResponse(list(user.blocked.values()), safe=False)

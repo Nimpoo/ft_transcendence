@@ -14,6 +14,7 @@ import "@/styles/Text.css"
 import { useSession } from "@/providers/Session"
 import FriendsList from "@/components/FriendsList"
 import UserSearchBar from "@/components/UserSearchBar"
+import FriendRequestsList from "@/components/FriendRequestsList"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -23,10 +24,12 @@ const ubu = Ubuntu ({
 function Home(): React.JSX.Element {
 	const { session, status } = useSession()
 
-	{/* --------------------------- CONNECTED -------------------------- */}
 	if (status == "loading") {
 		return <></> // todo loading
-	} else if (status == "connected" && session) {
+	}
+
+	{/* --------------------------- CONNECTED -------------------------- */}
+	if (status == "connected" && session) {
 		return (
 			<main className="homepage-left-wrapper">
 
@@ -72,6 +75,7 @@ function Home(): React.JSX.Element {
 
 					<div className="friends-bento spaceY-between-btn-3">
 						<UserSearchBar />
+						<FriendRequestsList />
 						<FriendsList />
 					</div>
 
@@ -80,7 +84,6 @@ function Home(): React.JSX.Element {
 			</main>
 		)
 	}
-	{/* ---------------------------------------------------------------- */}
 
 	{/* ------------------------ NOT CONNECTED ------------------------- */}
 	return (
@@ -93,7 +96,8 @@ function Home(): React.JSX.Element {
 						<h1 className="fw-bold custom-font-size text-light">Final Project.</h1>
 					</div>
 					<div className="col-3 align-items-center align-self-center mt-5">
-						<Link href={`https://api.intra.42.fr/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI as string)}&response_type=code`}>
+						{(process.env.NEXT_PUBLIC_CLIENT_ID && process.env.NEXT_PUBLIC_REDIRECT_URI &&
+							<Link href={`https://api.intra.42.fr/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI)}&response_type=code`}>
 								<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
 									<Image className="logo"
 										src="/svg/42-school_logo.svg"
@@ -103,7 +107,12 @@ function Home(): React.JSX.Element {
 									/>
 									Continue with 42
 								</button>
-						</Link>
+							</Link>
+						) || (
+							<button disabled type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
+								Client ID not defined
+							</button>
+						)}
 					</div>
 				</div>
 			</div>
