@@ -36,8 +36,6 @@ class UserConsumer(AsyncWebsocketConsumer):
     if self.user:
       await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-  async def user_notification(self, event):
-    await self.send(json.dumps(event.get('data')))
 
   async def handle_message(self, event):
     subtype = event["subtype"]
@@ -45,6 +43,16 @@ class UserConsumer(AsyncWebsocketConsumer):
       await self.handle_privmsg(event)
     elif subtype == "grpmsg":
       await self.handle_grpmsg(event)
+
+  # JSON request for chat should me formatted like that :
+  #   {
+  #      "query_type": "msg" (the only argument available for the moment is "msg")
+  #      "subtype": "privmsg" or "grpmsg"
+  #       "target": "losylves"
+  #       "sender": "mayoub"
+  #       "content": "Bonjour les copains" (the content of the message)
+  #   }
+
 
   async def handle_privmsg(self, event):
     qtype = event["query_type"]
@@ -62,7 +70,6 @@ class UserConsumer(AsyncWebsocketConsumer):
       )
     chat = await self.create_chat_async(content, self.scope, self.room_name)
     
-
   async def handle_grpmsg(self, event):
     qtype = event["query_type"]
   
@@ -74,6 +81,8 @@ class UserConsumer(AsyncWebsocketConsumer):
       chat = await sync_to_async(Chat.objects.create)(content=message, sender=scope['user'], room=room[0])
       return chat
 
+  async def user_notification(self, event):
+    await self.send(json.dumps(event.get('data')))
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
