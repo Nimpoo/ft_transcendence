@@ -28,6 +28,7 @@ class QueryAuthMiddleware:
 
         try:
             scope["user"] = await sync_to_async(User.objects.get)(pk=payload.get("id"))
+            scope["user_id"] = payload.get("id")
         except User.DoesNotExist:
             return await self.app(scope, receive, send)
 

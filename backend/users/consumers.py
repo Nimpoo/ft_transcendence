@@ -10,7 +10,6 @@ from asgiref.sync import sync_to_async
 
 
 class UserConsumer(AsyncWebsocketConsumer):
-
   async def connect(self):
     self.user: User = self.scope.get('user')
 
@@ -27,12 +26,54 @@ class UserConsumer(AsyncWebsocketConsumer):
       await self.channel_layer.group_add(self.room_group_name, self.channel_name)
       await self.accept()
 
+  async def receive(self, text_data):
+    text_data_json = json.loads(text_data)
+    qtype = text_data_json["query_type"]
+    if qtype == "msg":
+      await self.handle_message(text_data_json)
+    
   async def disconnect(self, code):
     if self.user:
       await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
   async def user_notification(self, event):
     await self.send(json.dumps(event.get('data')))
+
+  async def handle_message(self, event):
+    subtype = event["subtype"]
+    if subtype == "privmsg":
+      await self.handle_privmsg(event)
+    elif subtype == "grpmsg":
+      await self.handle_grpmsg(event)
+
+  async def handle_privmsg(self, event):
+    qtype = event["query_type"]
+    subtype = event["subtype"]
+    sender = event["sender"]
+    target = event["target"]
+    content = event["content"]
+    channel_name = f"user_{target}"
+    await self.channel_layer.group_send(channel_name, {
+      "type": "chat.message",
+      "query_type": qtype,
+      "sub_type": subtype,
+      "sender": sender,
+      "content": content}
+      )
+    chat = await self.create_chat_async(content, self.scope, self.room_name)
+    
+
+  async def handle_grpmsg(self, event):
+    qtype = event["query_type"]
+  
+  async def chat_message(self, event):
+    await self.send(text_data=json.dumps(event))
+  
+  async def create_chat_async(self, message, scope, room_name):
+      room = await sync_to_async(ChatRoom.objects.get_or_create)(name=room_name)
+      chat = await sync_to_async(Chat.objects.create)(content=message, sender=scope['user'], room=room[0])
+      return chat
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
