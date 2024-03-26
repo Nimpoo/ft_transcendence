@@ -78,6 +78,8 @@
 
 .conv-box {
     height: 395px;
+    width: 880px;
+    overflow-y: scroll;
 }
 
 .text-box-style {

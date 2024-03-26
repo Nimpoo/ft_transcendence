@@ -1,0 +1,48 @@
+.my-entire-div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    max-width: 50%;
+    display: flex;
+    flex: column;
+    margin-left: auto;
+}
+
+.friend-entire-div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    max-width: 50%;
+    display: flex;
+    flex: column;
+}
+
+.my-message-div {
+    text-align: justify;
+    background-color: rgb(190, 37, 73);
+    border-radius: 1rem;
+    padding: 10px;
+    word-wrap: break-word;
+    margin-left: auto;
+    max-width: 90%;
+}
+
+.friend-message-div {
+    text-align: justify;
+    background-color: rgb(150, 37, 190);
+    border-radius: 1rem;
+    padding: 10px;
+    word-wrap: break-word;
+    max-width: 90%;
+}
+
+.my-image-div {
+    width: 25px;
+    align-self: flex-end;
+    flex-direction: column;
+    margin-right: 5px;
+}
+
+.friend-image-div {
+    width: 25px;
+    align-self: flex-end;
+    flex-direction: column;
+}

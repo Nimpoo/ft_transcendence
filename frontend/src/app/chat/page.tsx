@@ -4,11 +4,14 @@ import "@/styles/Chat.css"
 import Image from "next/image"
 import { useState } from "react"
 import React from 'react'
+import ChatMessage from "@/components/ChatMessage"
 
 function Chat(): React.JSX.Element {
 
     const [conv, setConv] = useState(true);
     const [dropDown, setDropDown] = useState(false);
+    const [newMessage, setNewMessage] = useState<string>("");
+    const [messages, setMessages] = useState<string[]>([]);
 
     function handleClick() {
         setConv(!conv);
@@ -16,6 +19,21 @@ function Chat(): React.JSX.Element {
 
     function handleDropDown() {
         setDropDown(!dropDown);
+    }
+
+    function handleMessageSend() {
+        const trimMsg = newMessage.trim();
+        if (trimMsg !== "")
+        {
+            setMessages(prevMessages => [...prevMessages, newMessage]);
+            setNewMessage("");
+        }
+    }
+
+    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            handleMessageSend();
+        }
     }
 
     return (
@@ -125,10 +143,15 @@ function Chat(): React.JSX.Element {
                         </ul>
                     </div>
                     <div className="conv-box">
+                        <ChatMessage message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." isMyMessage={false}></ChatMessage>
+                        <ChatMessage message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." isMyMessage={true}></ChatMessage>
+                        {messages.map((message, index) => (
+                            <ChatMessage key={index} message={message} isMyMessage={true} />
+                        ))}
                     </div>
                     <div className="input-group">
-                        <input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send"></input>
-                        <button className="btn btn-text-style btn-light" type="button" id="button-send">
+                        <input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} onKeyDown={handleKeyPress}></input>
+                        <button className="btn btn-text-style btn-light" type="button" id="button-send" onClick={handleMessageSend}>
                             <Image className="logo"
                                 src={"/svg/Send-logo.svg"}
                                 width={21}
