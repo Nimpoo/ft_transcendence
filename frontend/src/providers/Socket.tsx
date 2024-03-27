@@ -79,6 +79,10 @@ export function SocketProvider({
 						case "friendrequest.remove":
 							toast(`${sender.display_name} removed you from friends`)
 							break
+
+						case "message.receive":
+							toast(`${sender.display_name}: ${data["content"]}`)
+							break
 					}
 				}
 
