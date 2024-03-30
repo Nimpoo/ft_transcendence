@@ -6,20 +6,19 @@ let score1 = 0
 let score2 = 0
 
 interface Ball {
-	coord: {
-		x: number,
-		y: number
-	}
-	dimensions: {
-		w: number,
-		h: number,
-	},
-	dir: {
-		vx: number,
-		vy: number,
-	},
+	coord: [number, number],
+	dimensions: [number, number],
+	dir: [number, number],
 	color: string,
 	draw: () => void,
+}
+
+var square: Ball = {
+	coord: [0, 0],
+	dimensions: [0, 0],
+	dir: [0, 0],
+	color: "white",
+	draw: function() {},
 }
 
 function Canvas({
@@ -47,39 +46,54 @@ function Canvas({
 				context.scale(dpi, dpi)
 
 				// ! /*--------------- BALL ---------------*/
-				var square: Ball = {
-					coord: {
-						x: width / 2,
-						y: height / 2,
-					},
-					dimensions: {
-						w: height / 35,
-						h: height / 35,
-					},
-					dir: {
-						vx: 5.25,
-						vy: 5.25,
-					},
-					color: "white",
-					draw: function() {
-						context.beginPath()
-						context.save()
-						context.translate(-(this.dimensions.w / 2), -(this.dimensions.h / 2))
-						context.closePath()
-						context.fillStyle = this.color
-						context.fillRect(this.coord.x, this.coord.y, this.dimensions.w, this.dimensions.h)
-						context.restore()
-					},
+
+				const ws = new WebSocket("ws://localhost:8000/ws/game/")
+				ws.onopen = function(event: Event) {
+					// console.log(event)
+					ws.send(JSON.stringify({
+						"type": "connection_established",
+						"Player One [CLIENT]": "Get Ready !",
+						})
+					)
 				}
+
+				ws.onclose = function(event: CloseEvent) {
+					// console.log(event)
+					ws.send(JSON.stringify({
+						"type": "connection_established",
+						"Player One [CLIENT]": "See you soon !",
+						})
+					)
+					ws.close()
+				}
+
+				ws.onmessage = function(event: MessageEvent<any>) {
+					const data = JSON.parse(event.data)
+
+					var coord_maj: [number, number] = data.new_position?.coordinates ?? [0, 0]
+					var dim_maj: [number, number] = data.new_position?.dimensions ?? [0, 0]
+					var dir_maj: [number, number] = data.new_position?.speed ?? [0, 0]
+
+					square = {
+						coord: [coord_maj[0] * width, coord_maj[1] * height],
+						dimensions: [dim_maj[0] * height, dim_maj[1] * height],
+						dir: [dir_maj[0] * width, dir_maj[1] * height],
+						color: "white",
+						draw: function() {
+							context.beginPath()
+							context.save()
+							context.translate(-(this.dimensions[0] / 2), -(this.dimensions[1] / 2))
+							context.closePath()
+							context.fillStyle = this.color
+							context.fillRect(this.coord[0], this.coord[1], this.dimensions[0], this.dimensions[1])
+							context.restore()
+						},
+					}
+					// console.log("coordonée", square.coord, score1++)
+					// console.log("speed", square.dir, score2++)
+				}
+
 				// ! /*------------------------------------*/
-
-				let animationFrameId: number
-
-				// * the animation loop
-				const animate = () => {
-						animationFrameId = window.requestAnimationFrame(animate)
-						demo()
-				}
 
 				// * the draw for the demo mode
 				const demo = () => {
@@ -101,22 +115,23 @@ function Canvas({
 					// ? The ball
 					square.draw()
 
-					// ? The collisions
-					if (square.coord.x + square.dir.vx + (square.dimensions.w / 2) > width || square.coord.x + square.dir.vx - (square.dimensions.w / 2) < 0) {
-						square.dir.vx *= -1
-						square.dir.vy += Math.random() + (0.500 - 0.0200) + 0.200
-					}
-
-					if (square.coord.y + square.dir.vy + (square.dimensions.h / 2) > height || square.coord.y + square.dir.vy - (square.dimensions.h / 2) < 0) {
-						square.dir.vy *= -1
-						square.dir.vx += Math.random() + (0.500 - 0.0200) + 0.200
-					}
-
+					// ? The score
 					context.fillText(`${score1}`, width / 5, height / 3.75)
 					context.fillText(`${score2}`, width * 4 / 5, height / 3.75)
-					square.coord.x += square.dir.vx
-					square.coord.y += square.dir.vy
+
+					// ? The collisions
+						// square.coord[0] += square.dir[0]
+						// square.coord[1] += square.dir[1]
 				}
+
+				let animationFrameId: number
+
+				// * the animation loop
+				const animate = () => {
+					animationFrameId = window.requestAnimationFrame(animate)
+					demo()
+				}
+
 				animate()
 
 				return () => { window.cancelAnimationFrame(animationFrameId) }
