@@ -1,28 +1,28 @@
 import type { Metadata } from "next"
 import { Ubuntu } from "next/font/google"
 import { Toaster } from "react-hot-toast"
-import { Suspense } from "react"
 
-import "bootstrap/dist/css/bootstrap.css"
 import "@/styles/global.css"
 import "@/styles/Background.css"
 import "@/styles/global.css"
 
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
 import { ModalProvider } from "@/providers/Modal"
 import { SessionProvider } from "@/providers/Session"
 import { SocketProvider } from "@/providers/Socket"
 
-const ubu = Ubuntu ({
-	subsets: ["latin"],
-	weight: "500",
-})
+import "bootstrap/dist/css/bootstrap.min.css"
+import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 
 export const metadata: Metadata = {
 	title: "ft_transcendence",
 	description: "Our final project",
 }
+
+const ubu = Ubuntu ({
+	subsets: ["latin"],
+	weight: "500",
+})
 
 function RootLayout({
 	children,
@@ -31,21 +31,19 @@ function RootLayout({
 }): React.JSX.Element {
 	return (
 		<html lang="en">
-			<body>
+			<body className={ubu.className}>
 				<Toaster position="bottom-right" reverseOrder />
 
-				<div id="div" className={ubu.className}>
-					<Suspense fallback={<h1>Loading... ⏳</h1>}>
-						<SessionProvider>
-							<SocketProvider>
-								<ModalProvider>
-									<Header />
-									{children}
-									<Footer />
-								</ModalProvider>
-							</SocketProvider>
-						</SessionProvider>
-					</Suspense>
+				<div id="div" className="vstack py-4 gap-3" style={{minHeight: "100vh"}}>
+					<SessionProvider>
+						<SocketProvider>
+							<ModalProvider>
+								<Header />
+								{children}
+								<Footer />
+							</ModalProvider>
+						</SocketProvider>
+					</SessionProvider>
 				</div>
 
 				<div id="gradient-bg">

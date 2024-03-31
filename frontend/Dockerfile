@@ -7,9 +7,11 @@ ARG CLIENT_SECRET
 EXPOSE 3000
 
 WORKDIR /app
-COPY . .
 
+COPY package*.json .
 RUN npm install
+
+COPY . .
 RUN npm run build
 
 CMD ["npm", "start"]

@@ -8,6 +8,7 @@ import toast from "react-hot-toast"
 interface Session extends User {
 	api: (url: string | URL | Request, method?: "GET"|"POST"|"DELETE", body?: BodyInit) => Promise<Response>
 	token: string
+	dfa_secret: string | null
 }
 
 type Status = "loading"|"connected"|"disconnected"
@@ -44,19 +45,19 @@ export function SessionProvider({
 				const response = await api("/users/me")
 
 				if (response.status != 200) {
-					removeCookie("session")
-					setStatus("disconnected")
-					setSession(null)
-					return
+					throw new Error(`/users/me returned ${response.status}`)
 				}
 
-				const data = await response.json()
-				setSession({...data, api, token: cookies.session})
-				setStatus("connected")
+				else {
+					const data = await response.json()
+					setSession({...data, api, token: cookies.session})
+					setStatus("connected")
+				}
 			}
-
+			
 			handleFetch().catch(e => {
-				toast.error("Something went wrong, try again.")
+				toast.error(e.message)
+				removeCookie("session")
 				setStatus("disconnected")
 				setSession(null)
 			})
@@ -67,7 +68,7 @@ export function SessionProvider({
 	}, [cookies, removeCookie])
 
 	return (
-		<SessionContext.Provider value={{ session, status }}>
+		<SessionContext.Provider value={{session, status}}>
 			{children}
 		</SessionContext.Provider>
 	)

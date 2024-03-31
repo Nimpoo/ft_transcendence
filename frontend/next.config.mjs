@@ -14,7 +14,7 @@ const nextConfig = {
 		return [
 			{
 				source: "/api/:path*",
-				destination: "http://pong:8000/:path*/"
+				destination: "http://localhost:8000/:path*/"
 			}
 		]
 	}

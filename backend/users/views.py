@@ -145,7 +145,7 @@ def search(request: HttpRequest) -> JsonResponse:
 @need_user
 def me(request: HttpRequest, user: User) -> JsonResponse:
     return JsonResponse(
-        model_to_dict(user, fields=["id", "login", "display_name", "created_at"])
+        model_to_dict(user, exclude=['friends', 'blocked'])
     )
 
 

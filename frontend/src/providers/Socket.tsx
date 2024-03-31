@@ -33,6 +33,7 @@ export function SocketProvider({
 
 				socket.onmessage = e => {
 					let data
+
 					try {
 						data = JSON.parse(e.data)
 					} catch (e) {

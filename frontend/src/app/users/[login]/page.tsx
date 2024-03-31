@@ -1,9 +1,10 @@
 "use client"
 
-import { useSession } from "@/providers/Session"
-import { useRouter } from "next/navigation"
-import { use, useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+
+import { useSession } from "@/providers/Session"
 
 function UserProfile({ params }: { params: { login: string } }): React.JSX.Element {
 	const router = useRouter()

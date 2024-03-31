@@ -1,7 +1,6 @@
 "use server"
 
 async function getAccessToken(code: string): Promise<string> {
-
 	if (!process.env["NEXT_PUBLIC_CLIENT_ID"] || !process.env["CLIENT_SECRET"] || !process.env["NEXT_PUBLIC_REDIRECT_URI"]) {
 		throw new Error("One or more required variables are missing")
 	}
@@ -28,7 +27,7 @@ async function getAccessToken(code: string): Promise<string> {
 	const token = data["access_token"]
 
 	if (token === undefined) {
-		throw new Error("api.intra.42.fr not returned a access token")
+		throw new Error("api.intra.42.fr didn't returned a access token")
 	}
 
 	return new Promise<string>(resolve => resolve(token))

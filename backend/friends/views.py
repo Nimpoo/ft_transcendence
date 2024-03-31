@@ -201,8 +201,6 @@ class Friend(View):
                 ],
             )
 
-        print(user, friendrequest.sender)
-
         match friendrequest.status:
             case FriendRequest.STATUS_PENDING:
                 if user == friendrequest.sender:

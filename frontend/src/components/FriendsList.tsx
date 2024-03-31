@@ -1,7 +1,10 @@
-import { useSession } from "@/providers/Session"
+"use client"
+
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useEffect, useState } from "react"
+
+import { useSession } from "@/providers/Session"
 
 function FriendsList(): React.JSX.Element {
 	const { session } = useSession()
@@ -19,39 +22,37 @@ function FriendsList(): React.JSX.Element {
 		}
 	}, [session])
 
-	if (session) {
-		const FriendsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
-			const handleRemove = () => {
-				session.api("/users/friends", "DELETE", JSON.stringify({ user_id: user.id })).catch(() => toast.error('Remove failed, try again'))
-				setFriendsList(friendsList.slice(index, index))
-			}
+	const FriendsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
+		const handleRemove = () => {
+			session?.api("/users/friends", "DELETE", JSON.stringify({ user_id: user.id }))
+				.catch(() => toast.error('Remove failed, try again'))
+				.then(() => setFriendsList(friendsList.slice(index, index)))
+		}
 
-			const handleBlock = () => {
-				session.api("/chat/block", "POST", JSON.stringify({ user_id: user.id })).catch(() => toast.error('Remove failed, try again'))
-			}
-
-			return (
-				<li style={{display: "flex", flexDirection: "column"}}>
-					<Link href={`/users/${user.login}`}>
-						<h5>{user.login}</h5>
-					</Link>
-					<div className="btn-group">
-						<button className="btn btn-success" onClick={handleRemove}>remove</button>
-						<button className="btn btn-danger" onClick={handleBlock}>block</button>
-					</div>
-				</li>
-			)
+		const handleBlock = () => {
+			session?.api("/chat/block", "POST", JSON.stringify({ user_id: user.id }))
+				.catch(() => toast.error('Remove failed, try again'))
+				.then(() => setFriendsList(friendsList.slice(index, index)))
 		}
 
 		return (
-			<ul className="list-unstyled">
-				{friendsList.map((friend, key) => <FriendsListItem key={key} user={friend} index={key} />)}
-			</ul>
+			<li style={{display: "flex", flexDirection: "column"}}>
+				<Link href={`/users/${user.login}`}>
+					<h5>{user.login}</h5>
+				</Link>
+				<div className="btn-group">
+					<button className="btn btn-success" onClick={handleRemove}>remove</button>
+					<button className="btn btn-danger" onClick={handleBlock}>block</button>
+				</div>
+			</li>
 		)
 	}
 
-	else
-		return <></>
+	return (
+		<ul className="list-unstyled">
+			{friendsList.map((friend, key) => <FriendsListItem key={key} user={friend} index={key} />)}
+		</ul>
+	)
 }
 
 export default FriendsList
