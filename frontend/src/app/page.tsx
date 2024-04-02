@@ -95,7 +95,7 @@ function Home(): React.JSX.Element {
 								<Link href={`https://api.intra.42.fr/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI)}&response_type=code`}>
 									<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
 										<Image className="logo"
-											src="/svg/42-school_logo.svg"
+											src="/assets/svg/42-school_logo.svg"
 											width={24}
 											height={24}
 											alt="42 Logo"

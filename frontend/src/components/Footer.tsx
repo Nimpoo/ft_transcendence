@@ -36,7 +36,7 @@ function Settings(): React.JSX.Element {
 			<div className="d-flex justify-content-between align-items-center mb-3">
 				<div>
 					<Image className="modal-icon"
-						src="/svg/volume-setting.svg"
+						src="/assets/svg/volume-setting.svg"
 						width={30}
 						height={30}
 						alt="sound logo"
@@ -56,7 +56,7 @@ function Settings(): React.JSX.Element {
 			<div className="d-flex justify-content-between align-items-center mb-3">
 				<div>
 					<Image className="modal-icon"
-						src="/svg/dark-mode-setting.svg"
+						src="/assets/svg/dark-mode-setting.svg"
 						width={30}
 						height={30}
 						alt="dark-mode logo"
@@ -78,7 +78,7 @@ function Settings(): React.JSX.Element {
 					<div className="d-flex justify-content-between align-items-center mb-3">
 						<div>
 							<Image className="modal-icon"
-								src="/svg/2fa-setting.svg"
+								src="/assets/svg/2fa-setting.svg"
 								width={30}
 								height={30}
 								alt="2fa logo"
@@ -113,45 +113,80 @@ function Settings(): React.JSX.Element {
 					</div>
 
 					{is2faOn &&
-						<span className="d-inline-block" tabIndex={0} data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content={dfaSecret}>
+						<>
 							<Canvas
 								text={`otpauth://totp/ft_transcendence:${session.login}?secret=${dfaSecret}&issuer=ft_transcendence`}
 								options={{
-									errorCorrectionLevel: 'M',
+									errorCorrectionLevel: "M",
 									margin: 3,
 									scale: 4,
 									width: 200,
 									color: {
-										dark: '#0000',
-										light: '#FFF',
+										dark: "#0000",
+										light: "#FFF",
 									},
 								}}
 							/>
-							setup key: <code className="badge text-bg-secondary">{dfaSecret}</code>
-						</span>
+							<span className="d-inline-block" tabIndex={0} data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content={dfaSecret}>
+								setup key: <code className="badge text-bg-secondary">{dfaSecret}</code>
+							</span>
+						</>
 					}
 
-					<div style={{justifyContent: "space-between", display: "flex"}} className="list-inline mt-4">
-						<div className="list-inline-item">
-							<button type="button" disabled={socket?.readyState !== WebSocket.OPEN} className="btn btn-primary">Change profile picture</button>
+					<div className="d-flex justify-content-between align-items-center mb-3">
+						<div>
+							<Image className="modal-icon"
+								src="/assets/svg/display-name-setting.svg"
+								width={30}
+								height={30}
+								alt="display name logo"
+							/>
+							<span className="ms-2">Display Name</span>
 						</div>
-						<div className="list-inline-item">
-							<button type="button" disabled={socket?.readyState !== WebSocket.OPEN} className="btn btn-success btn-size">Change pseudo</button>
-						</div>
+						<form onSubmit={e => {
+							e.preventDefault()
+
+							const form = e.target as HTMLFormElement
+							const display_name_input = form.display_name
+							
+							if (display_name_input && !display_name_input.classList.contains("invalid")) {
+								const display_name = display_name_input.value
+								session.api("/users/me/displayname", "POST", JSON.stringify({display_name}))
+									.then(response => response.json())
+									.then(console.log)
+									.catch(console.error)
+							}
+						}}>
+							<input type="text" name="display_name" id="display_name" defaultValue={session.display_name} onChange={e => {
+								const value = e.target.value
+								if (4 <= value.length && value.length <= 30) {
+									e.target.classList.remove("invalid")
+								} else {
+									e.target.classList.add("invalid")
+								}
+							}} />
+							<input type="submit" value="set" disabled={socket?.readyState !== WebSocket.OPEN} />
+						</form>
 					</div>
 
 					<div className="justify-content-center d-flex align-items-center">
 						<button type="button" className="btn btn-danger"
-								onClick={() => {
-									removeCookie("session", {sameSite: true});
-									clearModal();
-									toast("See you soon", {icon:"👋"});
-									let audioObject:HTMLAudioElement = new Audio(`/sounds/mario.wav`)
-									audioObject.volume = 0.3
-									audioObject.autoplay = true
+							onClick={
+								() => {
+									removeCookie("session", {sameSite: true})
+									clearModal()
+									toast("See you soon", {icon:"👋"})
+
+									if (isSoundOn) {
+										let audioObject: HTMLAudioElement = new Audio("/sounds/mario.wav")
+										audioObject.volume = 0.3
+										audioObject.autoplay = true
+									}
+
 									redirect("/")
-								}}
-							>Log out</button>
+								}
+							}
+						>Log out</button>
 					</div>
 				</>
 			)}
@@ -184,7 +219,7 @@ function Footer(): React.JSX.Element {
 				<Link className="link-light" href="/chat">
 					<button className="btn shadow-none">
 						<Image className="image"
-							src="/svg/chat.svg"
+							src="/assets/svg/chat.svg"
 							width={30}
 							height={30}
 							alt="Chat logo"
@@ -196,7 +231,7 @@ function Footer(): React.JSX.Element {
 
 			<button className="btn shadow-none" onClick={() => createModal(settingsModal)}>
 				<Image className="image"
-					src="/svg/settings.svg"
+					src="/assets/svg/settings.svg"
 					width={30}
 					height={30}
 					alt="Settings logo"

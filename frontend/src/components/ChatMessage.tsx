@@ -18,7 +18,7 @@ const MeChatMessage: React.FC<MessageProps> = ({message, isMyMessage}) => {
                 </div>
                 <div className="my-image-div">   
                     <Image className="avatar"
-                        src={"./svg/John Doe.svg"}
+                        src={"./assets/svg/John Doe.svg"}
                         width={25}
                         height={25}
                         alt="John Doe">
@@ -28,7 +28,7 @@ const MeChatMessage: React.FC<MessageProps> = ({message, isMyMessage}) => {
             {!isMyMessage && <div className="friend-entire-div clearfix">
                 <div className="friend-image-div">   
                     <Image className="avatar"
-                        src={"./svg/John Doe.svg"}
+                        src={"./assets/svg/John Doe.svg"}
                         width={25}
                         height={25}
                         alt="John Doe">

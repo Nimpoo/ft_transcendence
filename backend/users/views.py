@@ -1,9 +1,8 @@
 from django.forms import model_to_dict
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.utils.decorators import method_decorator
-from django.views.decorators.http import require_GET
 from django.views import View
 from django.db.models import Q
 
@@ -144,9 +143,45 @@ def search(request: HttpRequest) -> JsonResponse:
 @require_GET
 @need_user
 def me(request: HttpRequest, user: User) -> JsonResponse:
-    return JsonResponse(
-        model_to_dict(user, exclude=['friends', 'blocked'])
-    )
+    return JsonResponse(model_to_dict(user, exclude=["friends", "blocked"]))
+
+
+@require_POST
+@need_user
+def change_display_name(request: HttpRequest, user: User) -> JsonResponse:
+    if len(request.body) == 0:
+        return JsonResponse(
+            {"error": "Bad Request", "message": "Missing body."}, status=400
+        )
+
+    try:
+        body_payload = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"error": "Bad Request", "message": "Body must be JSON."}, status=400
+        )
+
+    display_name = body_payload.get("display_name")
+
+    if display_name is None:
+        return JsonResponse(
+            {"error": "Bad Request", "message": "Missing 'display_name' field."},
+            status=400,
+        )
+
+    if not 4 <= len(display_name) <= 30:
+        return JsonResponse(
+            {
+                "error": "Bad Request",
+                "message": "display name have to be between 4 and 30 characters.",
+            },
+            status=400,
+        )
+
+    user.display_name = display_name
+    user.save()
+
+    return JsonResponse(model_to_dict(user, exclude=["friends", "blocked"]))
 
 
 class DFA(View):

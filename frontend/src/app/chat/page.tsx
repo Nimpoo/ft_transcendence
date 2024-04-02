@@ -46,7 +46,7 @@ function Chat(): React.JSX.Element {
 					<div className="col-3 mt-3">
 						<button type="button" className="btn">
 							<Image className="image"
-								src={"/svg/Cross.svg"}
+								src={"/assets/svg/Cross.svg"}
 								width={25} 
 								height={25}
 								alt="Cross"
@@ -59,7 +59,7 @@ function Chat(): React.JSX.Element {
 						<input type="checkbox" className="btn-check" name="conv-1" id="1st-conv" autoComplete="on"></input>
 						<label className="btn btn-outline-dark btn-1-conv" htmlFor="1st-conv" onClick={handleClick}>
 							<Image className="picture mt-1"
-								src="./svg/John Doe.svg"
+								src="./assets/svg/John Doe.svg"
 								width={60}
 								height={60}
 								alt="John Doe"
@@ -82,7 +82,7 @@ function Chat(): React.JSX.Element {
 						<ul style={{display: "flex"}} className="list-inline">
 							<li className="list-inline-item" style={{marginTop: "3px"}}>
 								<Image className="icon"
-									src={"/svg/Question-mark.svg"}
+									src={"/assets/svg/Question-mark.svg"}
 									width={59}
 									height={59}
 									alt="question mark">
@@ -99,7 +99,7 @@ function Chat(): React.JSX.Element {
 						<input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" disabled></input>
 						<button className="btn btn-text-style btn-light" type="button" id="button-send" disabled>
 							<Image className="logo"
-								src={"/svg/Send-logo.svg"}
+								src={"/assets/svg/Send-logo.svg"}
 								width={21}
 								height={22}
 								alt="Send"
@@ -112,7 +112,7 @@ function Chat(): React.JSX.Element {
 						<ul style={{display: "flex"}} className="list-inline">
 							<li className="list-inline-item" style={{marginTop: "3px"}}>
 								<Image className="icon"
-									src={"/svg/John Doe.svg"}
+									src={"/assets/svg/John Doe.svg"}
 									width={59}
 									height={59}
 									alt="John Doe">
@@ -125,7 +125,7 @@ function Chat(): React.JSX.Element {
 								<div className="dropdown">
 									<button onClick={handleDropDown} className="dropbtn" data-bs-auto-close="true">
 										<Image className="icon"
-											src={"/svg/Three-dots.svg"}
+											src={"/assets/svg/Three-dots.svg"}
 											width={25}
 											height={10}
 											alt="parameters">
@@ -153,7 +153,7 @@ function Chat(): React.JSX.Element {
 						<input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} onKeyDown={handleKeyPress}></input>
 						<button className="btn btn-text-style btn-light" type="button" id="button-send" onClick={handleMessageSend}>
 							<Image className="logo"
-								src={"/svg/Send-logo.svg"}
+								src={"/assets/svg/Send-logo.svg"}
 								width={21}
 								height={22}
 								alt="Send"
