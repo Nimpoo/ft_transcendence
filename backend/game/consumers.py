@@ -1,10 +1,21 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json, asyncio, redis, pickle, random
+from uuid import uuid4
 
 
 class GameConsumer(AsyncWebsocketConsumer):
   async def connect(self):
+    self.uuid = str(uuid4())
     await self.accept()
+
+    try:
+      pool = redis.Redis('localhost', port=6379, decode_responses=True)
+      queue = 'queue'
+      pool.lpush(queue, self.uuid)
+
+    except Exception as e:
+      print(f'ERROR REDIS [CONSUMER]: {e}')
+
     await self.send(json.dumps({
       'type': 'connection_established',
       'Player One [SERVER]': 'Get Ready !',
