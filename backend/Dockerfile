@@ -1,18 +1,17 @@
-FROM python:3.12
-
-ARG JWT_SECRET
-
-ARG POSTGRES_HOST
-ARG POSTGRES_DB
-ARG POSTGRES_USER
-ARG POSTGRES_PASSWORD
+FROM python:latest
 
 EXPOSE 8000
 
-WORKDIR /app
-COPY . .
-
 RUN apt update && apt -y install ncat
+
+WORKDIR /app
+
+COPY requirements.txt .
 RUN python -m pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT [ "sh", "entrypoint.sh" ]
+VOLUME ./static:static
+VOLUME ./media:media
+
+COPY . .
+
+ENTRYPOINT ["sh", "entrypoint.sh"]

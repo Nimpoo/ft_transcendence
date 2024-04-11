@@ -15,7 +15,7 @@ function Callback(): React.JSX.Element {
 		const handleCallback = async (token: string, dfa: string|null = null) => {
 			let response = await toast.promise(
 				fetch(
-					"/api/users",
+					`http://${window.location.hostname}:8000/users/`,
 					{
 						method: "POST",
 						body: JSON.stringify((typeof dfa === "string") ? {token, dfa} : {token})

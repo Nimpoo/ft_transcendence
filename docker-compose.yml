@@ -1,8 +1,10 @@
+version: '3'
+
 services:
 
   ping:
     build:
-      context: frontend/
+      context: frontend
       args:
         - NEXT_PUBLIC_REDIRECT_URI=${NEXT_PUBLIC_REDIRECT_URI}
         - NEXT_PUBLIC_CLIENT_ID=${NEXT_PUBLIC_CLIENT_ID}
@@ -12,33 +14,24 @@ services:
     env_file: .env
     depends_on:
       - pong
-    restart: unless-stopped
+    restart: always
 
   pong:
-    build:
-      context: backend/
-      args:
-        - JWT_SECRET=${JWT_SECRET}
-        - POSTGRES_HOST=${POSTGRES_HOST}
-        - POSTGRES_DB=${POSTGRES_DB}
-        - POSTGRES_USER=${POSTGRES_USER}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - 8000:8000
+    build: backend
     env_file: .env
     depends_on:
       - postgres
       - redis
-    restart: unless-stopped
+    restart: always
 
   postgres:
     image: postgres
     env_file: .env
-    restart: unless-stopped
+    restart: always
 
   redis:
     image: redis
-    restart: unless-stopped
+    restart: always
 
   adminer:
     image: adminer
@@ -46,4 +39,16 @@ services:
       - 8080:8080
     depends_on:
       - postgres
-    restart: unless-stopped
+    restart: always
+
+  nginx:
+    image: nginx
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend/static:/static:ro
+      - ./backend/media:/media:ro
+      - ./nginx/ft_transcendence.conf:/etc/nginx/conf.d/ft_transcendence.conf
+    depends_on:
+      - pong
+    restart: always

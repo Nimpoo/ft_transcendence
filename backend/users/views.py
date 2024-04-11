@@ -102,9 +102,7 @@ class Index(View):
         return JsonResponse(
             {
                 "access_token": jwt.encode(
-                    model_to_dict(
-                        user, fields=["id", "login", "display_name", "created_at"]
-                    ),
+                    model_to_dict(user, fields=["id", "login", "created_at"]),
                     settings.JWT_SECRET,
                 )
             }
@@ -140,10 +138,13 @@ def search(request: HttpRequest) -> JsonResponse:
     return JsonResponse(list(results), safe=False)
 
 
-@require_GET
-@need_user
-def me(request: HttpRequest, user: User) -> JsonResponse:
-    return JsonResponse(model_to_dict(user, exclude=["friends", "blocked"]))
+class Me(View):
+
+    @method_decorator((need_user), name="dispatch")
+    def get(self, request: HttpRequest, user: User):
+        return JsonResponse(
+            model_to_dict(user, exclude=["avatar", "friends", "blocked"])
+        )
 
 
 @require_POST

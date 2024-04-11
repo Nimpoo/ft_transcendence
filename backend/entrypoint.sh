@@ -13,6 +13,5 @@ do
 done
 
 
-python manage.py makemigrations users chat friends
 python manage.py migrate
 daphne backend.asgi:application -b pong

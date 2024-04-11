@@ -1,15 +1,11 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.forms import model_to_dict
-from users.models import User
-from chat.models import Chat
-from urllib.parse import parse_qs
-from jwt import decode
-from backend import settings
-from django.shortcuts import get_object_or_404
 from asgiref.sync import sync_to_async
 
+from users.models import User
+from chat.models import Chat
+
 import json
-import jwt
 
 
 class UserConsumer(AsyncWebsocketConsumer):

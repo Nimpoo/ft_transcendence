@@ -24,32 +24,49 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "ueiLjOp3qsjEIbSg6YWphGnmh8g0lFNp0pDHxMoYJRKgB8xi88QUTUPBMNCsjzWzaUmz9x2xIzk1tEZdHzk6kg=="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = [
+    "Authorization",
+]
+
+CORS_ALLOW_CREDENTIALS = False
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "DELETE",
+]
+
 
 JWT_SECRET: str = os.environ.get("JWT_SECRET")
 
 if JWT_SECRET is None:
-    raise "no jwt secret"
+    raise RuntimeError("no jwt secret")
 
 # Application definition
 
 INSTALLED_APPS = [
     "daphne",
-    "users",
-    "friends",
-    "chat",
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "users",
+    "friends",
+    "chat",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -82,7 +99,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
@@ -91,31 +108,31 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
-# POSTGRES_DB = os.environ.get('POSTGRES_DB')
-# POSTGRES_USER = os.environ.get('POSTGRES_USER')
-# POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
+POSTGRES_DB = os.environ.get("POSTGRES_DB")
+POSTGRES_USER = os.environ.get("POSTGRES_USER")
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 
-# if None in [POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD]:
-#     raise "Missing mandatory variable for PostgreSQL"
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": POSTGRES_DB,
-#         "USER": POSTGRES_USER,
-#         "PASSWORD": POSTGRES_PASSWORD,
-#         "HOST": POSTGRES_HOST,
-#         "PORT": "5432",
-#     }
-# }
+if None in [POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD]:
+    raise RuntimeError("Missing mandatory variable for PostgreSQL")
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": POSTGRES_DB,
+        "USER": POSTGRES_USER,
+        "PASSWORD": POSTGRES_PASSWORD,
+        "HOST": POSTGRES_HOST,
+        "PORT": "5432",
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 
 # Password validation
@@ -153,6 +170,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

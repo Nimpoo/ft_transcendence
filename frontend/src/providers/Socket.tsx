@@ -23,7 +23,7 @@ export function SocketProvider({
 			const connectSocket = () => {
 				console.log('Attempting to connect...')
 
-				const socket = new WebSocket(`ws://${window.location.host}/api/users?token=${session.token}`)
+				const socket = new WebSocket(`ws://${window.location.hostname}:8000/users/?token=${session.token}`)
 
 				socket.onclose = e => {
 					console.error('disconnected, retrying in 5s...')

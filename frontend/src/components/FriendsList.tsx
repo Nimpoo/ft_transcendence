@@ -13,7 +13,7 @@ function FriendsList(): React.JSX.Element {
 	useEffect(() => {
 		if (session) {
 			const fetchFriendsList = async () => {
-				const response = await session.api(`/users/friends`)
+				const response = await session.api(`/users/friends/`)
 				const data = await response.json()
 				setFriendsList(data)
 			}
@@ -24,13 +24,13 @@ function FriendsList(): React.JSX.Element {
 
 	const FriendsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
 		const handleRemove = () => {
-			session?.api("/users/friends", "DELETE", JSON.stringify({ user_id: user.id }))
+			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: user.id }))
 				.catch(() => toast.error('Remove failed, try again'))
 				.then(() => setFriendsList(friendsList.slice(index, index)))
 		}
 
 		const handleBlock = () => {
-			session?.api("/chat/block", "POST", JSON.stringify({ user_id: user.id }))
+			session?.api("/chat/block/", "POST", JSON.stringify({ user_id: user.id }))
 				.catch(() => toast.error('Remove failed, try again'))
 				.then(() => setFriendsList(friendsList.slice(index, index)))
 		}

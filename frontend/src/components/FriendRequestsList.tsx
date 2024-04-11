@@ -13,7 +13,7 @@ function FriendRequestsList(): React.JSX.Element {
 	useEffect(() => {
 		if (session) {
 			const fetchFriendRequestsList = async () => {
-				const response = await session.api(`/users/friends/requests`)
+				const response = await session.api(`/users/friends/requests/`)
 				const data = await response.json()
 				setFriendsList(data)
 			}
@@ -24,13 +24,13 @@ function FriendRequestsList(): React.JSX.Element {
 
 	const FriendRequestsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
 		const handleAdd = () => {
-			session?.api("/users/friends", "POST", JSON.stringify({ user_id: user.id }))
+			session?.api("/users/friends/", "POST", JSON.stringify({ user_id: user.id }))
 				.then(() => setFriendsList(friendRequestsList.slice(index, index)))
 				.catch(() => toast.error('Add failed, try again'))
 		}
 
 		const handleReject = () => {
-			session?.api("/users/friends", "DELETE", JSON.stringify({ user_id: user.id }))
+			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: user.id }))
 				.then(() => setFriendsList(friendRequestsList.slice(index, index)))
 				.catch(() => toast.error('Rejct failed, try again'))
 		}
