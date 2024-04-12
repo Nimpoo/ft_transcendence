@@ -88,7 +88,7 @@ function Settings(): React.JSX.Element {
 						<div className="btn-group" role="group">
 							<input type="radio" onChange={async e => {
 								e.target.disabled = true
-								const response = await session.api("/users/dfa", "POST")
+								const response = await session.api("/users/dfa/", "POST")
 								if (response.status === 200) {
 									const data = await response.json().catch(e => console.error(e.message))
 									if (data && data["dfa_secret"])
@@ -101,7 +101,7 @@ function Settings(): React.JSX.Element {
 							<label className="btn btn-outline-success" htmlFor="setting-2fa-on">ON</label>
 							<input type="radio" onChange={async e => {
 								e.target.disabled = true
-								const response = await session.api("/users/dfa", "DELETE")
+								const response = await session.api("/users/dfa/", "DELETE")
 								if (response.status === 200)
 								session.dfa_secret = null
 									setDfaSecret(session.dfa_secret)
@@ -151,7 +151,7 @@ function Settings(): React.JSX.Element {
 							
 							if (display_name_input && !display_name_input.classList.contains("invalid")) {
 								const display_name = display_name_input.value
-								session.api("/users/me/displayname", "POST", JSON.stringify({display_name}))
+								session.api("/users/me/", "POST", JSON.stringify({display_name}))
 									.then(response => response.json())
 									.then(console.log)
 									.catch(console.error)

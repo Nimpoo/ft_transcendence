@@ -1,17 +1,14 @@
-version: '3'
-
 services:
 
   ping:
     build:
       context: frontend
       args:
-        - NEXT_PUBLIC_REDIRECT_URI=${NEXT_PUBLIC_REDIRECT_URI}
-        - NEXT_PUBLIC_CLIENT_ID=${NEXT_PUBLIC_CLIENT_ID}
+        - NEXT_PUBLIC_REDIRECT_URI=${REDIRECT_URI}
+        - NEXT_PUBLIC_CLIENT_ID=${CLIENT_ID}
         - CLIENT_SECRET=${CLIENT_SECRET}
     ports:
       - 3000:3000
-    env_file: .env
     depends_on:
       - pong
     restart: always
@@ -19,6 +16,9 @@ services:
   pong:
     build: backend
     env_file: .env
+    volumes:
+      - ./backend/media:/media
+      - ./backend/static:/static
     depends_on:
       - postgres
       - redis

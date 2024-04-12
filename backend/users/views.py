@@ -146,43 +146,40 @@ class Me(View):
             model_to_dict(user, exclude=["avatar", "friends", "blocked"])
         )
 
+    @method_decorator((need_user), name="dispatch")
+    def post(self, request: HttpRequest, user: User) -> JsonResponse:
+        if len(request.body) == 0:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "Missing body."}, status=400
+            )
 
-@require_POST
-@need_user
-def change_display_name(request: HttpRequest, user: User) -> JsonResponse:
-    if len(request.body) == 0:
+        try:
+            body_payload = json.loads(request.body.decode("utf-8"))
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "Body must be JSON."}, status=400
+            )
+
+        display_name = body_payload.get("display_name")
+
+        if not display_name is None:
+
+            if not 4 <= len(display_name) <= 30:
+                return JsonResponse(
+                    {
+                        "error": "Bad Request",
+                        "message": "display name have to be between 4 and 30 characters.",
+                    },
+                    status=400,
+                )
+
+            user.display_name = display_name
+
+        user.save()
+
         return JsonResponse(
-            {"error": "Bad Request", "message": "Missing body."}, status=400
+            model_to_dict(user, exclude=["avatar", "friends", "blocked"])
         )
-
-    try:
-        body_payload = json.loads(request.body.decode("utf-8"))
-    except json.JSONDecodeError:
-        return JsonResponse(
-            {"error": "Bad Request", "message": "Body must be JSON."}, status=400
-        )
-
-    display_name = body_payload.get("display_name")
-
-    if display_name is None:
-        return JsonResponse(
-            {"error": "Bad Request", "message": "Missing 'display_name' field."},
-            status=400,
-        )
-
-    if not 4 <= len(display_name) <= 30:
-        return JsonResponse(
-            {
-                "error": "Bad Request",
-                "message": "display name have to be between 4 and 30 characters.",
-            },
-            status=400,
-        )
-
-    user.display_name = display_name
-    user.save()
-
-    return JsonResponse(model_to_dict(user, exclude=["friends", "blocked"]))
 
 
 class DFA(View):

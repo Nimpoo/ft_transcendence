@@ -18,7 +18,7 @@ printf "Some variables will be asked, press \`enter\` for none.\n\n"
 
 cat << EOF > .env
 # 42's api keys
-NEXT_PUBLIC_CLIENT_ID=$(printf "Write your 42 uid api: " 1>&2; read api; echo $api)
+CLIENT_ID=$(printf "Write your 42 uid api: " 1>&2; read api; echo $api)
 CLIENT_SECRET=$(printf "Write your 42 secret api: " 1>&2; read api; echo $api)
 
 EOF
@@ -26,13 +26,11 @@ EOF
 printf "\n\e[0;32mWrite the \`redirect_uri\` that you've configured in your api's settings\e[0m\n"
 
 cat << EOF >> .env
-NEXT_PUBLIC_REDIRECT_URI=$(printf "Write your \`redirect_uri\`: " 1>&2; read api; echo $api)
+REDIRECT_URI=$(printf "Write your \`redirect_uri\`: " 1>&2; read api; echo $api)
 
 EOF
 
 printf "\n"
-
-ADMIN_URI=$(openssl rand -hex 15)
 
 cat << EOF >> .env
 JWT_SECRET=$(openssl rand -base64 32)

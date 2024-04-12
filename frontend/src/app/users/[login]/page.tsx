@@ -15,7 +15,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 	useEffect(() => {
 		const handleFetch = async () => {
 			const response = await toast.promise(
-				fetch(`/api/users/get?login=${encodeURIComponent(params.login)}`),
+				fetch(`http://${window.location.hostname}:8000/users/get/?login=${encodeURIComponent(params.login)}`),
 				{
 					loading: `Fetching user ${params.login}`,
 					success: `User ${params.login} fetched`,
