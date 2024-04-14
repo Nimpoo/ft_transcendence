@@ -39,12 +39,12 @@ function Home(): React.JSX.Element {
 					<div className="profile-bento spaceX-between-btn-2">
 						<div className="pfp-ranking">
 							<Link href="/profile">
-								<Image className="pfp" priority
-									src={"https://thispersondoesnotexist.com"}
+								<img className="pfp"
+									src={`http://${window.location.hostname}:8000/media/avatars/${session.login}.jpg`}
 									width={70}
 									height={70}
-									alt="Your Profile Picture">
-								</Image>
+									alt="Your Profile Picture"
+								/>
 							</Link>
 							<Image priority className="rank"
 								src={"/assets/ranking/challenger_1.png"}

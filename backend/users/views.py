@@ -1,4 +1,5 @@
 from django.forms import model_to_dict
+from django.core.files import File
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
@@ -10,6 +11,7 @@ import requests
 import json
 import jwt
 import pyotp
+import urllib.request
 
 from backend import settings
 from users.models import User
@@ -83,6 +85,29 @@ class Index(View):
 
         if created:
             user.display_name = user.login
+
+            data_image = data.get("image")
+            if data_image:
+
+                def get_image(url):
+                    result = urllib.request.urlretrieve(url)
+
+                    with open(result[0], "rb") as img:
+                        user.avatar.save(f"{user.login}.jpg", File(img))
+
+                image_versions = data_image.get("versions")
+                if image_versions:
+
+                    small = image_versions.get("small")
+                    if small:
+                        get_image(small)
+
+                else:
+
+                    default = data_image.get("link")
+                    if default:
+                        get_image(default)
+
             user.save()
 
         if user.dfa_secret:

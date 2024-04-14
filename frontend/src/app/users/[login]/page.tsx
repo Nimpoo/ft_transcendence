@@ -52,6 +52,12 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 
 	return (
 		<main>
+			<img className="pfp"
+				src={`http://${window.location.hostname}:8000/media/avatars/${user.login}.jpg`}
+				width={70}
+				height={70}
+				alt={`${user.login}'s profile picture`}
+			/>
 			{user.display_name}
 			{session && session.id != user.id && (
 				<div>

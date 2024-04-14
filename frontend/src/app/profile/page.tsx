@@ -32,8 +32,8 @@ function Profile(): React.JSX.Element {
 
 				<div className="bento" style={{height: "48%"}}>
 					<div className="default-wrapper">
-						<Image style={{borderRadius: "50%"}} priority
-							src={"https://thispersondoesnotexist.com"}
+						<img style={{borderRadius: "50%"}}
+							src={`http://${window.location.hostname}:8000/media/avatars/${session.login}.jpg`}
 							width={200}
 							height={200}
 							alt="Your profile picture"
