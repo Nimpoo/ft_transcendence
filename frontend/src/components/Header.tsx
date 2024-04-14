@@ -12,7 +12,7 @@ function Header(): React.JSX.Element {
 	const { createModal } = useModal()
 
 	function play(value: "luffy" | "zoro" | "nami" | "usopp") {
-		let audioObject:HTMLAudioElement = new Audio(`sound/${value}.wav`)
+		let audioObject:HTMLAudioElement = new Audio(`/assets/sounds/${value}.wav`)
 		audioObject.volume = 0.3
 		audioObject.autoplay = true
 	}

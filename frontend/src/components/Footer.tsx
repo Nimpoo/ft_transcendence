@@ -178,7 +178,7 @@ function Settings(): React.JSX.Element {
 									toast("See you soon", {icon:"👋"})
 
 									if (isSoundOn) {
-										let audioObject: HTMLAudioElement = new Audio("/sounds/mario.wav")
+										let audioObject: HTMLAudioElement = new Audio("/assets/sounds/mario.wav")
 										audioObject.volume = 0.3
 										audioObject.autoplay = true
 									}
