@@ -111,8 +111,6 @@ class Friend(View):
                 sender=user, receiver=receiver, status=FriendRequest.STATUS_PENDING
             )
 
-            print(f"{user.login} asked {receiver.login} as friend")
-
             async_to_sync(self.channel_layer.group_send)(
                 f"user_{receiver.login}",
                 {
@@ -132,8 +130,6 @@ class Friend(View):
         friend_request.save()
 
         user.friends.add(receiver)
-
-        print(f"{user.login} accepted {receiver.login} as friend")
 
         async_to_sync(self.channel_layer.group_send)(
             f"user_{receiver.login}",
@@ -205,9 +201,6 @@ class Friend(View):
             case FriendRequest.STATUS_PENDING:
                 if user == friendrequest.sender:
                     friendrequest.status = FriendRequest.STATUS_CANCELED
-                    print(
-                        f"{user.login} canceled his friendrequest to {receiver.login}"
-                    )
 
                     async_to_sync(self.channel_layer.group_send)(
                         f"user_{receiver.login}",
@@ -229,7 +222,6 @@ class Friend(View):
                     )
                 else:
                     friendrequest.status = FriendRequest.STATUS_REJECTED
-                    print(f"{user.login} rejected friendrequest from {receiver.login}")
 
                     async_to_sync(self.channel_layer.group_send)(
                         f"user_{receiver.login}",
@@ -251,7 +243,6 @@ class Friend(View):
                     )
             case FriendRequest.STATUS_ACCEPTED:
                 friendrequest.status = FriendRequest.STATUS_REMOVED
-                print(f"{user.login} removed {receiver.login} from friends")
 
                 async_to_sync(self.channel_layer.group_send)(
                     f"user_{receiver.login}",

@@ -57,7 +57,6 @@ class Index(View):
             headers={"Authorization": f"Bearer {token}"},
         )
         if response.status_code != 200:
-            print({"status": response.status_code, "token": token})
             return JsonResponse(
                 {"error": "Forbidden", "message": "The given token is not valid."},
                 status=403,
@@ -134,7 +133,7 @@ def search(request: HttpRequest) -> JsonResponse:
     query = request.GET.get("q")
     results = User.objects.filter(
         Q(login__contains=query) | Q(display_name__contains=query)
-    ).values()  # todo: make blocked status on fr
+    ).values("id", "login", "display_name", "created_at")
     return JsonResponse(list(results), safe=False)
 
 

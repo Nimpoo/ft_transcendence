@@ -4,5 +4,5 @@ from chat import views
 
 
 urlpatterns = [
-  path('block/', views.Block.as_view(), name='block')
+    path("block/", views.Block.as_view(), name="block"),
 ]

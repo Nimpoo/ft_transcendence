@@ -82,8 +82,6 @@ class Block(View):
 
         user.blocked.add(receiver)
 
-        print(f"{user.login} just blocked {receiver.login}")
-
         return JsonResponse(list(user.blocked.values()), safe=False)
 
     @method_decorator((need_user), name="dispatch")
@@ -125,6 +123,5 @@ class Block(View):
             )
 
         user.blocked.remove(receiver)
-        print(f"{user.login} just unblocked {receiver.login}")
 
         return JsonResponse(list(user.blocked.values()), safe=False)
