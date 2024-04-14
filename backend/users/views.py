@@ -157,7 +157,7 @@ def get_user(request: HttpRequest) -> JsonResponse:
 def search(request: HttpRequest) -> JsonResponse:
     query = request.GET.get("q")
     results = User.objects.filter(
-        Q(login__contains=query) | Q(display_name__contains=query)
+        Q(login__icontains=query) | Q(display_name__icontains=query)
     ).values("id", "login", "display_name", "created_at")
     return JsonResponse(list(results), safe=False)
 
