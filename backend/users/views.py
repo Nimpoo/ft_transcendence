@@ -88,25 +88,12 @@ class Index(View):
 
             data_image = data.get("image")
             if data_image:
-
-                def get_image(url):
-                    result = urllib.request.urlretrieve(url)
+                default = data_image.get("link")
+                if default:
+                    result = urllib.request.urlretrieve(default)
 
                     with open(result[0], "rb") as img:
                         user.avatar.save(f"{user.login}.jpg", File(img))
-
-                image_versions = data_image.get("versions")
-                if image_versions:
-
-                    small = image_versions.get("small")
-                    if small:
-                        get_image(small)
-
-                else:
-
-                    default = data_image.get("link")
-                    if default:
-                        get_image(default)
 
             user.save()
 

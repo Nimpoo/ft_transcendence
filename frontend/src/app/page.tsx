@@ -39,7 +39,7 @@ function Home(): React.JSX.Element {
 					<div className="profile-bento spaceX-between-btn-2">
 						<div className="pfp-ranking">
 							<Link href="/profile">
-								<img className="pfp"
+								<img className="pfp object-fit-cover"
 									src={`http://${window.location.hostname}:8000/media/avatars/${session.login}.jpg`}
 									width={70}
 									height={70}

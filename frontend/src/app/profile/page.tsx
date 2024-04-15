@@ -32,7 +32,7 @@ function Profile(): React.JSX.Element {
 
 				<div className="bento" style={{height: "48%"}}>
 					<div className="default-wrapper">
-						<img style={{borderRadius: "50%"}}
+						<img className="rounded-circle object-fit-cover"
 							src={`http://${window.location.hostname}:8000/media/avatars/${session.login}.jpg`}
 							width={200}
 							height={200}

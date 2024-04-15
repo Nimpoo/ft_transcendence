@@ -52,7 +52,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 
 	return (
 		<main>
-			<img className="pfp"
+			<img className="rounded-circle object-fit-cover"
 				src={`http://${window.location.hostname}:8000/media/avatars/${user.login}.jpg`}
 				width={70}
 				height={70}
