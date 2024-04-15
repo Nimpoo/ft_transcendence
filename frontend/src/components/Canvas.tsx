@@ -47,7 +47,7 @@ function Canvas({
 
 				// ! /*--------------- BALL ---------------*/
 
-				const ws = new WebSocket("ws://localhost:8000/ws/game/")
+				const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/game/`)
 				ws.onopen = function(event: Event) {
 					// console.log(event)
 					ws.send(JSON.stringify({
