@@ -196,9 +196,7 @@ class Me(View):
 class DFA(View):
 
     @method_decorator((need_user), name="dispatch")
-    def get(
-        self, request: HttpRequest, user: User
-    ) -> JsonResponse:  # todo return qr code
+    def get(self, request: HttpRequest, user: User) -> JsonResponse:
         return JsonResponse({"coucou": "ethienne"})
 
     @method_decorator((need_user), name="dispatch")

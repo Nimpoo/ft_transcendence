@@ -103,7 +103,14 @@ class UserConsumer(AsyncWebsocketConsumer):
                 "data": {
                     "type": "message.sent",
                     "to": model_to_dict(
-                        receiver, fields=["id", "login", "display_name", "created_at"]
+                        receiver,
+                        fields=[
+                            "id",
+                            "login",
+                            "display_name",
+                            "avatar_url",
+                            "created_at",
+                        ],
                     ),
                     "content": content,
                 },
@@ -117,7 +124,14 @@ class UserConsumer(AsyncWebsocketConsumer):
                 "data": {
                     "type": "message.receive",
                     "from": model_to_dict(
-                        self.user, fields=["id", "login", "display_name", "created_at"]
+                        self.user,
+                        fields=[
+                            "id",
+                            "login",
+                            "display_name",
+                            "avatar_url",
+                            "created_at",
+                        ],
                     ),
                     "content": content,
                 },

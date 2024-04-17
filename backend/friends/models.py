@@ -10,6 +10,7 @@ class FriendRequest(models.Model):
     STATUS_REJECTED = "rejected"
     STATUS_REMOVED = "removed"
     STATUS_CANCELED = "canceled"
+    STATUS_BLOCKED = "blocked"
 
     STATUS_CHOICES = [
         (STATUS_PENDING, "Pending"),
@@ -17,6 +18,7 @@ class FriendRequest(models.Model):
         (STATUS_REJECTED, "Rejected"),
         (STATUS_REMOVED, "Removed"),
         (STATUS_CANCELED, "Canceled"),
+        (STATUS_BLOCKED, "Blocked"),
     ]
 
     sender = models.ForeignKey(
@@ -34,6 +36,3 @@ class FriendRequest(models.Model):
 
     def __str__(self):
         return f"{self.sender.login} to {self.receiver.login} ({self.status})"
-
-
-# todo: make blocked status on fr

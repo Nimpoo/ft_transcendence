@@ -14,7 +14,10 @@ class Block(View):
 
     @method_decorator((need_user), name="dispatch")
     def get(self, request: HttpRequest, user: User) -> JsonResponse:
-        return JsonResponse(list(user.blocked.values()), safe=False)
+        return JsonResponse(
+            list(user.blocked.values("id", "login", "display_name", "created_at")),
+            safe=False,
+        )
 
     @method_decorator((need_user), name="dispatch")
     def post(self, request: HttpRequest, user: User) -> JsonResponse:
@@ -77,12 +80,15 @@ class Block(View):
                     ],
                 )
 
-            friend_request.status = FriendRequest.STATUS_REMOVED
+            friend_request.status = FriendRequest.STATUS_BLOCKED
             friend_request.save()
 
         user.blocked.add(receiver)
 
-        return JsonResponse(list(user.blocked.values()), safe=False)
+        return JsonResponse(
+            list(user.blocked.values("id", "login", "display_name", "created_at")),
+            safe=False,
+        )
 
     @method_decorator((need_user), name="dispatch")
     def delete(self, request: HttpRequest, user: User) -> JsonResponse:
@@ -124,4 +130,7 @@ class Block(View):
 
         user.blocked.remove(receiver)
 
-        return JsonResponse(list(user.blocked.values()), safe=False)
+        return JsonResponse(
+            list(user.blocked.values("id", "login", "display_name", "created_at")),
+            safe=False,
+        )

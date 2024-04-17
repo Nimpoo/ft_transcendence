@@ -8,7 +8,7 @@ from asgiref.sync import async_to_sync
 
 from users.models import User
 from friends.models import FriendRequest
-from utils.decorators import jwt_verify, need_user
+from utils.decorators import need_user
 
 import json
 
@@ -97,6 +97,18 @@ class Friend(View):
                 {"error": "Bad Request", "message": "IDs are equal."}, status=400
             )
 
+        if user.blocked.contains(receiver):
+            return JsonResponse(
+                {"error": "Bad Request", "message": "you blocked him"},
+                status=400,
+            )
+
+        if receiver.blocked.contains(user):
+            return JsonResponse(
+                {"error": "Bad Request", "message": f"{receiver.login} blocked you"},
+                status=400,
+            )
+
         if user.friends.contains(receiver):
             return JsonResponse(
                 {"error": "Bad Request", "message": "Already friend."}, status=400
@@ -118,7 +130,14 @@ class Friend(View):
                     "data": {
                         "type": "friendrequest.ask",
                         "from": model_to_dict(
-                            user, fields=["id", "login", "display_name", "created_at"]
+                            user,
+                            fields=[
+                                "id",
+                                "login",
+                                "display_name",
+                                "avatar_url",
+                                "created_at",
+                            ],
                         ),
                     },
                 },
@@ -138,7 +157,14 @@ class Friend(View):
                 "data": {
                     "type": "friendrequest.accept",
                     "from": model_to_dict(
-                        user, fields=["id", "login", "display_name", "created_at"]
+                        user,
+                        fields=[
+                            "id",
+                            "login",
+                            "display_name",
+                            "avatar_url",
+                            "created_at",
+                        ],
                     ),
                 },
             },
@@ -252,7 +278,13 @@ class Friend(View):
                             "type": "friendrequest.remove",
                             "from": model_to_dict(
                                 user,
-                                fields=["id", "login", "display_name", "created_at"],
+                                fields=[
+                                    "id",
+                                    "login",
+                                    "display_name",
+                                    "avatar_url",
+                                    "created_at",
+                                ],
                             ),
                         },
                     },
