@@ -51,16 +51,15 @@ function Canvas({
 				ws.onopen = function(event: Event) {
 					// console.log(event)
 					ws.send(JSON.stringify({
-						"type": "connection_established",
+						"type": "connect",
 						"Player One [CLIENT]": "Get Ready !",
 						})
 					)
 				}
 
 				ws.onclose = function(event: CloseEvent) {
-					// console.log(event)
 					ws.send(JSON.stringify({
-						"type": "connection_established",
+						"type": "disconnect",
 						"Player One [CLIENT]": "See you soon !",
 						})
 					)
