@@ -5,7 +5,6 @@ import Image from "next/image"
 import CountUp from "react-countup"
 
 import "@/styles/Homepage.css"
-import "@/styles/Text.css"
 import "@/styles/Rainbow.css"
 
 import { useSession } from "@/providers/Session"
@@ -75,9 +74,11 @@ function Home(): React.JSX.Element {
 					</div>
 				</div>
 
-				<button className="big-button">
-					<span className="stroke rainbow-text text-xl">PLAY</span>
-				</button>
+				<Link href="/game">
+					<button className={ "big-button " + ubu.className }>
+						<span className="stroke rainbow-text">PLAY</span>
+					</button>
+				</Link>
 
 				<div className="homepage-right-wrapper">
 					<div className="profile-bento spaceX-between-btn-2">
