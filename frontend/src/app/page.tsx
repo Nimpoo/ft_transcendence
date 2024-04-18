@@ -70,7 +70,7 @@ function Home(): React.JSX.Element {
 					<div className="friends-bento">
 						<UserSearchBar />
 						<FriendRequestsList />
-						<FriendsList />
+						<FriendsList />``
 					</div>
 
 				</div>

@@ -4,7 +4,7 @@ import React from "react"
 import "@/styles/ChatMessage.css"
 import Image from "next/image"
 
-interface MessageProps {
+export interface MessageProps {
     message: string;
     isMyMessage?: boolean;
 }

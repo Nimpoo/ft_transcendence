@@ -23,66 +23,37 @@ class UserConsumer(AsyncWebsocketConsumer):
             self.room_name = self.user.login
             self.room_group_name = f"user_{self.user.login}"
 
-            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-            await self.accept()
-
-    async def disconnect(self, code):
-        if self.user:
-            await self.channel_layer.group_discard(
-                self.room_group_name, self.channel_name
-            )
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        await self.accept()
 
     async def receive(self, text_data):
+      print("JE VIENS DE RECEVOIR UN TRUC LA")
+      text_data_json = json.loads(text_data)
+      qtype = text_data_json["query_type"]
+      if qtype == "msg":
+        await self.handle_message(text_data_json)
+    
+    async def disconnect(self, code):
+      if self.user:
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-        try:
-            payload = json.loads(text_data)
-        except json.JSONDecodeError:
-            await self.send(
-                json.dumps({"type": "error", "message": "Please provide a valid json"})
-            )
-            return
-
-        payload_type = payload.get("type")
-
-        match payload_type:
-            case "message.send":
-                await self.handle_message(payload)
-
-            case _:
-                await self.send(
-                    json.dumps(
-                        {
-                            "type": "user.notification",
-                            "data": {
-                                "type": "error",
-                                "message": f"Unkonw type: '{payload_type}'",
-                            },
-                        }
-                    )
-                )
 
     async def handle_message(self, event):
-        receiver_id = event.get("target")
-        content = event.get("content")
+      subtype = event["subtype"]
+      if subtype == "privmsg":
+        await self.handle_privmsg(event)
+      elif subtype == "grpmsg":
+        await self.handle_grpmsg(event)
 
-        if None in [receiver_id, content]:
-            await self.send(
-                json.dumps(
-                    {
-                        "type": "error",
-                        "message": "Please provide 'receiver_id' and 'content'",
-                    }
-                )
-            )
-            return
+  # JSON request for chat should me formatted like that :
+  #   {
+  #      "query_type": "msg" (the only argument available for the moment is "msg")
+  #      "subtype": "privmsg" or "grpmsg"
+  #       "target": "losylves"
+  #       "sender": "mayoub"
+  #       "content": "Bonjour les copains" (the content of the message)
+  #   }
 
-        try:
-            receiver = await sync_to_async(User.objects.get)(id=receiver_id)
-        except User.DoesNotExist:
-            await self.send(
-                json.dumps({"type": "error", "message": "targeted user does not exist"})
-            )
-            return
 
         if self.user is receiver:
             await self.send(
@@ -139,4 +110,4 @@ class UserConsumer(AsyncWebsocketConsumer):
         )
 
     async def user_notification(self, event):
-        await self.send(json.dumps(event.get("data")))
+      await self.send(json.dumps(event.get('data')))
