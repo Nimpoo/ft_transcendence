@@ -12,7 +12,6 @@ import "@/styles/Text.css"
 import { useSession } from "@/providers/Session"
 import FriendsList from "@/components/FriendsList"
 import UserSearchBar from "@/components/UserSearchBar"
-import FriendRequestsList from "@/components/FriendRequestsList"
 
 
 function Home(): React.JSX.Element {
@@ -69,8 +68,7 @@ function Home(): React.JSX.Element {
 
 					<div className="friends-bento">
 						<UserSearchBar />
-						<FriendRequestsList />
-						<FriendsList />``
+						<FriendsList />
 					</div>
 
 				</div>

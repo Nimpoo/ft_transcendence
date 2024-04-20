@@ -23,8 +23,6 @@ class QueryAuthMiddleware:
             payload = await sync_to_async(jwt.decode)(
                 token, settings.JWT_SECRET, algorithms=["HS256"], verify=True
             )
-#            print("payload is :")
-#            print(payload)
         except jwt.DecodeError:
             return await self.app(scope, receive, send)
 

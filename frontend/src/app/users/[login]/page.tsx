@@ -37,7 +37,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 	useEffect(() => {
 		if (session && user) {
 			const handleFetch = async () => {
-				const response = await session.api(`/users/friends/requests?user_id=${user.id}`)
+				const response = await session.api(`/users/friends/requests/?user_id=${user.id}`)
 				const data = await response.json().catch(() => null)
 				setRelation(data)
 			}
@@ -67,19 +67,19 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 								relation.sender === session.id && ( // ? Did I sent
 									<div>
 										<button disabled>pending...</button>
-										<button onClick={async () => setRelation(await (await session.api("/users/friends", "DELETE", JSON.stringify({user_id: user.id}))).json())}>cancel</button>
+										<button onClick={async () => setRelation(await (await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))).json())}>cancel</button>
 									</div>
 								) || (
 									<div>
-										<button onClick={async () => setRelation(await (await session.api("/users/friends", "POST", JSON.stringify({user_id: user.id}))).json())}>accept</button>
-										<button onClick={async () => setRelation(await (await session.api("/users/friends", "DELETE", JSON.stringify({user_id: user.id}))).json())}>reject</button>
+										<button onClick={async () => setRelation(await (await session.api("/users/friends/", "POST", JSON.stringify({user_id: user.id}))).json())}>accept</button>
+										<button onClick={async () => setRelation(await (await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))).json())}>reject</button>
 									</div>
 								)
 							) || relation.status === "accepted" && ( // ? Is he my friend ?
-								<button onClick={async () => setRelation(await (await session.api("/users/friends", "DELETE", JSON.stringify({user_id: user.id}))).json())}>remove</button>
+								<button onClick={async () => setRelation(await (await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))).json())}>remove</button>
 							)
 						) || (
-							<button onClick={async () => setRelation(await (await session.api("/users/friends", "POST", JSON.stringify({user_id: user.id}))).json())}>add</button>
+							<button onClick={async () => setRelation(await (await session.api("/users/friends/", "POST", JSON.stringify({user_id: user.id}))).json())}>add</button>
 						)
 					}
 				</div>

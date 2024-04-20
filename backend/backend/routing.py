@@ -4,5 +4,5 @@ from users.consumers import UserConsumer
 
 
 websocket_urlpatterns = [
-  path('users/', UserConsumer.as_asgi()),
+    path("users/", UserConsumer.as_asgi()),
 ]

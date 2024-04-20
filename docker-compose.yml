@@ -15,7 +15,12 @@ services:
 
   pong:
     build: backend
-    env_file: .env
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./backend/media:/media
       - ./backend/static:/static
@@ -26,7 +31,13 @@ services:
 
   postgres:
     image: postgres
-    env_file: .env
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
     restart: always
 
   redis:

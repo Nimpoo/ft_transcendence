@@ -5,10 +5,6 @@ class User(models.Model):
     login = models.CharField(max_length=30, unique=True)
     display_name = models.CharField(max_length=30)
     avatar = models.ImageField(null=True, blank=False, upload_to="avatars")
-    
-    @property
-    def avatar_url(self):
-        return self.avatar.url if self.avatar else None
 
     fortytwo_id = models.IntegerField(unique=True)
     dfa_secret = models.CharField(max_length=50, null=True)
