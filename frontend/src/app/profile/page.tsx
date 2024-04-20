@@ -32,11 +32,16 @@ function Profile(): React.JSX.Element {
 
 				<div className="bento" style={{height: "48%"}}>
 					<div className="default-wrapper">
-						<img className="rounded-circle object-fit-cover"
-							src={`http://${window.location.hostname}:8000/media/avatars/${session.login}.jpg`}
-							width={200}
-							height={200}
-							alt="Your profile picture"
+						<div
+							className="rounded-circle bg-cover"
+							style={{
+								backgroundImage: `url('http://${window.location.hostname}:8000/media/avatars/${session.login}.jpg')`,
+								backgroundSize: "cover",
+								backgroundPosition: "center center",
+								backgroundRepeat: "no-repeat",
+								width: "200px",
+								height: "200px"
+							}}
 						/>
 						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>{session.display_name}</h1>
 					</div>

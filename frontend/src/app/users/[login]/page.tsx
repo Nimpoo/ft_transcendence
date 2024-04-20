@@ -52,11 +52,16 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 
 	return (
 		<main>
-			<img className="rounded-circle object-fit-cover"
-				src={`http://${window.location.hostname}:8000/media/avatars/${user.login}.jpg`}
-				width={70}
-				height={70}
-				alt={`${user.login}'s profile picture`}
+			<div
+				className="rounded-circle bg-cover"
+				style={{
+					backgroundImage: `url('http://${window.location.hostname}:8000/media/avatars/${user.login}.jpg')`,
+					backgroundSize: "cover",
+					backgroundPosition: "center center",
+					backgroundRepeat: "no-repeat",
+					width: "200px",
+					height: "200px"
+				}}
 			/>
 			{user.display_name}
 			{session && session.id != user.id && (
