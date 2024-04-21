@@ -147,10 +147,10 @@ def get_conv(request: HttpRequest) -> JsonResponse:
     target = parsed_query.get("user", [None])[0]
     me = parsed_query.get("sender", [None])[0]
     sender_chats = Chat.objects.filter(
-        Q(sender__display_name__contains=target) & Q(room__name__contains=me)
+        Q(sender__display_name__contains=target) & Q(receiver__display_name__contains=me)
     )
     room_chats = Chat.objects.filter(
-        Q(room__name__contains=target) & Q(sender__display_name__contains=me)
+        Q(receiver__display_name__contains=target) & Q(sender__display_name__contains=me)
     )
     all_user_chat = sender_chats.union(room_chats)
 
@@ -160,7 +160,7 @@ def get_conv(request: HttpRequest) -> JsonResponse:
             "id": chat.id,
             "content": chat.content,
             "sender": chat.sender.display_name,
-            "room": chat.room.name,
+            "target": chat.receiver.display_name,
             "created_at": chat.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
         chat_list.append(chat_dict)
@@ -175,13 +175,12 @@ def get_all_convs(request: HttpRequest) -> JsonResponse:
     me = parsed_query.get("sender", [None])[0]
 
     # Get all chats involving the current user
-    chats = Chat.objects.filter(Q(sender__display_name=me) | Q(room__name__contains=me))
-
+    chats = Chat.objects.filter(Q(sender__display_name=me) | Q(receiver__display_name__contains=me))
     # Group chats by conversation (sender and receiver)
     conversation_groups = {}
     for chat in chats:
         other_user = (
-            chat.room.name.split("_")[-1]
+            chat.receiver.display_name
             if chat.sender.display_name == me
             else chat.sender.display_name
         )
@@ -199,7 +198,7 @@ def get_all_convs(request: HttpRequest) -> JsonResponse:
                 "id": latest_chat.id,
                 "content": latest_chat.content,
                 "sender": latest_chat.sender.display_name,
-                "room": latest_chat.room.name,
+                "target": latest_chat.receiver.display_name,
                 "created_at": latest_chat.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             }
         )

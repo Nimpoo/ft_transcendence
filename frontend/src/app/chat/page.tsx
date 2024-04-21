@@ -67,7 +67,6 @@ function Chat(): React.JSX.Element {
                 // conversations.sort((a, b) => b.id - a.id);
                 // setConversations(conversations);
             }
-            console.log(event)
           };
           return () => {
             socket.onmessage = null;
@@ -83,7 +82,6 @@ function Chat(): React.JSX.Element {
                 const   names = data.map((user: { name: string }) => user.name);
                 if (names !== "")
                     setUserNames(names);
-                console.log(userNames);
             } else {
                 console.error("Failed to fetch user names:", response.statusText);
             }
@@ -94,32 +92,29 @@ function Chat(): React.JSX.Element {
 
     function getUsernameInChat (chat: any) {
         const currentUser = session?.display_name;
-        const otherUser = chat.sender === currentUser ? chat.room.split('_')[1] : chat.sender;
+        const otherUser = chat.sender === currentUser ? chat.target : chat.sender;
         return otherUser;
     }
 
     async function getAllConv (user: string) {
         try {
-            const response = await fetch(`http://${window.location.hostname}:8000/users/search/?q=${encodeURIComponent(session?.display_name ?? "")}`,
+            const response = await fetch(`http://${window.location.hostname}:8000/chat/getconvs/?sender=${encodeURIComponent(session?.display_name ?? "")}`,
             {
                 method: "GET"
             })
             if (response.ok) {
                 const data = await response.json()
-                console.log(data)
                 const AllConv = data.map((chat: any) => ({
                     username: getUsernameInChat(chat),
                     lastMessage: chat.content,
                     isMyMessage: chat.sender === session?.display_name,
                     id: chat.id
                   }));
-                AllConv.sort((a: Conversation, b: Conversation) => b.id - a.id);
+                // AllConv.sort((a: Conversation, b: Conversation) => b.id - a.id);
                 setConversations(AllConv);
-                console.log(data)
             }
             else {
                 console.error("Fetched failed")
-                console.log(response)
             }
         }
         catch (error) {
@@ -130,17 +125,12 @@ function Chat(): React.JSX.Element {
 
     async function getChatByUser (user: string) {
         try {
-            const response = await fetch(`api/chat/getconv?user=${user}&sender=${encodeURIComponent(session?.display_name ?? "")}`,
+            const response = await fetch(`http://${window.location.hostname}:8000/chat/getconv?user=${user}&sender=${encodeURIComponent(session?.display_name ?? "")}`,
             {
                 method: "GET"
             })
             if (response.ok) {
                 const data = await response.json()
-                console.log("My name conv fetched :")
-                console.log(session?.display_name)
-                console.log("Name of the target conv fetched :")
-                console.log(user)
-                console.log(data)
                 const chatMessages = data.map((chat: any) => ({
                     message: chat.content,
                     isMyMessage: chat.sender === session?.display_name
@@ -148,7 +138,6 @@ function Chat(): React.JSX.Element {
                   setMsgs(chatMessages)            }
             else {
                 console.error("Fetched failed")
-                console.log(response)
             }
         }
         catch (error) {
@@ -159,7 +148,6 @@ function Chat(): React.JSX.Element {
 
     async function userSearch() {
         if (search) {
-            console.log(search)
             const response = await fetch(`http://${window.location.hostname}:8000/users/search?q=${encodeURIComponent(search)}`)
             setResults(await response.json())
             searchTimeout.current = null
@@ -185,6 +173,7 @@ function Chat(): React.JSX.Element {
             setMessages(prevMessages => [...prevMessages, newMessage]);
             setMsgs(prevMsgs => [...prevMsgs, newMsg]);
             socket?.send(JSON.stringify({
+                "type": "message.send",
                 "query_type": "msg",
                 "subtype": "privmsg",
                 "target": currentConv,
