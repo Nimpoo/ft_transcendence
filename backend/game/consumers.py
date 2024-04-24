@@ -31,23 +31,28 @@ class GameConsumer(AsyncWebsocketConsumer):
       WAITING_ROOMS.append({
         'room_uuid': str(room_uuid),
         'creator': self.username,
+        'participent': 1,
+        'complet': False,
       })
 
     elif data['type'] == 'game.join':
       for i in WAITING_ROOMS:
-        if i['room_uuid']:
+        if i['room_uuid'] and i['complet'] == False:
           await self.channel_layer.group_add(
             f'game_room_{i['room_uuid']}',
             self.channel_name
           )
-          WAITING_ROOMS.remove(i)
+          i['participent'] += 1
+          if i['participent'] == 2:
+            i['complet'] = True
           room_uuid = (i['room_uuid'])
           break
+
       else:
         await self.send(text_data=json.dumps({
-        'type': 'game.null',
-        'message': 'No lobby found :(.',
-      }))
+          'type': 'game.null',
+          'message': 'No lobby found :(.',
+        }))
         return
 
       await self.send(text_data=json.dumps({
