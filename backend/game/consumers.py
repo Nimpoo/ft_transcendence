@@ -40,9 +40,14 @@ class GameConsumer(AsyncWebsocketConsumer):
             f'game_room_{i['room_uuid']}',
             self.channel_name
           )
+          WAITING_ROOMS.remove(i)
           room_uuid = (i['room_uuid'])
           break
       else:
+        await self.send(text_data=json.dumps({
+        'type': 'game.null',
+        'message': 'No lobby found :(.',
+      }))
         return
 
       await self.send(text_data=json.dumps({
