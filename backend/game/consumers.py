@@ -13,6 +13,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
   async def receive(self, text_data=None, bytes_data=None):
     data = json.loads(text_data)
+    # ! WARNING: IT MUST BE HANLE IF NO ATTRIBUTE FOR 'user'
     self.username = data['user']
     if data['type'] == 'game.create':
       room_uuid = uuid4()
@@ -31,21 +32,22 @@ class GameConsumer(AsyncWebsocketConsumer):
       WAITING_ROOMS.append({
         'room_uuid': str(room_uuid),
         'creator': self.username,
-        'participent': 1,
-        'complet': False,
+        'limit': 2,
+        'participant': [
+          self.username,
+          ], 
       })
 
     elif data['type'] == 'game.join':
       for i in WAITING_ROOMS:
-        if i['room_uuid'] and i['complet'] == False:
+        if i['room_uuid'] and len(i['participant']) != i['limit']:
           await self.channel_layer.group_add(
             f'game_room_{i['room_uuid']}',
             self.channel_name
           )
-          i['participent'] += 1
-          if i['participent'] == 2:
-            i['complet'] = True
           room_uuid = (i['room_uuid'])
+          i['participant'].append(self.username)
+          print(i)
           break
 
       else:
