@@ -55,7 +55,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 			<div
 				className="rounded-circle bg-cover"
 				style={{
-					backgroundImage: `url('http://${window.location.hostname}:8000/media/avatars/${user.login}.jpg')`,
+					backgroundImage: `url('http://${window.location.hostname}:8000${user.avatar}')`,
 					backgroundSize: "cover",
 					backgroundPosition: "center center",
 					backgroundRepeat: "no-repeat",

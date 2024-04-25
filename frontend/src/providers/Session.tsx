@@ -1,11 +1,11 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from "react"
 import { useCookies } from "react-cookie"
 import toast from "react-hot-toast"
 
 
-interface Session extends User {
+interface Session extends User { // token undefied when setSession
 	api: (url: string | URL | Request, method?: "GET"|"POST"|"DELETE", body?: BodyInit) => Promise<Response>
 	token: string
 	dfa_secret: string | null
@@ -15,10 +15,12 @@ type Status = "loading"|"connected"|"disconnected"
 
 const SessionContext = createContext<{
 	session: Session|null,
-	status: Status
+	status: Status,
+	setSession: Dispatch<SetStateAction<Session | null>>|null
 }>({
 	session: null,
-	status: "loading"
+	status: "loading",
+	setSession: null
 })
 
 export function useSession() {
@@ -68,7 +70,7 @@ export function SessionProvider({
 	}, [cookies, removeCookie])
 
 	return (
-		<SessionContext.Provider value={{session, status}}>
+		<SessionContext.Provider value={{session, status, setSession}}>
 			{children}
 		</SessionContext.Provider>
 	)

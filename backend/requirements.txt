@@ -12,6 +12,7 @@ cryptography==42.0.5
 daphne==4.1.0
 Django==5.0.3
 django-cors-headers==4.3.1
+djangorestframework==3.15.1
 hyperlink==21.0.0
 idna==3.6
 incremental==22.10.0

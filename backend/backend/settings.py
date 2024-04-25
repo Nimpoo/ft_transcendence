@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "ueiLjOp3qsjEIbSg6YWphGnmh8g0lFNp0pDHxMoYJRKgB8xi88QUTUPBMNCsjzWzaUmz9x2xIzk1tEZdHzk6kg=="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -53,6 +53,7 @@ if JWT_SECRET is None:
 INSTALLED_APPS = [
     "daphne",
     "corsheaders",
+    "rest_framework",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -99,7 +100,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
@@ -116,21 +117,14 @@ POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 if None in [POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD]:
     raise RuntimeError("Missing mandatory variable for PostgreSQL")
 
-# DATABASES = {
-#    "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#        "NAME": POSTGRES_DB,
-#        "USER": POSTGRES_USER,
- #       "PASSWORD": POSTGRES_PASSWORD,
-#        "HOST": POSTGRES_HOST,
-#        "PORT": "5432",
-#    }
-#}
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": POSTGRES_DB,
+        "USER": POSTGRES_USER,
+        "PASSWORD": POSTGRES_PASSWORD,
+        "HOST": POSTGRES_HOST,
+        "PORT": "5432",
     }
 }
 
@@ -173,7 +167,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = "/static"
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = "media"
+MEDIA_ROOT = "/media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

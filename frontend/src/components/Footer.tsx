@@ -17,17 +17,16 @@ import "@/styles/components/Footer/Settings.css"
 
 
 function Settings(): React.JSX.Element {
-	const { session } = useSession()
+	const { session, setSession } = useSession()
 	const socket = useSocket()
 	const { clearModal } = useModal()
 	const { Canvas } = useQRCode()
 	const [cookies, setCookie, removeCookie] = useCookies(["session", "settings"])
+	const [dfaSecret, setDfaSecret] = useState(session?.dfa_secret)
 
 	const isSoundOn = cookies.settings & 1 ? true : false
 	const isDarkModeOn = cookies.settings >> 1 & 1 ? true : false
-
-	const [dfaSecret, setDfaSecret] = useState(session?.dfa_secret)
-	const is2faOn = session?.dfa_secret ? true : false
+	const is2faOn = Boolean(dfaSecret)
 
 	return (
 		<div className="modal-wrapper">
@@ -133,41 +132,79 @@ function Settings(): React.JSX.Element {
 						</>
 					}
 
-					<div className="d-flex justify-content-between align-items-center mb-3">
-						<div>
-							<Image className="modal-icon"
-								src="/assets/svg/display-name-setting.svg"
-								width={30}
-								height={30}
-								alt="display name logo"
-							/>
-							<span className="ms-2">Display Name</span>
-						</div>
-						<form onSubmit={e => {
-							e.preventDefault()
+					<form
+						onSubmit={
+							function (e) {
+								e.preventDefault()
 
-							const form = e.target as HTMLFormElement
-							const display_name_input = form.display_name
-							
-							if (display_name_input && !display_name_input.classList.contains("invalid")) {
-								const display_name = display_name_input.value
-								session.api("/users/me/", "POST", JSON.stringify({display_name}))
+								const form = e.target as HTMLFormElement
+								let formData = new FormData()
+
+								const display_name_input = form.display_name
+								if (display_name_input.value && !display_name_input.classList.contains("invalid")) {
+									formData.append("display_name", display_name_input.value)
+								}
+
+								const avatar_input = form.avatar
+								if (avatar_input.value) {
+									formData.append("avatar", avatar_input.files[0])
+								}
+
+								session.api("/users/me/", "POST", formData)
 									.then(response => response.json())
-									.then(console.log)
+									.then(setSession)
 									.catch(console.error)
 							}
-						}}>
-							<input type="text" name="display_name" id="display_name" defaultValue={session.display_name} onChange={e => {
-								const value = e.target.value
-								if (4 <= value.length && value.length <= 30) {
-									e.target.classList.remove("invalid")
-								} else {
-									e.target.classList.add("invalid")
-								}
-							}} />
-							<input type="submit" value="set" disabled={socket?.readyState !== WebSocket.OPEN} />
-						</form>
-					</div>
+						}
+					>
+
+					<div className="d-flex justify-content-between align-items-center mb-3">
+							<div>
+								<Image
+									className="modal-icon"
+									src="/assets/svg/display-name-setting.svg"
+									width={30}
+									height={30}
+									alt="display name logo"
+								/>
+								<span className="ms-2">Display Name</span>
+							</div>
+								<input
+									type="text"
+									name="display_name"
+									defaultValue={session.display_name}
+									onChange={
+										function (e) {
+											const value = e.target.value
+											if (4 <= value.length && value.length <= 30) {
+												e.target.classList.remove("invalid")
+											} else {
+												e.target.classList.add("invalid")
+											}
+										}
+									}
+								/>
+						</div>
+
+						<div className="d-flex justify-content-between align-items-center mb-3">
+							<div>
+								<Image
+									className="modal-icon"
+									src="/assets/svg/avatar-setting.svg"
+									width={30}
+									height={30}
+									alt="avatar logo"
+								/>
+								<span className="ms-2">Avatar</span>
+							</div>
+								<input
+									type="file"
+									name="avatar"
+								/>
+						</div>
+
+						<input type="submit" value="save" disabled={socket?.readyState !== WebSocket.OPEN} />
+					</form>
 
 					<div className="justify-content-center d-flex align-items-center">
 						<button type="button" className="btn btn-danger"

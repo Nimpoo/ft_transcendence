@@ -1,10 +1,10 @@
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 
-import jwt
-
-from backend import settings
+from django.conf import settings
 from users.models import User
+
+import jwt
 
 
 def jwt_verify(view):

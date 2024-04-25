@@ -15,6 +15,7 @@ import urllib.request
 
 from backend import settings
 from users.models import User
+from users.serializers import UserSerializer
 from utils.decorators import need_user
 from random_username.generate import generate_username
 
@@ -153,27 +154,14 @@ class Me(View):
 
     @method_decorator((need_user), name="dispatch")
     def get(self, request: HttpRequest, user: User):
-        return JsonResponse(
-            model_to_dict(user, exclude=["avatar", "friends", "blocked"])
-        )
+        serializer = UserSerializer(user)
+        return JsonResponse(serializer.data)
 
     @method_decorator((need_user), name="dispatch")
     def post(self, request: HttpRequest, user: User) -> JsonResponse:
-        if len(request.body) == 0:
-            return JsonResponse(
-                {"error": "Bad Request", "message": "Missing body."}, status=400
-            )
+        display_name = request.POST.get("display_name")
 
-        try:
-            body_payload = json.loads(request.body.decode("utf-8"))
-        except json.JSONDecodeError:
-            return JsonResponse(
-                {"error": "Bad Request", "message": "Body must be JSON."}, status=400
-            )
-
-        display_name = body_payload.get("display_name")
-
-        if not display_name is None:
+        if display_name:
 
             if not 4 <= len(display_name) <= 30:
                 return JsonResponse(
@@ -186,11 +174,15 @@ class Me(View):
 
             user.display_name = display_name
 
-        user.save()
+        new_avatar = request.FILES.get("avatar")
+        if new_avatar:
+            user.avatar.delete()
+            user.avatar.save(user.login + ".jpg", new_avatar)
 
-        return JsonResponse(
-            model_to_dict(user, exclude=["avatar", "friends", "blocked"])
-        )
+        user.save()
+        serializer = UserSerializer(user)
+
+        return JsonResponse(serializer.data)
 
 
 class DFA(View):
