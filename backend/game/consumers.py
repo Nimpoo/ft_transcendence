@@ -1,12 +1,12 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from backend.settings import WAITING_ROOMS
 
 import json
 from uuid import uuid4
 
 
-class GameConsumer(AsyncWebsocketConsumer):
+WAITING_ROOMS = []
 
+class GameConsumer(AsyncWebsocketConsumer):
 
   async def connect(self):
     await self.accept()
@@ -33,27 +33,28 @@ class GameConsumer(AsyncWebsocketConsumer):
         'room_uuid': str(room_uuid),
         'creator': self.username,
         'limit': 2,
-        'participant': [
+        'players': [
           self.username,
           ], 
       })
 
     elif data['type'] == 'game.join':
-      for i in WAITING_ROOMS:
-        if i['room_uuid'] and len(i['participant']) != i['limit']:
+      for room in WAITING_ROOMS:
+        if room['room_uuid'] and len(room['players']) != room['limit']:
+          self.room_group_name = room['room_uuid']
           await self.channel_layer.group_add(
-            f'game_room_{i['room_uuid']}',
+            f'game_room_{self.room_group_name}',
             self.channel_name
           )
-          room_uuid = (i['room_uuid'])
-          i['participant'].append(self.username)
-          print(i)
+          room_uuid = (room['room_uuid'])
+          room['players'].append(self.username)
+          print(room)
           break
 
       else:
         await self.send(text_data=json.dumps({
           'type': 'game.null',
-          'message': 'No lobby found :(.',
+          'message': 'No lobby found.',
         }))
         return
 
@@ -69,9 +70,18 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.room_group_name,
         self.channel_name
       )
-      for i in WAITING_ROOMS:
-        if i['creator'] == self.username:
-          WAITING_ROOMS.remove(i)
+
+      for room in WAITING_ROOMS:
+        if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+          room['players'].remove(self.username)
+          if not room['players']:
+            WAITING_ROOMS.remove(room)
+          break
+
+      self.send({
+        'type': 'game.left',
+        'message': f'{self.username} has left the room.'
+      })
 
     await self.close()
 
