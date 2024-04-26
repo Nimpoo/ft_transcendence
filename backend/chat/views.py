@@ -47,7 +47,7 @@ class Block(View):
 
         receiver = get_object_or_404(User, id=receiver_id)
 
-        if user is receiver:
+        if user.id == receiver.id:
             return JsonResponse(
                 {"error": "Bad Request", "message": "IDs are equal."}, status=400
             )
@@ -118,7 +118,7 @@ class Block(View):
 
         receiver = get_object_or_404(User, id=receiver_id)
 
-        if user is receiver:
+        if user.id == receiver.id:
             return JsonResponse(
                 {"error": "Bad Request", "message": "IDs are equal."}, status=400
             )
@@ -147,10 +147,12 @@ def get_conv(request: HttpRequest) -> JsonResponse:
     target = parsed_query.get("user", [None])[0]
     me = parsed_query.get("sender", [None])[0]
     sender_chats = Chat.objects.filter(
-        Q(sender__display_name__contains=target) & Q(receiver__display_name__contains=me)
+        Q(sender__display_name__contains=target)
+        & Q(receiver__display_name__contains=me)
     )
     room_chats = Chat.objects.filter(
-        Q(receiver__display_name__contains=target) & Q(sender__display_name__contains=me)
+        Q(receiver__display_name__contains=target)
+        & Q(sender__display_name__contains=me)
     )
     all_user_chat = sender_chats.union(room_chats)
 
@@ -175,7 +177,9 @@ def get_all_convs(request: HttpRequest) -> JsonResponse:
     me = parsed_query.get("sender", [None])[0]
 
     # Get all chats involving the current user
-    chats = Chat.objects.filter(Q(sender__display_name=me) | Q(receiver__display_name__contains=me))
+    chats = Chat.objects.filter(
+        Q(sender__display_name=me) | Q(receiver__display_name__contains=me)
+    )
     # Group chats by conversation (sender and receiver)
     conversation_groups = {}
     for chat in chats:

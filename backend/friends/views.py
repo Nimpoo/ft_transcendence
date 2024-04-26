@@ -92,7 +92,7 @@ class Friend(View):
 
         receiver = get_object_or_404(User, id=receiver_id)
 
-        if user is receiver:
+        if user.id == receiver.id:
             return JsonResponse(
                 {"error": "Bad Request", "message": "IDs are equal."}, status=400
             )
@@ -196,7 +196,7 @@ class Friend(View):
 
         receiver = get_object_or_404(User, id=receiver_id)
 
-        if user is receiver:
+        if user.id == receiver.id:
             return JsonResponse(
                 {"error": "Bad Request", "message": "IDs are equal."}, status=400
             )
@@ -225,7 +225,7 @@ class Friend(View):
 
         match friendrequest.status:
             case FriendRequest.STATUS_PENDING:
-                if user == friendrequest.sender:
+                if user.id == friendrequest.sender.id:
                     friendrequest.status = FriendRequest.STATUS_CANCELED
 
                     async_to_sync(self.channel_layer.group_send)(
