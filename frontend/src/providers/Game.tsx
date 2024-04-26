@@ -38,18 +38,27 @@ export function GameProvider({
 
 		ws.onmessage = function(event: MessageEvent<any>) {
 			const data = JSON.parse(event.data)
-			if (data["type"] === "game.create") {
-				toast(data.message, {icon: "🍖"})
-				router.push(`/game/${data.room_uuid}`)
-			}
 
-			else if (data["type"] === "game.join") {
-				toast(data.message, {icon: "⚔️"})
-				router.push(`/game/${data.room_uuid}`)
-			}
+			switch (data["type"]) {
+				case "game.create": {
+					toast(data.message, {icon: "🍖"})
+					router.push(`/game/${data.room_uuid}`)
+					break
+				}
+				case "game.join": {
+					toast(data.message, {icon: "⚔️"})
+					router.push(`/game/${data.room_uuid}`)
+					break
+				}
 
-			else if (data["type"] === "game.null") {
-				toast(data.message, {icon: "🍊"})
+				case "game.quit": {
+					toast(data.message, {icon: "🔨"})
+					break
+				}
+				case "game.null": {
+					toast(data.message, {icon: "🍊"})
+					break
+				}
 			}
 		}
 

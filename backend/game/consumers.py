@@ -8,12 +8,18 @@ WAITING_ROOMS = []
 
 class GameConsumer(AsyncWebsocketConsumer):
 
+  async def game_quit(self, text_data):
+    await self.send(json.dumps(text_data))
+
+  async def game_join(self, text_data):
+    await self.send(json.dumps(text_data))
+
   async def connect(self):
     await self.accept()
 
   async def receive(self, text_data=None, bytes_data=None):
     data = json.loads(text_data)
-    # ! WARNING: IT MUST BE HANLE IF NO ATTRIBUTE FOR 'user'
+    # ! WARNING: IT MUST BE HANDLE IF NO ATTRIBUTE FOR 'user'
     self.username = data['user']
     if data['type'] == 'game.create':
       room_uuid = uuid4()
@@ -35,20 +41,25 @@ class GameConsumer(AsyncWebsocketConsumer):
         'limit': 2,
         'players': [
           self.username,
-          ], 
+        ],
       })
 
     elif data['type'] == 'game.join':
       for room in WAITING_ROOMS:
-        if room['room_uuid'] and len(room['players']) != room['limit']:
-          self.room_group_name = room['room_uuid']
+        if room['room_uuid'] and len(room['players']) < room['limit']:
+          self.room_group_name = f'game_room_{room['room_uuid']}'
           await self.channel_layer.group_add(
-            f'game_room_{self.room_group_name}',
+            self.room_group_name,
             self.channel_name
           )
           room_uuid = (room['room_uuid'])
           room['players'].append(self.username)
-          print(room)
+          await self.channel_layer.group_send(self.room_group_name, {
+              'type': 'game.join',
+              'room_uuid': room_uuid,
+              'message': f'{data['user']} has joined the room.',
+            }
+          )
           break
 
       else:
@@ -58,14 +69,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         }))
         return
 
-      await self.send(text_data=json.dumps({
-        'type': 'game.join',
-        'room_uuid': room_uuid,
-        'message': f'{data['user']} has joined the room.',
-      }))
-
   async def disconnect(self, close_code):
     if hasattr(self, 'room_group_name'):
+      await self.channel_layer.group_send(self.room_group_name, {
+          'type': 'game.quit',
+          'message': f'{self.username} has left the room.',
+        }
+      )
       await self.channel_layer.group_discard(
         self.room_group_name,
         self.channel_name
@@ -77,11 +87,6 @@ class GameConsumer(AsyncWebsocketConsumer):
           if not room['players']:
             WAITING_ROOMS.remove(room)
           break
-
-      self.send({
-        'type': 'game.left',
-        'message': f'{self.username} has left the room.'
-      })
 
     await self.close()
 
