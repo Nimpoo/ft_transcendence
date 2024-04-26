@@ -3,6 +3,8 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import toast from "react-hot-toast"
+
 type Status = "loading" | "conected" | "disconnected"
 
 const GameContext = createContext<{
@@ -36,13 +38,18 @@ export function GameProvider({
 
 		ws.onmessage = function(event: MessageEvent<any>) {
 			const data = JSON.parse(event.data)
-			console.log("Received: ", data)
 			if (data["type"] === "game.create") {
+				toast(data.message, {icon: "🍖"})
 				router.push(`/game/${data.room_uuid}`)
 			}
 
 			else if (data["type"] === "game.join") {
+				toast(data.message, {icon: "⚔️"})
 				router.push(`/game/${data.room_uuid}`)
+			}
+
+			else if (data["type"] === "game.null") {
+				toast(data.message, {icon: "🍊"})
 			}
 		}
 
@@ -57,6 +64,9 @@ export function GameProvider({
 
 		setWs(ws)
 
+		return () => {
+			ws.close()
+		}
 	}, [])
 
 	const sendMessage = (message: any) => {

@@ -4,7 +4,7 @@ import { useSession } from "@/providers/Session"
 
 function GamingRoom(): React.JSX.Element {
 
-	const { session } = useSession()	
+	const { session } = useSession()
 
 	return(
 		<>
