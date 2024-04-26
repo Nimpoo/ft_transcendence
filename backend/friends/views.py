@@ -3,6 +3,7 @@ from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
 from django.utils.decorators import method_decorator
+from django.db.models import Q
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
@@ -30,32 +31,27 @@ def get_friend_request(request: HttpRequest, user: User) -> JsonResponse:
         )
 
     try:
+        query_user = User.objects.get(id=query_id)
+    except User.DoesNotExist:
         return JsonResponse(
-            model_to_dict(
-                FriendRequest.objects.get(
-                    sender=user,
-                    receiver_id=query_id,
-                    status__in=[
-                        FriendRequest.STATUS_PENDING,
-                        FriendRequest.STATUS_ACCEPTED,
-                    ],
-                )
-            )
+            {"error": "Not Found", "message": "There is no user with specified id."},
+            status=404,
         )
+
+    try:
+        friendrequest = FriendRequest.objects.filter(
+            Q(sender=user, receiver=query_user) | Q(sender=query_user, receiver=user)
+        ).latest("id")
     except FriendRequest.DoesNotExist:
         return JsonResponse(
-            model_to_dict(
-                get_object_or_404(
-                    FriendRequest,
-                    sender_id=query_id,
-                    receiver=user,
-                    status__in=[
-                        FriendRequest.STATUS_PENDING,
-                        FriendRequest.STATUS_ACCEPTED,
-                    ],
-                )
-            )
+            {
+                "error": "Not Found",
+                "message": "There is no friend request between you and specified user.",
+            },
+            status=404,
         )
+
+    return JsonResponse(model_to_dict(friendrequest))
 
 
 class Friend(View):
