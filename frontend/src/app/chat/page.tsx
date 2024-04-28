@@ -196,11 +196,14 @@ function Chat(): React.JSX.Element {
     function updateLastMessage(username: string, newLastMsg: string)
     {
         setConversations(prevConversations => {
-            return prevConversations.map(conversation => {
-                if (conversation.username === username)
-                    return { ...conversation, lastMessage: newLastMsg}
-                return conversation;
-            });
+            const index = prevConversations.findIndex(conversation => conversation.username === username);
+            if (index !== -1)
+            {
+                const updatedConversation = { ...prevConversations[index], lastMessage: newLastMsg };
+                const remainingConversations = prevConversations.filter(conversation => conversation.username !== username);
+                return [updatedConversation, ...remainingConversations];
+            }
+            return prevConversations;
         });
     }
 
