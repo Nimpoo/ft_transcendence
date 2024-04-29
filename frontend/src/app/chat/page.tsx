@@ -44,6 +44,7 @@ function Chat(): React.JSX.Element {
     const { session } = useSession()
     const [msgs, setMsgs] = useState<MessageProps[]>([]);
     const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
 
   // const strSession = cookies.session; 
     const socket = useSocket()
@@ -72,7 +73,7 @@ function Chat(): React.JSX.Element {
             socket.onmessage = null;
           };
         }
-      }, [socket]);
+      }, [socket, session?.display_name]);
 
     async function chatUserNames() {
         try {
@@ -89,40 +90,7 @@ function Chat(): React.JSX.Element {
             console.error("Error fetching user names:", error);
         }
     }
-
-    function getUsernameInChat (chat: any) {
-        const currentUser = session?.display_name;
-        const otherUser = chat.sender === currentUser ? chat.target : chat.sender;
-        return otherUser;
-    }
-
-    async function getAllConv (user: string) {
-        try {
-            const response = await fetch(`http://${window.location.hostname}:8000/chat/getconvs/?sender=${encodeURIComponent(session?.display_name ?? "")}`,
-            {
-                method: "GET"
-            })
-            if (response.ok) {
-                const data = await response.json()
-                const AllConv = data.map((chat: any) => ({
-                    username: getUsernameInChat(chat),
-                    lastMessage: chat.content,
-                    isMyMessage: chat.sender === session?.display_name,
-                    id: chat.id
-                  }));
-                // AllConv.sort((a: Conversation, b: Conversation) => b.id - a.id);
-                setConversations(AllConv);
-            }
-            else {
-                console.error("Fetched failed")
-            }
-        }
-        catch (error) {
-            console.error("Fetched failed catched")
-            console.error(error)
-        }
-    }
-
+    
     async function getChatByUser (user: string) {
         try {
             const response = await fetch(`http://${window.location.hostname}:8000/chat/getconv?user=${user}&sender=${encodeURIComponent(session?.display_name ?? "")}`,
@@ -146,19 +114,17 @@ function Chat(): React.JSX.Element {
         }
     }
 
-    async function userSearch() {
-        if (search) {
-            const response = await fetch(`http://${window.location.hostname}:8000/users/search?q=${encodeURIComponent(search)}`)
-            setResults(await response.json())
-            searchTimeout.current = null
+    function handleClick(username: string) {
+        if (username === currentConv) {
+            setSelectedConversation(null);
+            setConv(true);
         } else {
-            setResults(null)
+            setSelectedConversation(username);
+            setCurrentConv(username);
+            setConv(false);
         }
-    }
-
-    function handleClick() {
-        setConv(!conv);
         setSearch("");
+        getChatByUser(username);
     }
 
     function handleDropDown() {
@@ -208,17 +174,54 @@ function Chat(): React.JSX.Element {
     }
 
     useEffect(() => {
+        function getUsernameInChat (chat: any) {
+            const currentUser = session?.display_name;
+            const otherUser = chat.sender === currentUser ? chat.target : chat.sender;
+            return otherUser;
+        }
+
+        async function getAllConv (user: string) {
+            try {
+                const response = await fetch(`http://${window.location.hostname}:8000/chat/getconvs/?sender=${encodeURIComponent(session?.display_name ?? "")}`,
+                {
+                    method: "GET"
+                })
+                if (response.ok) {
+                    const data = await response.json()
+                    const AllConv = data.map((chat: any) => ({
+                        username: getUsernameInChat(chat),
+                        lastMessage: chat.content,
+                        isMyMessage: chat.sender === session?.display_name,
+                        id: chat.id
+                      }));
+                    setConversations(AllConv);
+                }
+                else {
+                    console.error("Fetched failed")
+                }
+            }
+            catch (error) {
+                console.error("Fetched failed catched")
+                console.error(error)
+            }
+        }    
+
         if (session?.display_name) {
         getAllConv(session.display_name);
         }
     }, [session?.display_name]);
 
-
-    // useEffect(() => {
-    //     chatUserNames();
-    // }, []);
-
     useEffect(() => {
+        async function userSearch() {
+            if (search) {
+                const response = await fetch(`http://${window.location.hostname}:8000/users/search?q=${encodeURIComponent(search)}`)
+                setResults(await response.json())
+                searchTimeout.current = null
+            } else {
+                setResults(null)
+            }
+        }
+
         if (searchTimeout.current) {
             clearTimeout(searchTimeout.current)
             searchTimeout.current = setTimeout(userSearch, 500)
@@ -248,8 +251,8 @@ function Chat(): React.JSX.Element {
                 <div className="vstack gap-3 scrollab">
                     {conversations.map((convo, index) => (
                         <div key={index}>
-                            <input type="checkbox" className="btn-check" name="conv-1" id="btnconv" autoComplete="on"></input>
-                            <label className="btn btn-outline-dark btn-1-conv" htmlFor="btnconv" onClick={() => {handleClick(); setCurrentConv(convo.username); getChatByUser(convo.username)}}>
+                            <input type="checkbox" className="btn-check" name={`conv-${convo.username}`} id={`btnconv-${convo.username}`} autoComplete="on" checked={selectedConversation === convo.username}></input>
+                            <label className="btn btn-outline-dark btn-1-conv" htmlFor={`btnconv-${convo.username}`} onClick={() => {handleClick(convo.username)}}>
                                 <Image className="picture mt-1"
                                     src="/assets/svg/John Doe.svg"
                                     width={60}
@@ -287,7 +290,7 @@ function Chat(): React.JSX.Element {
                                     <div>
                                         {results.map((user, key) => (
                                             <div key={key}>
-                                                <Link onClick={() => {handleClick(); setCurrentConv(user.display_name); getChatByUser(user.display_name)}} href={""}>
+                                                <Link onClick={() => {handleClick(user.display_name)}} href={""}>
                                                     {user.display_name}
                                                 </Link>
                                             </div>
