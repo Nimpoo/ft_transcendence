@@ -1,14 +1,30 @@
 "use client"
 
-import { useSession } from "@/providers/Session"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
-function GamingRoom(): React.JSX.Element {
+import { useGame } from "@/providers/Game"
 
-	const { session } = useSession()
+import toast from "react-hot-toast"
 
-	return(
+function GamingRoom(): React.JSX.Element | null {
+
+	const { players } = useGame()
+
+	const router = useRouter()
+
+	useEffect(() => {
+		if (!players.length) {
+			toast.error("DÉGAGE DE LÀ T'AS RIEN À FAIRE ICI BORDEL")
+			router.push("/game")
+			return
+		}
+	}, [players.length, router])
+
+	return (
 		<>
-			{session?.nickname}
+			<div>{players && players.length > 0 ? players[0] : "Waiting for players ..."}</div>
+			<div>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</div>
 		</>
 	)
 }

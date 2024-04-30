@@ -8,10 +8,12 @@ import toast from "react-hot-toast"
 type Status = "loading" | "conected" | "disconnected"
 
 const GameContext = createContext<{
-	status: Status
-	sendMessage?: (message: any) => void
+	status: Status,
+	sendMessage?: (message: any) => void,
+	players: string[],
 }>({
-	status: "loading"
+	status: "loading",
+	players: [],
 })
 
 export function useGame() {
@@ -27,6 +29,7 @@ export function GameProvider({
 	const router = useRouter()
 
 	const [status, setStatus] = useState<Status>("loading")
+	const [players, setPlayers] = useState<string[]>([])
 	const [ws, setWs] = useState<WebSocket | null>(null)
 
 	useEffect(() => {
@@ -42,16 +45,22 @@ export function GameProvider({
 			switch (data["type"]) {
 				case "game.create": {
 					toast(data.message, {icon: "🍖"})
+					setPlayers(data.players)
+					localStorage.setItem("room_uuid", data["room_uuid"])
 					router.push(`/game/${data.room_uuid}`)
 					break
 				}
 				case "game.join": {
 					toast(data.message, {icon: "⚔️"})
+					setPlayers(data.players)
+					localStorage.setItem("room_uuid", data["room_uuid"])
 					router.push(`/game/${data.room_uuid}`)
 					break
 				}
 
 				case "game.quit": {
+					setPlayers(data.players)
+					localStorage.removeItem("room_uuid")
 					toast(data.message, {icon: "🔨"})
 					break
 				}
@@ -76,7 +85,7 @@ export function GameProvider({
 		return () => {
 			ws.close()
 		}
-	}, [])
+	}, [router])
 
 	const sendMessage = (message: any) => {
 		if (ws && ws?.readyState === WebSocket.OPEN) {
@@ -87,7 +96,7 @@ export function GameProvider({
 	}
 
 	return (
-		<GameContext.Provider value={{ status, sendMessage }}>
+		<GameContext.Provider value={{ status, players, sendMessage }}>
 			{children}
 		</GameContext.Provider>
 	)
