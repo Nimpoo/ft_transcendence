@@ -23,14 +23,6 @@ interface Conversation {
 
 function Chat(): React.JSX.Element {
 
-    // document.querySelector('button-send').onclick = function (e) {
-    //     const messageInput = document.querySelector('#input');
-    //     const msg = messageInput.value;
-    //     ws.send(JSON.stringify({
-    //         'message': msg,
-    //     }));
-    // };
-
     const [cookies, setCookie] = useCookies(["session"]);
     const [conv, setConv] = useState(true);
     const [dropDown, setDropDown] = useState(false);
@@ -45,8 +37,8 @@ function Chat(): React.JSX.Element {
     const [msgs, setMsgs] = useState<MessageProps[]>([]);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+    const [lastMessageSender, setLastMessageSender] = useState<string | undefined>(undefined);
 
-  // const strSession = cookies.session; 
     const socket = useSocket()
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -62,11 +54,9 @@ function Chat(): React.JSX.Element {
             const messageData = JSON.parse(event.data);
             if (messageData.query_type === 'msg')
             {
-                const newMsg = { message: messageData.content, isMyMessage: messageData.sender === session?.display_name };
+                const newMsg = { message: messageData.content, isMyMessage: messageData.sender === session?.display_name, timestamp: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }) };
                 setMsgs(prevMsgs => [...prevMsgs, newMsg]);
                 updateLastMessage(messageData.sender, messageData.content);
-                // conversations.sort((a, b) => b.id - a.id);
-                // setConversations(conversations);
             }
           };
           return () => {
@@ -101,10 +91,11 @@ function Chat(): React.JSX.Element {
                 const data = await response.json()
                 const chatMessages = data.map((chat: any) => ({
                     message: chat.content,
-                    isMyMessage: chat.sender === session?.display_name
-                  }));
-                  setMsgs(chatMessages)            }
-            else {
+                    isMyMessage: chat.sender === session?.display_name,
+                    timestamp: new Date(chat.created_at).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' })
+                }));
+                setMsgs(chatMessages)           
+            } else {
                 console.error("Fetched failed")
             }
         }
@@ -135,7 +126,7 @@ function Chat(): React.JSX.Element {
         const trimMsg = newMessage.trim();
         if (trimMsg !== "")
         {
-            const newMsg = { message: newMessage, isMyMessage: true };
+            const newMsg = { message: newMessage, isMyMessage: true, timestamp: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }) };
             setMessages(prevMessages => [...prevMessages, newMessage]);
             setMsgs(prevMsgs => [...prevMsgs, newMsg]);
             socket?.send(JSON.stringify({
@@ -148,8 +139,7 @@ function Chat(): React.JSX.Element {
             }))
             setNewMessage("");
             updateLastMessage(currentConv, newMessage);
-            // conversations.sort((a, b) => b.id - a.id);
-            // setConversations(conversations);
+            setLastMessageSender(session?.display_name);
         }
     }
 
@@ -350,9 +340,8 @@ function Chat(): React.JSX.Element {
                         </ul>
                     </div>
                     <div className="conv-box" ref={chatContainerRef}>
-                        {/* {getChatByUser()} */}
                         {msgs.map((msg, index) => (
-                            <ChatMessage key={index} message={msg.message} isMyMessage={msg.isMyMessage} />
+                            <ChatMessage key={index} message={msg.message} isMyMessage={msg.isMyMessage} timestamp={msg.timestamp} />
                         ))}
                     </div>
                     <div className="input-group">

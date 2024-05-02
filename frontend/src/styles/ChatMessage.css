@@ -46,3 +46,15 @@
     align-self: flex-end;
     flex-direction: column;
 }
+
+.my-timestamp {
+    font-size: 10px;
+    text-align: end;
+    color: rgba(255, 255, 255, 0.606);
+}
+
+.friend-timestamp {
+    font-size: 10px;
+    text-align: end;
+    color: rgba(255, 255, 255, 0.606);
+}
