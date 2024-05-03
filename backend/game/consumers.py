@@ -8,74 +8,102 @@ WAITING_ROOMS = []
 
 class GameConsumer(AsyncWebsocketConsumer):
 
+############# ? Channel Send Message ? ##############
   async def game_quit(self, text_data):
     await self.send(json.dumps(text_data))
 
   async def game_join(self, text_data):
     await self.send(json.dumps(text_data))
+    
+  async def game_update(self, text_data):
+    await self.send(json.dumps(text_data))
+###################################################?
 
-  async def game_begin(self, text_data):
-    print(self.username)
-    x, y = 1 / 2, 1 / 2
-    w, h = 1 / 35, 1 / 35
-    vx, vy = 1 / 600, 1 / 200
+  async def game_begin(self, text_data=None):
+    self.game_loop = await asyncio.create_task(self.game_loop()) # ? Line 27
 
-    ball_info = {
-      'coordinates': [x, y],
-      'dimensions': [w, h],
-      'speed': [vx, vy],
-    }
+####################################################
+####################################################
+  async def game_loop(self):
+    try:
+      self.x, self.y = 1 / 2, 1 / 2
+      self.w, self.h = 1 / 35, 1 / 35
+      self.vx, self.vy = 1 / 600, 1 / 200
 
-    # collision = False
+      ball_info = {
+        'coordinates': [self.x, self.y],
+        'dimensions': [self.w, self.h],
+        'speed': [self.vx, self.vy],
+      }
 
-    await self.send(json.dumps({
-      'type': 'opening_game_data',
-      'new_position': ball_info,
-      })
-    )
+      # collision = False
 
-    # while True:
+      await self.channel_layer.group_send(self.room_group_name, {
+          'type': 'game.update',
+          'new_position': ball_info,
+        }
+      )
+      await self.send(text_data=json.dumps({
+        'type': 'game.update',
+        'new_position': ball_info,
+      }))
+      while True:
+        await asyncio.sleep(0.016) # 60fps
+        await self.update_data(ball_info) # ? Line 23
+    except asyncio.CancelledError:
+      print('oopsi')
+      pass
+####################################################
+####################################################
+  async def update_data(self, ball_info: dict[str, list[float]]):
 
-    await asyncio.sleep(0.016) # 60 FPS
-
-    if (x + vx + (w / 2) > 1.01 or x + vx - (w / 2) < -0.01):
-      vx *= -1
+    if (self.x + self.vx + (self.w / 2) > 1.01 or self.x + self.vx - (self.w / 2) < -0.01):
+      self.vx *= -1
       # collision = True
       # vy += random.uniform(0.0001, 0.0002)
 
-    if (y + vy + (h / 2) > 1 or y + vy - (h / 2) < 0):
-      vy *= -1
+    if (self.y + self.vy + (self.h / 2) > 1 or self.y + self.vy - (self.h / 2) < 0):
+      self.vy *= -1
       # collision = True
       # vx += random.uniform(0.0001, 0.0002)
 
 
     # if (collision == True):
-    ball_info['coordinates'] = [x, y]
-    ball_info['dimensions'] = [w, h]
-    ball_info['speed'] = [vx, vy]
+    ball_info['coordinates'] = [self.x, self.y]
+    ball_info['dimensions'] = [self.w, self.h]
+    ball_info['speed'] = [self.vx, self.vy]
 
-    await self.send(json.dumps({
-      'type': 'game.data',
-      'new_position': ball_info,
-      })
+    await self.channel_layer.group_send(self.room_group_name, {
+        'type': 'game.update',
+        'new_position': ball_info,
+      }
     )
+    await self.send(text_data=json.dumps({
+      'type': 'game.update',
+      'new_position': ball_info,
+    }))
 
-    x += vx
-    y += vy
+    self.x += self.vx
+    self.y += self.vy
+####################################################
+####################################################
 
+################## * Connection * ##################
   async def connect(self):
     await self.accept()
+###################################################*
 
+#################### ? Receive ? ###################
   async def receive(self, text_data=None, bytes_data=None):
     data = json.loads(text_data)
     self.username = data.get('user', 'unknown_player')
 
+    ############### Launch The Game ################
     if data['type'] == 'game.begin':
-      await self.channel_layer.group_send(self.room_group_name, {
-          'type': 'game.begin',
-        }
-      )
+      await self.game_begin() # ? Line 58
+    ################################################
 
+    ############### Creation a Room ################
     if data['type'] == 'game.create':
       room_uuid = uuid4()
       self.room_group_name = f'game_room_{room_uuid}'
@@ -99,7 +127,9 @@ class GameConsumer(AsyncWebsocketConsumer):
           self.username,
         ],
       })
+    ################################################
 
+    ################ Joining a Room ################
     elif data['type'] == 'game.join':
       for room in WAITING_ROOMS:
         if room['room_uuid'] and len(room['players']) < room['limit']:
@@ -124,7 +154,10 @@ class GameConsumer(AsyncWebsocketConsumer):
           'message': 'No lobby found.',
         }))
         return
+    ################################################
+###################################################?
 
+################ ! Deconnection ! #################
   async def disconnect(self, close_code):
     if hasattr(self, 'room_group_name'):
 
@@ -149,6 +182,7 @@ class GameConsumer(AsyncWebsocketConsumer):
       )
 
     await self.close()
+###################################################!
 
 
 
