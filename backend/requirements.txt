@@ -20,12 +20,15 @@ cryptography==42.0.5
 daphne==4.1.0
 Django==5.0.3
 django-cors-headers==4.3.1
+django-formtools==2.5.1
 djangorestframework==3.15.1
+hiredis==2.3.2
 hyperlink==21.0.0
 idna==3.6
 incremental==22.10.0
 msgpack==1.0.8
 pillow==10.3.0
+prompt-toolkit==3.0.43
 psycopg2==2.9.9
 pyasn1==0.5.1
 pyasn1-modules==0.3.0
