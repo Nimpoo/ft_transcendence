@@ -1,31 +1,63 @@
 "use client"
 
-import { useEffect } from "react"
+import { Ubuntu } from "next/font/google"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
+import { useSession } from "@/providers/Session"
 import { useGame } from "@/providers/Game"
 
 import toast from "react-hot-toast"
+import Canvas from "@/components/Canvas"
+
+import "@/styles/Rainbow.css"
+
+const ubu = Ubuntu ({
+	subsets: ["latin"],
+	weight: "700",
+})
 
 function GamingRoom(): React.JSX.Element | null {
 
-	const { players } = useGame()
+	const [Begin, setBegin] = useState(true)
+
+	const { session } = useSession()
+	const { players, sendMessage } = useGame()
 
 	const router = useRouter()
 
+	const LetsBegin = () => {
+		setBegin(false)
+		if (sendMessage) {
+			sendMessage({
+				"type": "game.begin",
+				"user": session?.nickname,
+			})
+		}
+	}
+
 	useEffect(() => {
 		if (!players.length) {
-			toast.error("DÉGAGE DE LÀ T'AS RIEN À FAIRE ICI BORDEL")
+			toast.error("DÉGAGE DE LÀ TAS RIEN À FAIRE ICI BORDEL")
 			router.push("/game")
 			return
 		}
 	}, [players.length, router])
 
 	return (
-		<>
-			<div>{players && players.length > 0 ? players[0] : "Waiting for players ..."}</div>
-			<div>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</div>
-		</>
+		<div style={{display: "flex", flexDirection: "column"}}>
+			<div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+				<h5>{players && players.length > 0 ? players[0] : "Waiting for players ..."}</h5>
+				<h5>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</h5>
+			</div>
+			<Canvas />
+			{Begin && players[0] === session?.nickname &&
+				<button onClick={LetsBegin} className={"big-button-xl " + ubu.className}
+				style={{position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)"}}>
+					<span className="stroke rainbow-text">LETS BEGIN !</span>
+				</button>
+			}
+		</div>
 	)
 }
 

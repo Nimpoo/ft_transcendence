@@ -1,4 +1,8 @@
+"use client"
+
 import { useEffect, useRef } from "react"
+
+import { useGame } from "@/providers/Game"
 
 import "@/styles/game/Game.css"
 
@@ -26,6 +30,9 @@ function Canvas({
 }: {
 	props?: any,
 }): React.JSX.Element {
+
+	const { message } = useGame()
+
 	const ref = useRef<HTMLCanvasElement>(null)
 
 	useEffect(() => {
@@ -47,27 +54,8 @@ function Canvas({
 
 				// ! /*--------------- BALL ---------------*/
 
-				const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/game/`)
-				ws.onopen = function(event: Event) {
-					// console.log(event)
-					ws.send(JSON.stringify({
-						"type": "connect",
-						"Player One [CLIENT]": "Get Ready !",
-						})
-					)
-				}
-
-				ws.onclose = function(event: CloseEvent) {
-					ws.send(JSON.stringify({
-						"type": "disconnect",
-						"Player One [CLIENT]": "See you soon !",
-						})
-					)
-					ws.close()
-				}
-
-				ws.onmessage = function(event: MessageEvent<any>) {
-					const data = JSON.parse(event.data)
+				if (message) {
+					const data = message
 
 					var coord_maj: [number, number] = data.new_position?.coordinates ?? [0, 0]
 					var dim_maj: [number, number] = data.new_position?.dimensions ?? [0, 0]
@@ -87,9 +75,9 @@ function Canvas({
 							context.fillRect(this.coord[0], this.coord[1], this.dimensions[0], this.dimensions[1])
 							context.restore()
 						},
+						// console.log("coordonée", square.coord, score1++)
+						// console.log("speed", square.dir, score2++)
 					}
-					// console.log("coordonée", square.coord, score1++)
-					// console.log("speed", square.dir, score2++)
 				}
 
 				// ! /*------------------------------------*/
@@ -136,7 +124,7 @@ function Canvas({
 				return () => { window.cancelAnimationFrame(animationFrameId) }
 			}
 		}
-	}, [])
+	}, [message])
 
 	return (<canvas ref={ref} className="game" style={{backgroundColor: "black"}} {...props} />)
 }

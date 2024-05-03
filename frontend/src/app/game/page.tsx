@@ -1,7 +1,5 @@
 "use client"
 
-// import Canvas from "@/components/Canvas"
-
 import { Ubuntu } from "next/font/google"
 
 import { useGame } from "@/providers/Game"

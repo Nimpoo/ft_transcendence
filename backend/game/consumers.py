@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-import json
+import json, asyncio
 from uuid import uuid4
 
 
@@ -14,13 +14,68 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def game_join(self, text_data):
     await self.send(json.dumps(text_data))
 
+  async def game_begin(self, text_data):
+    print(self.username)
+    x, y = 1 / 2, 1 / 2
+    w, h = 1 / 35, 1 / 35
+    vx, vy = 1 / 600, 1 / 200
+
+    ball_info = {
+      'coordinates': [x, y],
+      'dimensions': [w, h],
+      'speed': [vx, vy],
+    }
+
+    # collision = False
+
+    await self.send(json.dumps({
+      'type': 'opening_game_data',
+      'new_position': ball_info,
+      })
+    )
+
+    # while True:
+
+    await asyncio.sleep(0.016) # 60 FPS
+
+    if (x + vx + (w / 2) > 1.01 or x + vx - (w / 2) < -0.01):
+      vx *= -1
+      # collision = True
+      # vy += random.uniform(0.0001, 0.0002)
+
+    if (y + vy + (h / 2) > 1 or y + vy - (h / 2) < 0):
+      vy *= -1
+      # collision = True
+      # vx += random.uniform(0.0001, 0.0002)
+
+
+    # if (collision == True):
+    ball_info['coordinates'] = [x, y]
+    ball_info['dimensions'] = [w, h]
+    ball_info['speed'] = [vx, vy]
+
+    await self.send(json.dumps({
+      'type': 'game.data',
+      'new_position': ball_info,
+      })
+    )
+
+    x += vx
+    y += vy
+
   async def connect(self):
     await self.accept()
 
   async def receive(self, text_data=None, bytes_data=None):
     data = json.loads(text_data)
-    # ! WARNING: IT MUST BE HANDLE IF NO ATTRIBUTE FOR 'user'
-    self.username = data['user']
+    self.username = data.get('user', 'unknown_player')
+
+    if data['type'] == 'game.begin':
+      await self.channel_layer.group_send(self.room_group_name, {
+          'type': 'game.begin',
+        }
+      )
+
     if data['type'] == 'game.create':
       room_uuid = uuid4()
       self.room_group_name = f'game_room_{room_uuid}'
@@ -38,7 +93,7 @@ class GameConsumer(AsyncWebsocketConsumer):
       }))
       WAITING_ROOMS.append({
         'room_uuid': str(room_uuid),
-        'creator': self.username,
+        'host': self.username,
         'limit': 2,
         'players': [
           self.username,
@@ -78,6 +133,8 @@ class GameConsumer(AsyncWebsocketConsumer):
           room['players'].remove(self.username)
           if not room['players']:
             WAITING_ROOMS.remove(room)
+          elif room['host'] == self.username:
+            room['host'] = room['players'][0]
           await self.channel_layer.group_send(self.room_group_name, {
               'type': 'game.quit',
               'players': room['players'],
