@@ -39,10 +39,9 @@ class GameConsumer(AsyncWebsocketConsumer):
       # collision = False
 
       await self.channel_layer.group_send(self.room_group_name, {
-          'type': 'game.update',
-          'new_position': ball_info,
-        }
-      )
+        'type': 'game.update',
+        'new_position': ball_info,
+      })
       await self.send(text_data=json.dumps({
         'type': 'game.update',
         'new_position': ball_info,
@@ -74,10 +73,9 @@ class GameConsumer(AsyncWebsocketConsumer):
     ball_info['speed'] = [self.vx, self.vy]
 
     await self.channel_layer.group_send(self.room_group_name, {
-        'type': 'game.update',
-        'new_position': ball_info,
-      }
-    )
+      'type': 'game.update',
+      'new_position': ball_info,
+    })
     await self.send(text_data=json.dumps({
       'type': 'game.update',
       'new_position': ball_info,
@@ -169,11 +167,10 @@ class GameConsumer(AsyncWebsocketConsumer):
           elif room['host'] == self.username:
             room['host'] = room['players'][0]
           await self.channel_layer.group_send(self.room_group_name, {
-              'type': 'game.quit',
-              'players': room['players'],
-              'message': f'{self.username} has left the room.',
-            }
-          )
+            'type': 'game.quit',
+            'players': room['players'],
+            'message': f'{self.username} has left the room.',
+          })
           break
 
       await self.channel_layer.group_discard(
