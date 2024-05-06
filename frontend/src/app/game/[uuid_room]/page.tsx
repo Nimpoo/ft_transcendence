@@ -51,12 +51,35 @@ function GamingRoom(): React.JSX.Element | null {
 				<h5>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</h5>
 			</div>
 			<Canvas />
-			{Begin && players[0] === session?.nickname &&
-				<button onClick={LetsBegin} className={"big-button-xl " + ubu.className}
-				style={{position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)"}}>
-					<span className="stroke rainbow-text">LETS BEGIN !</span>
-				</button>
-			}
+			{Begin && players[0] === session?.nickname && (
+				<div>
+					{players[1] ? (
+						<button 
+							onClick={LetsBegin}
+							className={"big-button-xl " + ubu.className}
+							style={{
+								position: "absolute",
+								top: "50%",
+								left: "50%",
+								transform: "translate(-50%, -50%)",
+							}}
+						>
+							<span className="stroke rainbow-text">LETS BEGIN !</span>
+						</button>
+					) : (
+						<h1
+							style={{
+								position: "absolute",
+								top: "50%",
+								left: "50%",
+								transform: "translate(-50%, -50%)",
+							}}
+						>
+							Waiting for an opponant ...
+						</h1>
+					)}
+				</div>
+			)}
 		</div>
 	)
 }
