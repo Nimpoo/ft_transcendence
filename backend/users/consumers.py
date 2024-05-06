@@ -20,6 +20,7 @@ class UserConsumer(AsyncWebsocketConsumer):
             await self.close()
         else:
             # WebSocket Setup
+            all_consumers.append(self)
 
             self.room_name = self.user.login
             self.room_group_name = f"user_{self.user.login}"
@@ -56,6 +57,7 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         if self.user:
+            all_consumers.remove(self)
             await self.channel_layer.group_discard(
                 self.room_group_name, self.channel_name
             )
@@ -185,3 +187,5 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     async def user_notification(self, event):
         await self.send(json.dumps(event.get("data")))
+
+all_consumers: list[UserConsumer] = []

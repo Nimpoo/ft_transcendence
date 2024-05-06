@@ -2,10 +2,11 @@ from django.forms import model_to_dict
 from django.core.files import File
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.db.models import Q
+from django.conf import settings
 
 import requests
 import json
@@ -13,11 +14,11 @@ import jwt
 import pyotp
 import urllib.request
 
-from backend import settings
 from users.models import User
 from users.serializers import UserSerializer
 from utils.decorators import need_user
 from random_username.generate import generate_username
+from users.consumers import all_consumers
 
 
 class Index(View):
@@ -148,6 +149,13 @@ def search(request: HttpRequest) -> JsonResponse:
         Q(login__icontains=query) | Q(display_name__icontains=query)
     ).values("id", "login", "display_name", "created_at")
     return JsonResponse(list(results), safe=False)
+
+
+def get_online_users(request: HttpRequest):
+    return JsonResponse(
+        [UserSerializer(consumer.user).data for consumer in set(all_consumers)],
+        safe=False,
+    )
 
 
 class Me(View):

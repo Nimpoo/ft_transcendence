@@ -9,5 +9,6 @@ urlpatterns = [
     path("me/", views.Me.as_view(), name="me"),
     path("dfa/", views.DFA.as_view(), name="dfa"),
     path("search/", views.search, name="search-user"),
+    path("online/", views.get_online_users, name="get-online-users"),
     path("friends/", include("friends.urls")),
 ]
