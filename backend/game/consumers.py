@@ -17,10 +17,16 @@ class GameConsumer(AsyncWebsocketConsumer):
     
   async def game_update(self, text_data):
     await self.send(json.dumps(text_data))
+    
+  async def game_break(self, text_data):
+    try:
+      self.game_loop.cancel()
+    except Exception as e:
+      pass
 ###################################################?
 
   async def game_begin(self, text_data=None):
-    self.game_loop = await asyncio.create_task(self.game_loop()) # ? Line 27
+    self.game_loop = asyncio.create_task(self.game_loop()) # ? Line 27
 
 ####################################################
 ####################################################
@@ -48,7 +54,7 @@ class GameConsumer(AsyncWebsocketConsumer):
       }))
       while True:
         await asyncio.sleep(0.016) # 60fps
-        await self.update_data(ball_info) # ? Line 23
+        await self.update_data(ball_info) # ? Line 57
     except asyncio.CancelledError:
       print('oopsi')
       pass
@@ -98,7 +104,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     ############### Launch The Game ################
     if data['type'] == 'game.begin':
-      await self.game_begin() # ? Line 58
+      await self.game_begin() # ? Line 22
     ################################################
 
     ############### Creation a Room ################
@@ -158,6 +164,15 @@ class GameConsumer(AsyncWebsocketConsumer):
 ################ ! Deconnection ! #################
   async def disconnect(self, close_code):
     if hasattr(self, 'room_group_name'):
+
+      if hasattr(self, "game_loop"):
+        try:
+          self.game_loop.cancel()
+        except Exception as e:
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.break',
+          })
+          pass
 
       for room in WAITING_ROOMS:
         if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
