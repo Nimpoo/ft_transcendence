@@ -1,8 +1,13 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 
+import { useSession } from "@/providers/Session"
+import { useModal } from "@/providers/Modal"
 import { useGame } from "@/providers/Game"
+
+import Link from "next/link"
 
 import "@/styles/game/Game.css"
 
@@ -31,7 +36,22 @@ function Canvas({
 	props?: any,
 }): React.JSX.Element {
 
-	const { message } = useGame()
+	const router = useRouter()
+
+	// ? /*--------- End Game Screen ----------*/
+	const { clearModal } = useModal()
+
+	const endGame =
+	<Link href="/game">
+		<button>
+			return to home
+		</button>
+	</Link>
+	// ? /*------------------------------------*/
+
+	const { session } = useSession()
+	const { createModal } = useModal()
+	const { message, sendMessage, gameStatus, setGameStatus } = useGame()
 
 	const ref = useRef<HTMLCanvasElement>(null)
 
@@ -52,41 +72,12 @@ function Canvas({
 			if (context) {
 				context.scale(dpi, dpi)
 
-				// ! /*--------------- BALL ---------------*/
-
-				if (message) {
-					const data = message
-
-					var coord_maj: [number, number] = data.new_position?.coordinates ?? [0, 0]
-					var dim_maj: [number, number] = data.new_position?.dimensions ?? [0, 0]
-					var dir_maj: [number, number] = data.new_position?.speed ?? [0, 0]
-
-					square = {
-						coord: [coord_maj[0] * width, coord_maj[1] * height],
-						dimensions: [dim_maj[0] * height, dim_maj[1] * height],
-						dir: [dir_maj[0] * width, dir_maj[1] * height],
-						color: "white",
-						draw: function() {
-							context.beginPath()
-							context.save()
-							context.translate(-(this.dimensions[0] / 2), -(this.dimensions[1] / 2))
-							context.closePath()
-							context.fillStyle = this.color
-							context.fillRect(this.coord[0], this.coord[1], this.dimensions[0], this.dimensions[1])
-							context.restore()
-						},
-						// console.log("coordonée", square.coord, score1++)
-						// console.log("speed", square.dir, score2++)
-					}
-				}
-
-				// ! /*------------------------------------*/
-
-				// * the draw for the demo mode
-				const demo = () => {
+/////////////////////////////////////////////////////
+// ????????????????? CONSTRUCTIONS ??????????????????
+				// * /*-------------- GROUND --------------*/
+				const ground = () => {
 					context.clearRect(0, 0, canvas.width, canvas.height)
 
-					// ? The net
 					const x = width / 2, y = 0, w = width / 225, h = height
 					context.beginPath()
 					context.lineWidth = w
@@ -98,6 +89,69 @@ function Canvas({
 
 					context.font = "100px Pong"
 					context.fillStyle = "white"
+				}
+				// * /*------------------------------------*/
+
+				// ? /*-------------- PADDLES -------------*/
+				// PADDLE DRAWING HERE
+				// ? /*------------------------------------*/
+
+				// ! /*--------------- BALL ---------------*/
+				if (message && message.type === "game.update" && gameStatus !== "finished") {
+					const data = message
+
+					var coord_maj:	[number, number] = data.new_position?.coordinates ?? [0, 0]
+					var dim_maj:		[number, number] = data.new_position?.dimensions ?? [0, 0]
+					var dir_maj:		[number, number] = data.new_position?.speed ?? [0, 0]
+
+					square = {
+						coord:      [coord_maj[0] * width, coord_maj[1] * height],
+						dimensions: [dim_maj[0] * height, dim_maj[1] * height],
+						dir:        [dir_maj[0] * width, dir_maj[1] * height],
+						color: "white",
+						draw: function() {
+							context.beginPath()
+							context.save()
+							context.translate(
+								-(this.dimensions[0] / 2),
+								-(this.dimensions[1] / 2),
+							)
+							context.closePath()
+							context.fillStyle = this.color
+							context.fillRect(
+								this.coord[0],
+								this.coord[1],
+								this.dimensions[0],
+								this.dimensions[1],
+							)
+							context.restore()
+						},
+						// console.log("coordonée", square.coord, score1++)
+						// console.log("speed", square.dir, score2++)
+					}
+				}
+				// ! /*------------------------------------*/
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////
+// !!!!!!!!!!!!!!!!!!!!! GAME !!!!!!!!!!!!!!!!!!!!!!!
+				// ? /*------------ DEMO MODE -------------*/
+				const demo = () => {
+					context.clearRect(0, 0, canvas.width, canvas.height)
+
+					ground()
+
+					context.fillText("0", width / 5, height / 3.75)
+					context.fillText("0", width * 4 / 5, height / 3.75)
+				}
+				// ? /*------------------------------------*/
+
+				// ? /*----------- PLAYING MODE -----------*/
+				const playing = () => {
+					context.clearRect(0, 0, canvas.width, canvas.height)
+
+					ground()
 
 					// ? The ball
 					square.draw()
@@ -110,13 +164,36 @@ function Canvas({
 						// square.coord[0] += square.dir[0]
 						// square.coord[1] += square.dir[1]
 				}
+				// ? /*------------------------------------*/
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
 				let animationFrameId: number
 
 				// * the animation loop
+				console.log("THE GAME STATUS IS: ", gameStatus)
 				const animate = () => {
 					animationFrameId = window.requestAnimationFrame(animate)
-					demo()
+					if (gameStatus === "pending") {
+						demo()
+
+					} else if (gameStatus === "in-game") {
+						playing()
+
+					} else if (gameStatus === "finished") {
+						createModal(endGame)
+						setGameStatus("pending")
+						setTimeout(() => {
+							if (sendMessage) {
+								sendMessage({
+									"type": "game.finished",
+									"user": session?.nickname,
+								})
+							}
+							router.push("/game")
+							clearModal()
+						}, 2000)
+					}
 				}
 
 				animate()
@@ -124,7 +201,7 @@ function Canvas({
 				return () => { window.cancelAnimationFrame(animationFrameId) }
 			}
 		}
-	}, [message])
+	}, [message, gameStatus])
 
 	return (<canvas ref={ref} className="game" style={{backgroundColor: "black"}} {...props} />)
 }

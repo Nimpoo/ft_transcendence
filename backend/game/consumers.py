@@ -20,13 +20,14 @@ class GameConsumer(AsyncWebsocketConsumer):
     
   async def game_break(self, text_data):
     try:
-      self.game_loop.cancel()
+      cancel = self.loop.cancel()
+      print(f'cancel [CHANNELS]: {cancel}')
     except Exception as e:
       pass
 ###################################################?
 
   async def game_begin(self, text_data=None):
-    self.game_loop = asyncio.create_task(self.game_loop()) # ? Line 27
+    self.loop = asyncio.create_task(self.game_loop()) # ? Line 27
 
 ####################################################
 ####################################################
@@ -107,6 +108,29 @@ class GameConsumer(AsyncWebsocketConsumer):
       await self.game_begin() # ? Line 22
     ################################################
 
+    ############### Finish The Game ################
+    if data['type'] == 'game.finished':
+      if hasattr(self, 'room_group_name'):
+        for room in WAITING_ROOMS:
+          if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+            room['players'].remove(self.username)
+            if not room['players']:
+              WAITING_ROOMS.remove(room)
+            elif room['host'] == self.username:
+              room['host'] = room['players'][0]
+            await self.channel_layer.group_send(self.room_group_name, {
+              'type': 'game.quit',
+              'players': room['players'],
+              'message': f'{self.username} has left the room.',
+            })
+            break
+
+        await self.channel_layer.group_discard(
+          self.room_group_name,
+          self.channel_name
+        )
+    ################################################
+
     ############### Creation a Room ################
     if data['type'] == 'game.create':
       room_uuid = uuid4()
@@ -167,7 +191,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 
       if hasattr(self, "game_loop"):
         try:
-          self.game_loop.cancel()
+          cancel = self.loop.cancel()
+          print(f'cancel [DISCONNECT]: {cancel}')
         except Exception as e:
           await self.channel_layer.group_send(self.room_group_name, {
             'type': 'game.break',

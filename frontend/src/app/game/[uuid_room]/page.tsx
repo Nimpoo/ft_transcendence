@@ -19,7 +19,7 @@ const ubu = Ubuntu ({
 
 function GamingRoom(): React.JSX.Element | null {
 
-	const [Begin, setBegin] = useState(true)
+	const [begin, setBegin] = useState<boolean>(true)
 
 	const { session } = useSession()
 	const { players, sendMessage } = useGame()
@@ -51,7 +51,7 @@ function GamingRoom(): React.JSX.Element | null {
 				<h5>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</h5>
 			</div>
 			<Canvas />
-			{Begin && players[0] === session?.nickname && (
+			{begin && players[0] === session?.nickname && (
 				<div>
 					{players[1] ? (
 						<button 

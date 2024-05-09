@@ -5,17 +5,18 @@ import { useRouter } from "next/navigation"
 
 import toast from "react-hot-toast"
 
-type Status = "loading" | "conected" | "disconnected"
-
 const GameContext = createContext<{
-	status: Status,
-	sendMessage?: (message: any) => void,
+	sendMessage: (message: any) => void,
 	message: any,
+	gameStatus: "pending" | "in-game" | "finished",
+	setGameStatus: React.Dispatch<React.SetStateAction<"pending" | "in-game" | "finished">>,
 	players: string[],
 }>({
-	status: "loading",
-	players: [],
+	sendMessage: (message: any) => {},
 	message: undefined,
+	gameStatus: "pending",
+	setGameStatus: () => {},
+	players: [],
 })
 
 export function useGame() {
@@ -30,37 +31,42 @@ export function GameProvider({
 
 	const router = useRouter()
 
-	const [status, setStatus] = useState<Status>("loading")
 	const [players, setPlayers] = useState<string[]>([])
 	const [ws, setWs] = useState<WebSocket | null>(null)
 	const [message, setMessage] = useState<any>()
+	const [gameStatus, setGameStatus] = useState<"pending" | "in-game" | "finished">("pending")
 
 	useEffect(() => {
 		const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/game/`)
 
 		ws.onopen = function(event: Event) {
-			setStatus("conected")
+			console.log("Websocket Open ✅")
 		}
 
 		ws.onmessage = function(event: MessageEvent<any>) {
 			const data = JSON.parse(event.data)
+			console.log("[PROVIDER GAMESTATUS]:	{", gameStatus, "}\n[TYPE]:					{", data["type"], "}")
 
 			switch (data["type"]) {
 				case "game.create": {
 					toast(data.message, {icon: "🍖"})
 					setPlayers(data.players)
+					setGameStatus("pending")
 					router.push(`/game/${data.room_uuid}`)
 					break
 				}
 				case "game.join": {
 					toast(data.message, {icon: "⚔️"})
 					setPlayers(data.players)
+					setGameStatus("pending")
 					router.push(`/game/${data.room_uuid}`)
 					break
 				}
 
 				case "game.quit": {
+					setMessage(data)
 					setPlayers(data.players)
+					setGameStatus("finished")
 					toast(data.message, {icon: "🔨"})
 					break
 				}
@@ -69,8 +75,11 @@ export function GameProvider({
 					break
 				}
 
-				default: {
+				case "game.update": {
 					setMessage(data)
+					if (gameStatus !== "in-game") {
+						setGameStatus("in-game")
+					}
 					break
 				}
 			}
@@ -81,7 +90,6 @@ export function GameProvider({
 		}
 
 		ws.onclose = function(event: CloseEvent) {
-			setStatus("disconnected")
 			ws.close()
 		}
 
@@ -101,7 +109,7 @@ export function GameProvider({
 	}
 
 	return (
-		<GameContext.Provider value={{ status, players, sendMessage, message }}>
+		<GameContext.Provider value={{ players, sendMessage, message, gameStatus, setGameStatus }}>
 			{children}
 		</GameContext.Provider>
 	)
