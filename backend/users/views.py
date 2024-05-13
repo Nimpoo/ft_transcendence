@@ -133,6 +133,11 @@ def get_user(request: HttpRequest) -> JsonResponse:
             query = {"id": query_id}
     elif query_login is not None:
         query = {"login": query_login}
+    else:
+        return JsonResponse(
+            {"error": "Bad Request", "message": "Missing 'id' or 'login' fields."},
+            status=400,
+        )
 
     return JsonResponse(
         model_to_dict(

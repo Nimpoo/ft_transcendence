@@ -20,7 +20,16 @@ def jwt_verify(view):
                 status=401,
             )
 
-        token_type, token = authorization.split()
+        if not authorization.startswith("Bearer "):
+            return JsonResponse(
+                {
+                    "error": "Forbidden",
+                    "message": "Only 'Bearer' authorization type is accepted.",
+                },
+                status=401,
+            )
+
+        token = authorization[7:].strip()
 
         try:
             payload = jwt.decode(
