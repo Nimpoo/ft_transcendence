@@ -22,9 +22,42 @@ function GamingRoom(): React.JSX.Element | null {
 	const [begin, setBegin] = useState<boolean>(true)
 
 	const { session } = useSession()
-	const { players, sendMessage } = useGame()
+	const { players, sendMessage, gameStatus } = useGame()
 
 	const router = useRouter()
+
+	useEffect(() => {
+		if (gameStatus === "in-game") {
+			const keyhandler = (e: any) => {
+				console.log(e.key)
+				if (e.key === "z") {
+					if (sendMessage) {
+						sendMessage({
+							"type": "game.paddle",
+							"user": session?.nickname,
+							"key": "up",
+							"player": `${players && players[0] === session?.nickname ? "1" : "2"}`
+						})
+					}
+				} else if (e.key === "s") {
+					if (sendMessage) {
+						sendMessage({
+							"type": "game.paddle",
+							"user": session?.nickname,
+							"key": "down",
+							"player": `${players && players[0] === session?.nickname ? "1" : "2"}`
+						})
+					}
+				}
+			}
+
+			window.addEventListener("keydown", keyhandler)
+
+			return () => {
+				window.removeEventListener("keydown", keyhandler)
+			}
+		}
+	}, [gameStatus])
 
 	const LetsBegin = () => {
 		setBegin(false)

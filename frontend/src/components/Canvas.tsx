@@ -7,8 +7,6 @@ import { useSession } from "@/providers/Session"
 import { useModal } from "@/providers/Modal"
 import { useGame } from "@/providers/Game"
 
-import Link from "next/link"
-
 import "@/styles/game/Game.css"
 
 let score1 = 0
@@ -22,7 +20,31 @@ interface Ball {
 	draw: () => void,
 }
 
+interface Paddle {
+	coord: [number, number],
+	dimensions: [number, number],
+	dir: [number, number],
+	color: string,
+	draw: () => void,
+}
+
 var square: Ball = {
+	coord: [0, 0],
+	dimensions: [0, 0],
+	dir: [0, 0],
+	color: "white",
+	draw: function() {},
+}
+
+var racket_1: Paddle = {
+	coord: [0, 0],
+	dimensions: [0, 0],
+	dir: [0, 0],
+	color: "white",
+	draw: function() {},
+}
+
+var racket_2: Paddle = {
 	coord: [0, 0],
 	dimensions: [0, 0],
 	dir: [0, 0],
@@ -39,8 +61,6 @@ function Canvas({
 	const router = useRouter()
 
 	// ? /*--------- End Game Screen ----------*/
-	const { clearModal } = useModal()
-
 	const endGame =
 	<button>
 		PLACEHOLDER
@@ -90,10 +110,6 @@ function Canvas({
 				}
 				// * /*------------------------------------*/
 
-				// ? /*-------------- PADDLES -------------*/
-				// PADDLE DRAWING HERE
-				// ? /*------------------------------------*/
-
 				// ! /*--------------- BALL ---------------*/
 				if (message && message.type === "game.update" && gameStatus !== "finished") {
 					const data = message
@@ -129,6 +145,65 @@ function Canvas({
 					}
 				}
 				// ! /*------------------------------------*/
+
+				// ? /*-------------- PADDLES -------------*/
+					if (message) {
+						const data = message
+
+						var coord_pad_1: [number, number] = data.new_position?.paddle_coord_1 ?? [0, 0]
+						var coord_pad_2: [number, number] = data.new_position?.paddle_coord_2 ?? [0, 0]
+						var dim_pad:   [number, number] = data.new_position?.paddle_dimensions ?? [0, 0]
+
+						racket_1 = {
+							coord:      [coord_pad_1[0] * width, coord_pad_1[1] * height],
+							dimensions: [dim_pad[0] * width, dim_pad[1] * height],
+							dir:        [0, 0],
+							color: "white",
+							draw: function() {
+								context.beginPath()
+								context.save()
+								context.translate(
+									-(this.dimensions[0] / 2),
+									-(this.dimensions[1] / 2),
+								)
+								context.closePath()
+								context.fillStyle = this.color
+								context.fillRect(
+									this.coord[0],
+									this.coord[1],
+									this.dimensions[0],
+									this.dimensions[1],
+								)
+								context.restore()
+							},
+						}
+
+						racket_2 = {
+							coord:      [coord_pad_2[0] * width, coord_pad_2[1] * height],
+							dimensions: [dim_pad[0] * width, dim_pad[1] * height],
+							dir:        [0, 0],
+							color: "white",
+							draw: function() {
+								context.beginPath()
+								context.save()
+								context.translate(
+									-(this.dimensions[0] / 2),
+									-(this.dimensions[1] / 2),
+								)
+								context.closePath()
+								context.fillStyle = this.color
+								context.fillRect(
+									this.coord[0],
+									this.coord[1],
+									this.dimensions[0],
+									this.dimensions[1],
+								)
+								context.restore()
+							},
+						}
+					}
+				// ? /*------------------------------------*/
+
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
@@ -148,11 +223,15 @@ function Canvas({
 				// ? /*----------- PLAYING MODE -----------*/
 				const playing = () => {
 					context.clearRect(0, 0, canvas.width, canvas.height)
-
+	
 					ground()
 
 					// ? The ball
 					square.draw()
+
+					// ? The paddle
+					racket_1.draw()
+					racket_2.draw()
 
 					// ? The score
 					context.fillText(`${score1}`, width / 5, height / 3.75)
@@ -169,7 +248,7 @@ function Canvas({
 				let animationFrameId: number
 
 				// * the animation loop
-				console.log("THE GAME STATUS IS: ", gameStatus)
+				// console.log("THE GAME STATUS IS: ", gameStatus)
 				const animate = () => {
 					animationFrameId = window.requestAnimationFrame(animate)
 					if (gameStatus === "pending") {

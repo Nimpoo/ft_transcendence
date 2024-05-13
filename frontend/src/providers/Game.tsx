@@ -43,9 +43,9 @@ export function GameProvider({
 			console.log("Websocket Open ✅")
 		}
 
-		ws.onmessage = function(event: MessageEvent<any>) {
+		ws.onmessage = function(event: any) {
 			const data = JSON.parse(event.data)
-			console.log("[PROVIDER GAMESTATUS]:	{", gameStatus, "}\n[TYPE]:					{", data["type"], "}")
+			// console.log("[PROVIDER GAMESTATUS]:	{", gameStatus, "}\n[TYPE]:					{", data["type"], "}")
 
 			switch (data["type"]) {
 				case "game.create": {

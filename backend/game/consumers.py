@@ -9,6 +9,29 @@ WAITING_ROOMS = []
 class GameConsumer(AsyncWebsocketConsumer):
 
 ############# ? Channel Send Message ? ##############
+  async def game_paddles(self, text_data):
+    for room in WAITING_ROOMS:
+      if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players'] and text_data['player'] == '2':
+        try:
+          if text_data['key'] == 'up' and self.py_2 < 1:
+            self.py_2 -= 0.01
+
+          elif text_data['key'] == 'down' and self.py_2 > 0:
+            self.py_2 += 0.01
+
+          ball_info = {
+            'paddle_coord_1': [self.px_1, self.py_1],
+            'paddle_coord_2': [self.px_2, self.py_2],
+            'paddle_dimensions': [self.pw, self.ph],
+          }
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.update',
+            'new_position': ball_info,
+          })
+
+        except Exception as e:
+          print(e)
+
   async def game_quit(self, text_data):
     await self.send(json.dumps(text_data))
 
@@ -16,6 +39,9 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.send(json.dumps(text_data))
     
   async def game_update(self, text_data):
+    # await asyncio.sleep(3)
+    # if text_data['new_position']['paddle_coord_1'] or text_data['new_position']['paddle_coord_2']:
+    #   print(f'{self.username} receive this: {text_data['new_position']['paddle_coord_2']}')
     await self.send(json.dumps(text_data))
     
   async def game_break(self, text_data):
@@ -37,10 +63,17 @@ class GameConsumer(AsyncWebsocketConsumer):
       self.w, self.h = 1 / 35, 1 / 35
       self.vx, self.vy = 1 / 600, 1 / 200
 
+      self.px_1, self.py_1 = 1 / 30, 1 / 2
+      self.px_2, self.py_2 = 29 / 30, 1 / 2
+      self.pw, self.ph = 1 / 125, 1 / 5
+
       ball_info = {
         'coordinates': [self.x, self.y],
         'dimensions': [self.w, self.h],
         'speed': [self.vx, self.vy],
+        'paddle_coord_1': [self.px_1, self.py_1],
+        'paddle_coord_2': [self.px_2, self.py_2],
+        'paddle_dimensions': [self.pw, self.ph],
       }
 
       # collision = False
@@ -78,6 +111,9 @@ class GameConsumer(AsyncWebsocketConsumer):
     ball_info['coordinates'] = [self.x, self.y]
     ball_info['dimensions'] = [self.w, self.h]
     ball_info['speed'] = [self.vx, self.vy]
+    ball_info['paddle_coord_1'] = [self.px_1, self.py_1]
+    ball_info['paddle_coord_2'] = [self.px_2, self.py_2]
+    ball_info['paddle_dimensions'] = [self.pw, self.ph]
 
     await self.channel_layer.group_send(self.room_group_name, {
       'type': 'game.update',
@@ -102,6 +138,33 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def receive(self, text_data=None, bytes_data=None):
     data = json.loads(text_data)
     self.username = data.get('user', 'unknown_player')
+    ############## Paddles Movements ###############
+    if data['type'] == 'game.paddle':
+      for room in WAITING_ROOMS:
+        if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players'] and data['player'] == '1':
+          if data['key'] == 'up' and self.py_1 < 1:
+            self.py_1 -= 0.01
+
+          elif data['key'] == 'down' and self.py_1 > 0:
+            self.py_1 += 0.01
+
+          ball_info = {
+            'paddle_coord_1': [self.px_1, self.py_1],
+            'paddle_coord_2': [self.px_2, self.py_2],
+            'paddle_dimensions': [self.pw, self.ph],
+          }
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.update',
+            'new_position': ball_info,
+          })
+
+        elif room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players'] and data['player'] == '2':
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.paddles',
+            'key': data['key'],
+            'player': '2',
+          })
+    ################################################
 
     ############### Launch The Game ################
     if data['type'] == 'game.begin':
@@ -172,8 +235,7 @@ class GameConsumer(AsyncWebsocketConsumer):
               'room_uuid': room['room_uuid'],
               'players': room['players'],
               'message': f'{data['user']} has joined the room.',
-            }
-          )
+          })
           break
 
       else:
