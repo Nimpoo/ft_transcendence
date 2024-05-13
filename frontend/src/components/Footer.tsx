@@ -152,7 +152,11 @@ function Settings(): React.JSX.Element {
 
 								session.api("/users/me/", "POST", formData)
 									.then(response => response.json())
-									.then(setSession)
+									.then(data => {
+										if (setSession) {
+											setSession({...session, ...data})
+										}
+									})
 									.catch(console.error)
 							}
 						}
