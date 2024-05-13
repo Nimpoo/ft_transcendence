@@ -42,11 +42,9 @@ function Canvas({
 	const { clearModal } = useModal()
 
 	const endGame =
-	<Link href="/game">
-		<button>
-			return to home
-		</button>
-	</Link>
+	<button>
+		PLACEHOLDER
+	</button>
 	// ? /*------------------------------------*/
 
 	const { session } = useSession()
@@ -181,18 +179,15 @@ function Canvas({
 						playing()
 
 					} else if (gameStatus === "finished") {
+						if (sendMessage) {
+							sendMessage({
+								"type": "game.finished",
+								"user": session?.nickname,
+							})
+						}
+						router.push("/game")
 						createModal(endGame)
 						setGameStatus("pending")
-						setTimeout(() => {
-							if (sendMessage) {
-								sendMessage({
-									"type": "game.finished",
-									"user": session?.nickname,
-								})
-							}
-							router.push("/game")
-							clearModal()
-						}, 2000)
 					}
 				}
 
