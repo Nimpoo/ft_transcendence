@@ -1,4 +1,3 @@
-from django.forms import model_to_dict
 from django.core.files import File
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -115,7 +114,7 @@ class Index(View):
         return JsonResponse(
             {
                 "access_token": jwt.encode(
-                    model_to_dict(user, fields=["id", "login", "created_at"]),
+                    {"id": user.id},
                     settings.JWT_SECRET,
                 )
             }
@@ -140,10 +139,9 @@ def get_user(request: HttpRequest) -> JsonResponse:
         )
 
     return JsonResponse(
-        model_to_dict(
+        UserSerializer(
             get_object_or_404(User, **query),
-            fields=["id", "login", "display_name", "created_at"],
-        )
+        ).data
     )
 
 

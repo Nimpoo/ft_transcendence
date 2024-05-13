@@ -1,4 +1,3 @@
-from django.forms import model_to_dict
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
@@ -7,8 +6,10 @@ from django.db.models import Q
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+from friends.serializers import FriendRequestSerializer
 from users.models import User
 from friends.models import FriendRequest
+from users.serializers import UserSerializer
 from utils.decorators import need_user
 
 import json
@@ -51,7 +52,7 @@ def get_friend_request(request: HttpRequest, user: User) -> JsonResponse:
             status=404,
         )
 
-    return JsonResponse(model_to_dict(friendrequest))
+    return JsonResponse(FriendRequestSerializer(friendrequest).data)
 
 
 class Friend(View):
@@ -125,21 +126,12 @@ class Friend(View):
                     "type": "user.notification",
                     "data": {
                         "type": "friendrequest.ask",
-                        "from": model_to_dict(
-                            user,
-                            fields=[
-                                "id",
-                                "login",
-                                "display_name",
-                                "avatar_url",
-                                "created_at",
-                            ],
-                        ),
+                        "from": UserSerializer(user).data,
                     },
                 },
             )
 
-            return JsonResponse(model_to_dict(friend_request))
+            return JsonResponse(FriendRequestSerializer(friend_request).data)
 
         friend_request.status = FriendRequest.STATUS_ACCEPTED
         friend_request.save()
@@ -152,21 +144,12 @@ class Friend(View):
                 "type": "user.notification",
                 "data": {
                     "type": "friendrequest.accept",
-                    "from": model_to_dict(
-                        user,
-                        fields=[
-                            "id",
-                            "login",
-                            "display_name",
-                            "avatar_url",
-                            "created_at",
-                        ],
-                    ),
+                    "from": UserSerializer(user).data,
                 },
             },
         )
 
-        return JsonResponse(model_to_dict(friend_request))
+        return JsonResponse(FriendRequestSerializer(friend_request).data)
 
     @method_decorator((need_user), name="dispatch")
     def delete(self, request: HttpRequest, user: User) -> JsonResponse:
@@ -230,15 +213,7 @@ class Friend(View):
                             "type": "user.notification",
                             "data": {
                                 "type": "friendrequest.cancel",
-                                "from": model_to_dict(
-                                    user,
-                                    fields=[
-                                        "id",
-                                        "login",
-                                        "display_name",
-                                        "created_at",
-                                    ],
-                                ),
+                                "from": UserSerializer(user).data,
                             },
                         },
                     )
@@ -251,15 +226,7 @@ class Friend(View):
                             "type": "user.notification",
                             "data": {
                                 "type": "friendrequest.reject",
-                                "from": model_to_dict(
-                                    user,
-                                    fields=[
-                                        "id",
-                                        "login",
-                                        "display_name",
-                                        "created_at",
-                                    ],
-                                ),
+                                "from": UserSerializer(user).data,
                             },
                         },
                     )
@@ -272,20 +239,11 @@ class Friend(View):
                         "type": "user.notification",
                         "data": {
                             "type": "friendrequest.remove",
-                            "from": model_to_dict(
-                                user,
-                                fields=[
-                                    "id",
-                                    "login",
-                                    "display_name",
-                                    "avatar_url",
-                                    "created_at",
-                                ],
-                            ),
+                            "from": UserSerializer(user).data,
                         },
                     },
                 )
 
         friendrequest.save()
 
-        return JsonResponse(model_to_dict(friendrequest))
+        return JsonResponse(FriendRequestSerializer(friendrequest).data)

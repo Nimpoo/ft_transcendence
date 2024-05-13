@@ -1,9 +1,9 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.shortcuts import get_object_or_404
-from django.forms import model_to_dict
 from asgiref.sync import sync_to_async
 
 from users.models import User
+from users.serializers import UserSerializer
 from chat.models import Chat
 
 import json
@@ -137,16 +137,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                     "type": "user.notification",
                     "data": {
                         "type": "message.sent",
-                        "to": model_to_dict(
-                            receiver,
-                            fields=[
-                                "id",
-                                "login",
-                                "display_name",
-                                "avatar_url",
-                                "created_at",
-                            ],
-                        ),
+                        "to": UserSerializer(receiver).data,
                         "content": content,
                     },
                 },
@@ -158,16 +149,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                     "type": "user.notification",
                     "data": {
                         "type": "message.receive",
-                        "from": model_to_dict(
-                            self.user,
-                            fields=[
-                                "id",
-                                "login",
-                                "display_name",
-                                "avatar_url",
-                                "created_at",
-                            ],
-                        ),
+                        "from": UserSerializer(self.user).data,
                         "content": content,
                     },
                 },
@@ -187,5 +169,6 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     async def user_notification(self, event):
         await self.send(json.dumps(event.get("data")))
+
 
 all_consumers: list[UserConsumer] = []
