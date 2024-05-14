@@ -73,6 +73,10 @@ function Canvas({
 
 	const ref = useRef<HTMLCanvasElement>(null)
 
+	var coord_maj:	[number, number] = [0, 0]
+	var dim_maj:		[number, number] = [0, 0]
+	var dir_maj:		[number, number] = [0, 0]
+
 	useEffect(() => {
 		// * get the current ref
 		const canvas = ref.current
@@ -114,9 +118,9 @@ function Canvas({
 				if (message && message.type === "game.update" && gameStatus !== "finished") {
 					const data = message
 
-					var coord_maj:	[number, number] = data.new_position?.coordinates ?? [0, 0]
-					var dim_maj:		[number, number] = data.new_position?.dimensions ?? [0, 0]
-					var dir_maj:		[number, number] = data.new_position?.speed ?? [0, 0]
+					coord_maj = data.new_position?.coordinates ?? coord_maj
+					dim_maj = data.new_position?.dimensions ?? dim_maj
+					dir_maj = data.new_position?.speed ?? dir_maj
 
 					square = {
 						coord:      [coord_maj[0] * width, coord_maj[1] * height],

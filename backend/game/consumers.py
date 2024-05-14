@@ -25,16 +25,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             else:
               self.py_2 += 0.01
 
-          ball_info = {
-            'paddle_coord_1': [self.px_1, self.py_1],
-            'paddle_coord_2': [self.px_2, self.py_2],
-            'paddle_dimensions': [self.pw, self.ph],
-          }
-          await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.update',
-            'new_position': ball_info,
-          })
-
         except Exception as e:
           print(e)
 
@@ -59,7 +49,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 ###################################################?
 
   async def game_begin(self, text_data=None):
-    self.loop = asyncio.create_task(self.game_loop()) # ? Line 27
+    self.loop = asyncio.create_task(self.game_loop()) # ? Line 66
 
 ####################################################
 ####################################################
@@ -163,6 +153,9 @@ class GameConsumer(AsyncWebsocketConsumer):
               self.py_1 += 0.01
 
           ball_info = {
+            'coordinates': [self.x, self.y],
+            'dimensions': [self.w, self.h],
+            'speed': [self.vx, self.vy],
             'paddle_coord_1': [self.px_1, self.py_1],
             'paddle_coord_2': [self.px_2, self.py_2],
             'paddle_dimensions': [self.pw, self.ph],
