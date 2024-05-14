@@ -90,7 +90,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         await asyncio.sleep(0.016) # 60fps
         await self.update_data(ball_info) # ? Line 57
     except asyncio.CancelledError:
-      print('oopsi')
+      print('GAME LOOP WAS INTERUPTED')
+      del ball_info, self.x, self.y, self.w, self.h, self.py_1, self.py_2, self.px_1, self.px_2, self.loop
+
       pass
 ####################################################
 ####################################################
