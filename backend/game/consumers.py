@@ -13,11 +13,17 @@ class GameConsumer(AsyncWebsocketConsumer):
     for room in WAITING_ROOMS:
       if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players'] and text_data['player'] == '2':
         try:
-          if text_data['key'] == 'up' and self.py_2 < 1:
-            self.py_2 -= 0.01
+          if text_data['key'] == 'up' and self.py_2 <= 1:
+            if (self.py_2 - self.ph / 2) - 0.01 <= 0:
+              self.py_2 = 0 + self.ph / 2
+            else:
+              self.py_2 -= 0.01
 
-          elif text_data['key'] == 'down' and self.py_2 > 0:
-            self.py_2 += 0.01
+          elif text_data['key'] == 'down' and self.py_2 >= 0:
+            if (self.py_2 + self.ph / 2) + 0.01 >= 1:
+              self.py_2 = 1 - self.ph / 2
+            else:
+              self.py_2 += 0.01
 
           ball_info = {
             'paddle_coord_1': [self.px_1, self.py_1],
@@ -144,11 +150,17 @@ class GameConsumer(AsyncWebsocketConsumer):
     if data['type'] == 'game.paddle':
       for room in WAITING_ROOMS:
         if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players'] and data['player'] == '1':
-          if data['key'] == 'up' and self.py_1 < 1:
-            self.py_1 -= 0.01
+          if data['key'] == 'up' and self.py_1 <= 1:
+            if (self.py_1 - self.ph / 2) - 0.01 <= 0:
+              self.py_1 = 0 + self.ph / 2
+            else:
+              self.py_1 -= 0.01
 
-          elif data['key'] == 'down' and self.py_1 > 0:
-            self.py_1 += 0.01
+          elif data['key'] == 'down' and self.py_1 >= 0:
+            if (self.py_1 + self.ph / 2) + 0.01 >= 1:
+              self.py_1 = 1 - self.ph / 2
+            else:
+              self.py_1 += 0.01
 
           ball_info = {
             'paddle_coord_1': [self.px_1, self.py_1],
