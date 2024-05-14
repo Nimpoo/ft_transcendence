@@ -30,7 +30,7 @@ function GamingRoom(): React.JSX.Element | null {
 		if (gameStatus === "in-game") {
 			const keyhandler = (e: any) => {
 				console.log(e.key)
-				if (e.key === "z") {
+				if (e.key === "z" || e.key === "Z") {
 					if (sendMessage) {
 						sendMessage({
 							"type": "game.paddle",
@@ -39,7 +39,7 @@ function GamingRoom(): React.JSX.Element | null {
 							"player": `${players && players[0] === session?.nickname ? "1" : "2"}`
 						})
 					}
-				} else if (e.key === "s") {
+				} else if (e.key === "s" || e.key === "S") {
 					if (sendMessage) {
 						sendMessage({
 							"type": "game.paddle",

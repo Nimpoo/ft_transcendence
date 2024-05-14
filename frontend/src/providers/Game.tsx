@@ -39,11 +39,11 @@ export function GameProvider({
 	useEffect(() => {
 		const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/game/`)
 
-		ws.onopen = function(event: Event) {
+		ws.onopen = (event: Event) => {
 			console.log("Websocket Open ✅")
 		}
 
-		ws.onmessage = function(event: any) {
+		ws.onmessage = (event: any) => {
 			const data = JSON.parse(event.data)
 			// console.log("[PROVIDER GAMESTATUS]:	{", gameStatus, "}\n[TYPE]:					{", data["type"], "}")
 
@@ -85,12 +85,8 @@ export function GameProvider({
 			}
 		}
 
-		ws.onerror = function(event: Event) {
+		ws.onerror = (event: Event) => {
 			console.error("[WEBSOCKET ERROR]: ", event)
-		}
-
-		ws.onclose = function(event: CloseEvent) {
-			ws.close()
 		}
 
 		setWs(ws)
@@ -101,7 +97,7 @@ export function GameProvider({
 	}, [router])
 
 	const sendMessage = (message: any) => {
-		if (ws && ws?.readyState === WebSocket.OPEN) {
+		if (ws && ws.readyState === WebSocket.OPEN) {
 			ws.send(JSON.stringify(message))
 		} else {
 			console.error("[SEND MESSAGE ERROR]: Websocket isn't open.")
