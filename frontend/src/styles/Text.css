@@ -1,10 +1,104 @@
 .custom-font-size {
-	font-size: 130px;
+	font-size: 20px;
+}
+
+@media screen and (max-width: 575px) {
+	.custom-font-size {
+		font-size: 35px;
+	}
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+	.custom-font-size {
+		font-size: 45px;
+	}
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+	.custom-font-size {
+		font-size: 55px;
+	}
+}
+
+@media screen and (min-width: 992px) and (max-width: 1399px) {
+	.custom-font-size {
+		font-size: 70px;
+	}
+}
+
+@media screen and (min-width: 1400px) {
+	.custom-font-size {
+		font-size: 110px;
+	}
 }
 
 .btn-with-logo {
+	font-size: 15px;
 	display: flex;
 	align-items: center;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	width: auto;
+	height: auto;
+}
+
+@media screen and (max-width: 575px) {
+	.btn-with-logo {
+		padding-left: 10px;
+		padding-right: 10px;
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+	.btn-with-logo {
+		padding-left: 20px;
+		padding-right: 20px;
+		padding-top: 20px;
+		padding-bottom: 20px;
+	}
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+	.btn-with-logo {
+		padding-left: 30px;
+		padding-right: 30px;
+		padding-top: 25px;
+		padding-bottom: 25px;
+	}
+}
+
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+	.btn-with-logo {
+		font-size: 20px;
+		padding-left: 40px;
+		padding-right: 40px;
+		padding-top: 35px;
+		padding-bottom: 35px;
+	}
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1399px) {
+	.btn-with-logo {
+		font-size: 25px;
+		padding-left: 50px;
+		padding-right: 50px;
+		padding-top: 45px;
+		padding-bottom: 45px;
+	}
+}
+
+@media screen and (min-width: 1400px) {
+	.btn-with-logo {
+		font-size: 30px;
+		padding-left: 50px;
+		padding-right: 50px;
+		padding-top: 45px;
+		padding-bottom: 45px;
+	}
 }
 
 .logo {

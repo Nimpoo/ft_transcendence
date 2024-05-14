@@ -280,9 +280,9 @@ function Header(): React.JSX.Element {
 			{/* ---------------------------------------------------------------- */}
 
 			<Link href="/">
-				<h1 className="title">
+				<div className="title-header">
 					The Transcendence
-				</h1>
+				</div>
 			</Link>
 
 			{/* ------------------------- ZORO - NOAH -------------------------- */}

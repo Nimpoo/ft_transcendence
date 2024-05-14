@@ -7,7 +7,6 @@ import CountUp from "react-countup"
 import "@/styles/Homepage.css"
 import "@/styles/Text.css"
 import "@/styles/Rainbow.css"
-import "@/styles/Text.css"
 
 import { useSession } from "@/providers/Session"
 import FriendsList from "@/components/FriendsList"
@@ -133,15 +132,15 @@ function Home(): React.JSX.Element {
 			<main>
 				<div className="container-fluid">
 					<div className="row">
-						<div className="col-9 mt-lg-5">
+						<div className="col-7 col-xl-8 col-xxl-8">
 							<h1 className="fw-bold custom-font-size text-light">Welcome</h1>
 							<h1 className="fw-bold custom-font-size text-light">to our</h1>
 							<h1 className="fw-bold custom-font-size text-light">Final Project.</h1>
 						</div>
-						<div className="col-3 align-items-center align-self-center mt-5">
+						<div className="col-5 col-xl-4 col-xxl-4 align-items-center align-self-center mt-5">
 							{(process.env.NEXT_PUBLIC_CLIENT_ID && process.env.NEXT_PUBLIC_REDIRECT_URI &&
 								<Link href={`https://api.intra.42.fr/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI)}&response_type=code`}>
-									<button type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
+									<button type="button" className="btn btn-light btn-outline-info btn-with-logo">
 										<Image className="logo"
 											src="/assets/svg/42-school_logo.svg"
 											width={24}
@@ -152,7 +151,7 @@ function Home(): React.JSX.Element {
 									</button>
 								</Link>
 							) || (
-								<button disabled type="button" className="btn btn-light btn-outline-info btn-with-logo px-5 py-4">
+								<button disabled type="button" className="btn btn-light btn-outline-info btn-with-logo">
 									Client ID not defined
 								</button>
 							)}
