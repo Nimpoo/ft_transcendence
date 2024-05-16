@@ -35,9 +35,6 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.send(json.dumps(text_data))
     
   async def game_update(self, text_data):
-    # await asyncio.sleep(3)
-    # if text_data['new_position']['paddle_coord_1'] or text_data['new_position']['paddle_coord_2']:
-    #   print(f'{self.username} receive this: {text_data['new_position']['paddle_coord_2']}')
     await self.send(json.dumps(text_data))
     
   async def game_break(self, text_data):
@@ -49,7 +46,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 ###################################################?
 
   async def game_begin(self, text_data=None):
-    self.loop = asyncio.create_task(self.game_loop()) # ? Line 66
+    self.loop = asyncio.create_task(self.game_loop()) # ? Line 56
 
 ####################################################
 ####################################################
@@ -72,8 +69,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         'paddle_dimensions': [self.pw, self.ph],
       }
 
-      # collision = False
-
       await self.channel_layer.group_send(self.room_group_name, {
         'type': 'game.update',
         'new_position': ball_info,
@@ -84,7 +79,7 @@ class GameConsumer(AsyncWebsocketConsumer):
       }))
       while True:
         await asyncio.sleep(0.016) # 60fps
-        await self.update_data(ball_info) # ? Line 57
+        await self.update_data(ball_info) # ? Line 93
     except asyncio.CancelledError:
       print('GAME LOOP WAS INTERUPTED')
       del ball_info, self.x, self.y, self.w, self.h, self.py_1, self.py_2, self.px_1, self.px_2, self.loop
@@ -94,18 +89,26 @@ class GameConsumer(AsyncWebsocketConsumer):
 ####################################################
   async def update_data(self, ball_info: dict[str, list[float]]):
 
+    # ? Player 1 paddle collision
+    if self.x + self.vx + -(self.w / 2) < self.px_1 + -(self.pw / 2):
+      if self.py_1 + (self.ph / 2) > self.y + self.vy + (self.h / 2) > self.py_1 + -(self.ph / 2) or self.py_1 + (self.ph / 2) > self.y + self.vy + -(self.h / 2) > self.py_1 + -(self.ph / 2):
+        print(f'{self.y + self.vy + -(self.h / 2)} --- {self.py_1 + (self.ph / 2)} : {self.py_1 + -(self.ph / 2)}')
+        self.vx *= -1
+    # ?
+
     if (self.x + self.vx + (self.w / 2) > 1.01 or self.x + self.vx - (self.w / 2) < -0.01):
       self.vx *= -1
-      # collision = True
-      # vy += random.uniform(0.0001, 0.0002)
+
+    # ? Player 2 paddle collision
+    if self.x + self.vx + (self.w / 2) > self.px_2 + (self.pw / 2):
+      if self.py_2 + -(self.ph / 2) < self.y + self.vy + -(self.h / 2) < self.py_2 + (self.ph / 2) or self.py_2 + -(self.ph / 2) < self.y + self.vy + (self.h / 2) < self.py_2 + (self.ph / 2):
+        print(f'{self.y + self.vy + -(self.h / 2)} --- {self.py_2 + (self.ph / 2)} : {self.py_2 + -(self.ph / 2)}')
+        self.vx *= -1
+    # ?
 
     if (self.y + self.vy + (self.h / 2) > 1 or self.y + self.vy - (self.h / 2) < 0):
       self.vy *= -1
-      # collision = True
-      # vx += random.uniform(0.0001, 0.0002)
 
-
-    # if (collision == True):
     ball_info['coordinates'] = [self.x, self.y]
     ball_info['dimensions'] = [self.w, self.h]
     ball_info['speed'] = [self.vx, self.vy]
