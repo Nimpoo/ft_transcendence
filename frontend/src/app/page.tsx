@@ -130,14 +130,14 @@ function Home(): React.JSX.Element {
 		{/* ------------------------ NOT CONNECTED ------------------------- */}
 		return (
 			<main>
-				<div className="container-fluid">
+				<div className="not-connected-wrapper">
 					<div className="row">
-						<div className="col-7 col-xl-8 col-xxl-8">
+						<div className="col-7 col-xl-8 col-xxl-9">
 							<h1 className="fw-bold custom-font-size text-light">Welcome</h1>
 							<h1 className="fw-bold custom-font-size text-light">to our</h1>
 							<h1 className="fw-bold custom-font-size text-light">Final Project.</h1>
 						</div>
-						<div className="col-5 col-xl-4 col-xxl-4 align-items-center align-self-center mt-5">
+						<div className="col-5 col-xl-4 col-xxl-3 align-items-center align-self-center mt-5">
 							{(process.env.NEXT_PUBLIC_CLIENT_ID && process.env.NEXT_PUBLIC_REDIRECT_URI &&
 								<Link href={`https://api.intra.42.fr/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_REDIRECT_URI)}&response_type=code`}>
 									<button type="button" className="btn btn-light btn-outline-info btn-with-logo">

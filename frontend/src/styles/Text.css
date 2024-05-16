@@ -1,3 +1,10 @@
+.not-connected-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 70vh;
+}
+
 .custom-font-size {
 	font-size: 20px;
 }
@@ -83,19 +90,19 @@
 
 @media screen and (min-width: 1200px) and (max-width: 1399px) {
 	.btn-with-logo {
-		font-size: 25px;
-		padding-left: 50px;
-		padding-right: 50px;
-		padding-top: 45px;
-		padding-bottom: 45px;
+		font-size: 20px;
+		padding-left: 45px;
+		padding-right: 45px;
+		padding-top: 40px;
+		padding-bottom: 40px;
 	}
 }
 
 @media screen and (min-width: 1400px) {
 	.btn-with-logo {
-		font-size: 30px;
-		padding-left: 50px;
-		padding-right: 50px;
+		font-size: 20px;
+		padding-left: 55px;
+		padding-right: 55px;
 		padding-top: 45px;
 		padding-bottom: 45px;
 	}
