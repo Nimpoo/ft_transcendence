@@ -26,7 +26,7 @@ def get_friend_request(request: HttpRequest, user: User) -> JsonResponse:
                     id__in=user.received_friend_requests.filter(
                         status=FriendRequest.STATUS_PENDING
                     ).values_list("sender", flat=True)
-                ).values("id", "login", "display_name", "created_at")
+                ).values("id", "login", "display_name", "avatar", "created_at")
             ),
             safe=False,
         )

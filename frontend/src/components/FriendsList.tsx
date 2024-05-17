@@ -34,11 +34,6 @@ function FriendsList(): React.JSX.Element {
 		}
 	}, [session])
 
-	useEffect(() => {
-		if (socket) {
-		}
-	}, [socket])
-
 	const FriendsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
 		const handleRemove = () => {
 			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: user.id }))
@@ -53,13 +48,28 @@ function FriendsList(): React.JSX.Element {
 		}
 
 		return (
-			<li style={{display: "flex", flexDirection: "column"}}>
-				<Link href={`/users/${user.login}`}>
-					<h5>{user.display_name}</h5>
-				</Link>
-				<div className="btn-group">
-					<button className="btn btn-success" onClick={handleRemove}>remove</button>
-					<button className="btn btn-danger" onClick={handleBlock}>block</button>
+			<li style={{display: "flex", flexDirection: "row"}}>
+				<div
+					className="rounded-circle bg-cover m-2"
+					style={
+						{
+							backgroundImage: `url("http://${window.location.hostname}:8000/media/${user.avatar}")`,
+							backgroundSize: "cover",
+							backgroundPosition: "center center",
+							backgroundRepeat: "no-repeat",
+							width: 70,
+							height: 70
+						}
+					}
+				/>
+				<div>
+					<Link href={`/users/${user.login}`}>
+						<h5>{user.display_name}</h5>
+					</Link>
+					<div className="btn-group">
+						<button className="btn btn-success" onClick={handleRemove}>remove</button>
+						<button className="btn btn-danger" onClick={handleBlock}>block</button>
+					</div>
 				</div>
 			</li>
 		)
@@ -79,13 +89,28 @@ function FriendsList(): React.JSX.Element {
 		}
 
 		return (
-			<li style={{display: "flex", flexDirection: "column"}}>
-				<Link href={`/users/${user.login}`}>
-					<h5>{user.display_name}</h5>
-				</Link>
-				<div className="btn-group">
-					<button className="btn btn-success" onClick={handleAdd}>add</button>
-					<button className="btn btn-danger" onClick={handleReject}>reject</button>
+			<li style={{display: "flex", flexDirection: "row"}}>
+				<div
+					className="rounded-circle bg-cover m-2"
+					style={
+						{
+							backgroundImage: `url("http://${window.location.hostname}:8000/media/${user.avatar}")`,
+							backgroundSize: "cover",
+							backgroundPosition: "center center",
+							backgroundRepeat: "no-repeat",
+							width: 70,
+							height: 70
+						}
+					}
+				/>
+				<div>
+					<Link href={`/users/${user.login}`}>
+						<h5>{user.display_name}</h5>
+					</Link>
+					<div className="btn-group">
+						<button className="btn btn-success" onClick={handleAdd}>add</button>
+						<button className="btn btn-danger" onClick={handleReject}>reject</button>
+					</div>
 				</div>
 			</li>
 		)
