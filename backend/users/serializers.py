@@ -10,10 +10,5 @@ class UserSerializer(serializers.ModelSerializer):
             "login",
             "display_name",
             "avatar",
-            "fortytwo_id",
-            "dfa_secret",
             "created_at",
-            "friends",
-            "blocked",
         )
-        depth = 1

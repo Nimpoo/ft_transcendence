@@ -1,3 +1,4 @@
+from django.core import serializers
 from django.core.files import File
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -22,17 +23,9 @@ from users.consumers import all_consumers
 
 class Index(View):
 
-    def get(self, request: HttpRequest):  # Get X users
-        # todo: make parameters adjustable by the client
-        page = 0
-        page_size = 5
-        # todo: add more params like: sort, range, filter
-        return JsonResponse(
-            list(User.objects.values("id", "login", "display_name", "created_at"))[
-                page * page_size : page * page_size + page_size
-            ],
-            safe=False,
-        )
+    def get(self, request: HttpRequest):
+        users = User.objects.all().order_by("id")[:10].values("id", "login", "display_name", "avatar", "created_at")
+        return JsonResponse(list(users), safe=False)
 
     def post(self, request: HttpRequest):  # Create user
         if len(request.body) == 0:
@@ -150,7 +143,7 @@ def search(request: HttpRequest) -> JsonResponse:
     query = request.GET.get("q")
     results = User.objects.filter(
         Q(login__icontains=query) | Q(display_name__icontains=query)
-    ).values("id", "login", "display_name", "created_at")
+    ).values("id", "login", "display_name", "avatar", "created_at")
     return JsonResponse(list(results), safe=False)
 
 
@@ -200,7 +193,7 @@ class DFA(View):
 
     @method_decorator((need_user), name="dispatch")
     def get(self, request: HttpRequest, user: User) -> JsonResponse:
-        return JsonResponse({"coucou": "ethienne"})
+        return JsonResponse({"dfa_secret": user.dfa_secret})
 
     @method_decorator((need_user), name="dispatch")
     def post(self, request: HttpRequest, user: User) -> JsonResponse:

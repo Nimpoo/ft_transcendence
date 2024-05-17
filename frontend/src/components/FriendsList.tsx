@@ -42,13 +42,13 @@ function FriendsList(): React.JSX.Element {
 	const FriendsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
 		const handleRemove = () => {
 			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: user.id }))
-				.catch(() => toast.error('Remove failed, try again'))
+				.catch(() => toast.error("Remove failed, try again"))
 				.then(() => setFriendsList(friendsList.slice(index, index)))
 		}
 
 		const handleBlock = () => {
 			session?.api("/chat/block/", "POST", JSON.stringify({ user_id: user.id }))
-				.catch(() => toast.error('Remove failed, try again'))
+				.catch(() => toast.error("Remove failed, try again"))
 				.then(() => setFriendsList(friendsList.slice(index, index)))
 		}
 
@@ -69,13 +69,13 @@ function FriendsList(): React.JSX.Element {
 		const handleAdd = () => {
 			session?.api("/users/friends/", "POST", JSON.stringify({ user_id: user.id }))
 				.then(() => setFriendRequestsList(friendRequestsList.slice(index, index)))
-				.catch(() => toast.error('Add failed, try again'))
+				.catch(() => toast.error("Add failed, try again"))
 		}
 
 		const handleReject = () => {
 			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: user.id }))
 				.then(() => setFriendRequestsList(friendRequestsList.slice(index, index)))
-				.catch(() => toast.error('Rejct failed, try again'))
+				.catch(() => toast.error("Rejct failed, try again"))
 		}
 
 		return (

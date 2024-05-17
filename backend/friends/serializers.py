@@ -6,4 +6,3 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = ("id", "sender", "receiver", "status", "created_at")
-        depth = 1

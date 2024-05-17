@@ -22,11 +22,23 @@ function Settings(): React.JSX.Element {
 	const { clearModal } = useModal()
 	const { Canvas } = useQRCode()
 	const [cookies, setCookie, removeCookie] = useCookies(["session", "settings"])
-	const [dfaSecret, setDfaSecret] = useState(session?.dfa_secret)
+	const [dfaSecret, setDfaSecret] = useState<string|null>(null)
 
 	const isSoundOn = cookies.settings & 1 ? true : false
 	const isDarkModeOn = cookies.settings >> 1 & 1 ? true : false
 	const is2faOn = Boolean(dfaSecret)
+
+	useEffect(() => {
+		if (session) {
+			session.api("/users/dfa/")
+				.then(response => response.json)
+				.then((data: any) => {
+					if (data["dfa_secret"]) {
+						setDfaSecret(data["dfa_secret"])
+					}
+				})
+		}
+	}, [session])
 
 	return (
 		<div className="modal-wrapper">

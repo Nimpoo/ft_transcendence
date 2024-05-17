@@ -19,28 +19,32 @@ export function SocketProvider({
 	const [socket, setSocket] = useState<WebSocket|null>(null)
 
 	useEffect(() => {
+		let ws: WebSocket | undefined
+
 		if (session) {
 			const connectSocket = () => {
-				console.log('Attempting to connect...')
+				ws = new WebSocket(`ws://${window.location.hostname}:8000/users/?token=${session.token}`)
 
-				const socket = new WebSocket(`ws://${window.location.hostname}:8000/users/?token=${session.token}`)
-
-				socket.onclose = e => {
-					console.error('disconnected, retrying in 5s...')
-					socket.close()
-					setTimeout(connectSocket, 5000)
+				ws.onopen = function(this, event) {
+					toast.success("connected")
+					setSocket(this)
 				}
 
-				socket.onmessage = e => {
+				ws.onclose = function(this, event) {
+					toast.error("disconnected")
+					setTimeout(connectSocket, 10000)
+				}
+
+				ws.onmessage = function(this, event) {
 					let data
 
 					try {
-						data = JSON.parse(e.data)
-					} catch (e) {
+						data = JSON.parse(event.data)
+					} catch (event) {
 						return
 					}
 
-					const sender: User = data['from']
+					const sender: User = data["from"]
 
 					switch (data["type"]) {
 						case "friendrequest.ask":
@@ -50,11 +54,11 @@ export function SocketProvider({
 
 									<div className="btn-group">
 										<button onClick={async () => {
-											session.api("/users/friends", "POST", JSON.stringify({user_id: sender.id}))
+											session.api("/users/friends/", "POST", JSON.stringify({user_id: sender.id}))
 											toast.dismiss(t.id)
 										}}>accept</button>
 										<button onClick={async () => {
-											session.api("/users/friends", "DELETE", JSON.stringify({user_id: sender.id}))
+											session.api("/users/friends/", "DELETE", JSON.stringify({user_id: sender.id}))
 											toast.dismiss(t.id)
 										}}>reject</button>
 									</div>
@@ -70,15 +74,15 @@ export function SocketProvider({
 							break
 
 						case "friendrequest.accept":
-							toast(`${sender.display_name} accepted your friend request`)
+							toast.success(`${sender.display_name} accepted your friend request`)
 							break
 
 						case "friendrequest.reject":
-							toast(`${sender.display_name} rejected your friend request`)
+							toast.error(`${sender.display_name} rejected your friend request`)
 							break
 
 						case "friendrequest.remove":
-							toast(`${sender.display_name} removed you from friends`)
+							toast.error(`${sender.display_name} removed you from friends`)
 							break
 
 						case "message.receive":
@@ -86,14 +90,15 @@ export function SocketProvider({
 							break
 					}
 				}
-
-				socket.onopen = e => {
-					console.info('connected')
-					setSocket(socket)
-				}
 			}
 
 			connectSocket()
+		}
+
+		return () => {
+			if (ws instanceof WebSocket && ws.readyState === WebSocket.OPEN) {
+				ws.close()
+			}
 		}
 	}, [session])
 

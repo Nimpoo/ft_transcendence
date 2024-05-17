@@ -61,7 +61,7 @@ class Friend(View):
     @method_decorator((need_user), name="dispatch")
     def get(self, request: HttpRequest, user: User) -> JsonResponse:
         return JsonResponse(
-            list(user.friends.values("id", "login", "display_name", "created_at")),
+            list(user.friends.values("id", "login", "display_name", "avatar", "created_at")),
             safe=False,
         )
 

@@ -7,7 +7,7 @@ class User(models.Model):
     avatar = models.ImageField(null=True, blank=False, upload_to="avatars")
 
     fortytwo_id = models.IntegerField(unique=True)
-    dfa_secret = models.CharField(max_length=50, null=True)
+    dfa_secret = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     friends = models.ManyToManyField("self", blank=True, symmetrical=True)

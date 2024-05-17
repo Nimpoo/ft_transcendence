@@ -5,7 +5,7 @@ import { getAccessToken } from "../callback/api"
 import "@/styles/Chat.css"
 import Image from "next/image"
 import { useState, useEffect, useRef } from "react"
-import React from 'react'
+import React from "react"
 import ChatMessage from "@/components/ChatMessage"
 import { MessageProps } from "@/components/ChatMessage"
 import { useCookies } from "react-cookie"
@@ -52,9 +52,9 @@ function Chat(): React.JSX.Element {
         if (socket) {
           socket.onmessage = (event) => {
             const messageData = JSON.parse(event.data);
-            if (messageData.query_type === 'msg')
+            if (messageData.query_type === "msg")
             {
-                const newMsg = { message: messageData.content, isMyMessage: messageData.sender === session?.display_name, timestamp: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }) };
+                const newMsg = { message: messageData.content, isMyMessage: messageData.sender === session?.display_name, timestamp: new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "numeric", year: "numeric", hour: "numeric", minute: "numeric", second: "numeric" }) };
                 setMsgs(prevMsgs => [...prevMsgs, newMsg]);
                 updateLastMessage(messageData.sender, messageData.content);
             }
@@ -92,7 +92,7 @@ function Chat(): React.JSX.Element {
                 const chatMessages = data.map((chat: any) => ({
                     message: chat.content,
                     isMyMessage: chat.sender === session?.display_name,
-                    timestamp: new Date(chat.created_at).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' })
+                    timestamp: new Date(chat.created_at).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "numeric", year: "numeric", hour: "numeric", minute: "numeric", second: "numeric" })
                 }));
                 setMsgs(chatMessages)           
             } else {
@@ -126,7 +126,7 @@ function Chat(): React.JSX.Element {
         const trimMsg = newMessage.trim();
         if (trimMsg !== "")
         {
-            const newMsg = { message: newMessage, isMyMessage: true, timestamp: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }) };
+            const newMsg = { message: newMessage, isMyMessage: true, timestamp: new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "numeric", year: "numeric", hour: "numeric", minute: "numeric", second: "numeric" }) };
             setMessages(prevMessages => [...prevMessages, newMessage]);
             setMsgs(prevMsgs => [...prevMsgs, newMsg]);
             socket?.send(JSON.stringify({

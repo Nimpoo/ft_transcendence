@@ -24,7 +24,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 			)
 
 			if (response.status != 200) {
-				toast.error(`User '${params.login}' doesn't exist`)
+				toast.error(`User "${params.login}" doesn"t exist`)
 				router.push("/")
 			}
 
@@ -55,7 +55,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 			<div
 				className="rounded-circle bg-cover"
 				style={{
-					backgroundImage: `url('http://${window.location.hostname}:8000${user.avatar}')`,
+					backgroundImage: `url("http://${window.location.hostname}:8000${user.avatar}")`,
 					backgroundSize: "cover",
 					backgroundPosition: "center center",
 					backgroundRepeat: "no-repeat",
