@@ -96,8 +96,11 @@ export function SocketProvider({
 		}
 
 		return () => {
-			if (ws instanceof WebSocket && ws.readyState === WebSocket.OPEN) {
-				ws.close()
+			if (ws instanceof WebSocket) {
+				if (ws.readyState === WebSocket.OPEN) {
+					ws.onclose = () => {}
+					ws.close()
+				}
 			}
 		}
 	}, [session])

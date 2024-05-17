@@ -26,12 +26,11 @@ function Settings(): React.JSX.Element {
 
 	const isSoundOn = cookies.settings & 1 ? true : false
 	const isDarkModeOn = cookies.settings >> 1 & 1 ? true : false
-	const is2faOn = Boolean(dfaSecret)
 
 	useEffect(() => {
 		if (session) {
 			session.api("/users/dfa/")
-				.then(response => response.json)
+				.then(response => response.json())
 				.then((data: any) => {
 					if (data["dfa_secret"]) {
 						setDfaSecret(data["dfa_secret"])
@@ -108,7 +107,7 @@ function Settings(): React.JSX.Element {
 								}
 								e.target.disabled = false
 							}}
-								className="btn-check" name="setting-2fa" id="setting-2fa-on" hidden disabled={socket?.readyState !== WebSocket.OPEN} checked={is2faOn} />
+								className="btn-check" name="setting-2fa" id="setting-2fa-on" hidden disabled={socket?.readyState !== WebSocket.OPEN} checked={dfaSecret !== null} />
 							<label className="btn btn-outline-success" htmlFor="setting-2fa-on">ON</label>
 							<input type="radio" onChange={async e => {
 								e.target.disabled = true
@@ -118,12 +117,12 @@ function Settings(): React.JSX.Element {
 									setDfaSecret(session.dfa_secret)
 								e.target.disabled = false
 							}}
-								className="btn-check" name="setting-2fa" id="setting-2fa-off" hidden disabled={socket?.readyState !== WebSocket.OPEN} checked={!is2faOn} />
+								className="btn-check" name="setting-2fa" id="setting-2fa-off" hidden disabled={socket?.readyState !== WebSocket.OPEN} checked={dfaSecret === null} />
 							<label className="btn btn-outline-danger" htmlFor="setting-2fa-off">OFF</label>
 						</div>
 					</div>
 
-					{is2faOn &&
+					{dfaSecret &&
 						<>
 							<Canvas
 								text={`otpauth://totp/ft_transcendence:${session.login}?secret=${dfaSecret}&issuer=ft_transcendence`}
