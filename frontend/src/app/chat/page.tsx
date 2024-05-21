@@ -232,8 +232,7 @@ function Chat(): React.JSX.Element {
 					selectedConversation && (
 						<div>
 							<div className="row box-2-title rounded-bottom-0">
-								<ul style={
-									{display: "flex"}} className="list-inline">
+								<ul style={{display: "flex"}} className="list-inline">
 									<li className="list-inline-item" style={{marginTop: "3px"}}>
 											<div
 												className="rounded-circle bg-cover"
@@ -250,7 +249,9 @@ function Chat(): React.JSX.Element {
 											/>
 									</li>
 									<li className="list-inline-item">
-										<h5 className="conv-name">{selectedConversation.display_name}</h5>
+										<Link href={`/users/${selectedConversation.login}`}>
+											<h5 className="conv-name">{selectedConversation.display_name}</h5>
+										</Link>
 									</li>
 									<li className="list-inline-item dropplace">
 										<div className="dropdown">
@@ -262,15 +263,6 @@ function Chat(): React.JSX.Element {
 													alt="parameters"
 												/>
 											</button>
-											{
-												false && (
-													<ul className="dropdown-content list-group">
-														<li className="list-group-item"><a className="link-color" href="#">Link 1</a></li>
-														<li className="list-group-item"><a className="link-color" href="#">Link 2</a></li>
-														<li className="list-group-item"><a className="link-color" href="#">Link 3</a></li>
-													</ul>
-												)
-											}
 										</div>
 									</li>
 								</ul>
