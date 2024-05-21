@@ -179,7 +179,7 @@ function Chat(): React.JSX.Element {
 						<p className="fs-4">Conversations</p>
 					</div>
 					<div className="col-3 mt-3">
-						<button type="button" className="btn">
+						<button type="button" className="btn" onClick={() => setSelectedConversation(undefined)}>
 							<Image className="image"
 								src={"/assets/svg/Cross.svg"}
 								width={25}
@@ -234,8 +234,7 @@ function Chat(): React.JSX.Element {
 							<div className="row box-2-title rounded-bottom-0">
 								<ul style={
 									{display: "flex"}} className="list-inline">
-									<li className="list-inline-item" style={
-										{marginTop: "3px"}}>
+									<li className="list-inline-item" style={{marginTop: "3px"}}>
 											<div
 												className="rounded-circle bg-cover"
 												style={
