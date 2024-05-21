@@ -299,19 +299,26 @@ function Chat(): React.JSX.Element {
 								<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name(s) to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} />
 								{
 									results &&
-									<div>
+									<ul>
 										{
 											results.map(
-												(user, key) => (
-													<div key={key}>
-														<Link onClick={() => handleClick(user)} href="#">
-															{user.display_name}
-														</Link>
-													</div>
-												)
+												(user, key) => {
+													if (session.id === user.id)
+													{
+														return <></>
+													}
+
+													return (
+														<li key={key}>
+															<Link onClick={() => handleClick(user)} href="#">
+																{user.display_name}
+															</Link>
+														</li>
+													)
+												}
 											)
 										}
-									</div>
+									</ul>
 								}
 							</div>
 							<div className="conv-box" />
