@@ -141,10 +141,8 @@ def get_user(request: HttpRequest) -> JsonResponse:
 @require_GET
 def search(request: HttpRequest) -> JsonResponse:
     query = request.GET.get("q")
-    results = User.objects.filter(
-        Q(login__icontains=query) | Q(display_name__icontains=query)
-    ).values("id", "login", "display_name", "avatar", "created_at")
-    return JsonResponse(list(results), safe=False)
+    results = User.objects.filter(Q(login__icontains=query) | Q(display_name__icontains=query))
+    return JsonResponse([UserSerializer(user).data for user in results], safe=False)
 
 
 def get_online_users(request: HttpRequest):
