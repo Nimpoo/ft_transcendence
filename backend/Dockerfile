@@ -2,8 +2,6 @@ FROM python:latest
 
 EXPOSE 8000
 
-RUN apt update && apt -y install ncat
-
 WORKDIR /app
 
 COPY requirements.txt .
