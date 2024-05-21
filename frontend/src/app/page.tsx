@@ -11,13 +11,14 @@ import "@/styles/Rainbow.css"
 import { useSession } from "@/providers/Session"
 import FriendsList from "@/components/FriendsList"
 import UserSearchBar from "@/components/UserSearchBar"
+import Loading from "./loading"
 
 
 function Home(): React.JSX.Element {
 	const { session, status } = useSession()
 
 	if (status == "loading") {
-		return <></> // todo loading
+		return <Loading />
 	}
 
 	else if (status == "connected" && session) {

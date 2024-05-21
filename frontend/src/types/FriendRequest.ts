@@ -1,4 +1,5 @@
-interface FriendRequest {
+interface FriendRequest
+{
 	id: number
 	sender: number
 	receiver: number

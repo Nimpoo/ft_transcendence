@@ -1,3 +1,4 @@
+from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django.http import HttpRequest, JsonResponse
 from django.db.models import Q
@@ -8,6 +9,7 @@ from django.views.decorators.http import require_GET
 import urllib.parse
 import json
 
+from chat.serializers import ChatSerializer
 from friends.models import FriendRequest
 from users.models import User
 from chat.models import Chat
@@ -141,70 +143,40 @@ class Block(View):
 
 
 @require_GET
-def get_conv(request: HttpRequest) -> JsonResponse:
-    query_string = request.GET.urlencode()
-    parsed_query = urllib.parse.parse_qs(query_string)
-    target = parsed_query.get("user", [None])[0]
-    me = parsed_query.get("sender", [None])[0]
-    sender_chats = Chat.objects.filter(
-        Q(sender__display_name__contains=target)
-        & Q(receiver__display_name__contains=me)
-    )
-    room_chats = Chat.objects.filter(
-        Q(receiver__display_name__contains=target)
-        & Q(sender__display_name__contains=me)
-    )
-    all_user_chat = sender_chats.union(room_chats)
+@need_user
+def get_conv(request: HttpRequest, user: User) -> JsonResponse:
+    target_id = request.GET.get("user")
 
-    chat_list = []
-    for chat in all_user_chat:
-        chat_dict = {
-            "id": chat.id,
-            "content": chat.content,
-            "sender": chat.sender.display_name,
-            "target": chat.receiver.display_name,
-            "created_at": chat.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        chat_list.append(chat_dict)
+    if target_id is None:
+        return JsonResponse({"error": "Bad Request", "message": "You must provide `user`."}, status=400)
 
-    return JsonResponse(chat_list, safe=False, status=200)
+    try:
+        target = User.objects.get(id=target_id)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "Not Found", "message": "The provided id does not match a user."}, status=404)
+
+    all_user_chat = Chat.objects.filter(Q(sender=target, receiver=user) | Q(receiver=target, sender=user))
+    chat_list = [ChatSerializer(chat).data for chat in all_user_chat]
+
+    return JsonResponse(chat_list, safe=False)
 
 
 @require_GET
-def get_all_convs(request: HttpRequest) -> JsonResponse:
-    query_string = request.GET.urlencode()
-    parsed_query = urllib.parse.parse_qs(query_string)
-    me = parsed_query.get("sender", [None])[0]
-
-    # Get all chats involving the current user
-    chats = Chat.objects.filter(
-        Q(sender__display_name=me) | Q(receiver__display_name__contains=me)
+@need_user
+def get_all_convs(request: HttpRequest, user: User) -> JsonResponse:
+    crspdts = User.objects.filter(
+        id__in=[chat.sender.id for chat in user.received_messages.all()]
+            + [chat.receiver.id for chat in user.sent_messages.all()]
     )
-    # Group chats by conversation (sender and receiver)
-    conversation_groups = {}
-    for chat in chats:
-        other_user = (
-            chat.receiver.display_name
-            if chat.sender.display_name == me
-            else chat.sender.display_name
-        )
-        conversation_key = f"{me}_{other_user}"
-        if conversation_key not in conversation_groups:
-            conversation_groups[conversation_key] = []
-        conversation_groups[conversation_key].append(chat)
 
-    # Get the latest message for each conversation
-    latest_messages = []
-    for conversation_key, chats in conversation_groups.items():
-        latest_chat = max(chats, key=lambda chat: chat.created_at)
-        latest_messages.append(
-            {
-                "id": latest_chat.id,
-                "content": latest_chat.content,
-                "sender": latest_chat.sender.display_name,
-                "target": latest_chat.receiver.display_name,
-                "created_at": latest_chat.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            }
-        )
+    chats = [
+        ChatSerializer(
+            Chat.objects.filter(
+                Q(sender=user, receiver=crspdt)
+                    | Q(sender=crspdt, receiver=user)
+            ).order_by("-id").first()
+        ).data
+        for crspdt in crspdts
+    ]
 
-    return JsonResponse(latest_messages, safe=False, status=200)
+    return JsonResponse(chats, safe=False)

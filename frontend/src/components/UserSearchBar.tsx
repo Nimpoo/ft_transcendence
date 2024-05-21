@@ -3,32 +3,37 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
-function UserSearchBar(): React.JSX.Element {
+function UserSearchBar(props: any): React.JSX.Element {
 	const [search, setSearch] = useState<string>("")
-	const [results, setResults] = useState<User[]|null>(null)
-	const searchTimeout = useRef<NodeJS.Timeout|null>(null)
+	const [results, setResults] = useState<User[]>()
+	const searchTimeout = useRef<NodeJS.Timeout>()
 
 	useEffect(() => {
 		const handleSearch = async () => {
-			if (search) {
+			if (search)
+			{
 				const response = await fetch(`http://${window.location.hostname}:8000/users/search/?q=${encodeURIComponent(search)}`)
-				setResults(await response.json())	
-				searchTimeout.current = null
-			} else {
-				setResults(null)
+				const data = await response.json()
+				setResults(data)
+				clearTimeout(searchTimeout.current)
+			}
+
+			else
+			{
+				setResults(undefined)
 			}
 		}
 
-		if (searchTimeout.current) {
+		if (searchTimeout.current)
+		{
 			clearTimeout(searchTimeout.current)
-			searchTimeout.current = setTimeout(handleSearch, 500)
-		} else {
-			searchTimeout.current = setTimeout(handleSearch, 500)
 		}
+
+		searchTimeout.current = setTimeout(handleSearch, 500)
 	}, [search])
 
 	return (
-		<div>
+		<div style={{width: "100%"}}>
 			<input type="text" onChange={e => setSearch(e.target.value)} />
 			{results &&
 				<ul>

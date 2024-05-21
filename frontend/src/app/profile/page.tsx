@@ -10,6 +10,7 @@ import { useSession } from "@/providers/Session"
 
 import "@/styles/profile/Profile.css"
 import FriendsList from "@/components/FriendsList"
+import Loading from "../loading"
 
 function Profile(): React.JSX.Element {
 	const router = useRouter()
@@ -23,7 +24,7 @@ function Profile(): React.JSX.Element {
 	}, [router, status])
 
 	if (session == null || status != "connected") {
-		return <></> // todo loading
+		return <Loading />
 	}
 
 	return (

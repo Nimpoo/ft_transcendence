@@ -2,6 +2,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.shortcuts import get_object_or_404
 from asgiref.sync import sync_to_async
 
+from chat.serializers import ChatSerializer
 from users.models import User
 from users.serializers import UserSerializer
 from chat.models import Chat
@@ -62,109 +63,66 @@ class UserConsumer(AsyncWebsocketConsumer):
                 self.room_group_name, self.channel_name
             )
 
-    async def handle_privmsg(self, event):
-        qtype = event["query_type"]
-        subtype = event["subtype"]
-        sender = event["sender"]
-        target = event["target"]
-        content = event["content"]
-        channel_name = f"user_{target}"
-        await self.channel_layer.group_send(
-            channel_name,
-            {
-                "type": "chat.message",
-                "query_type": qtype,
-                "sub_type": subtype,
-                "sender": sender,
-                "content": content,
-            },
-        )
-        await self.create_chat_async(content, sender, target)
-
     async def handle_message(self, event):
-        receiver_id = event.get("target")
+        target_id = event.get("target_id")
         content = event.get("content")
 
-        if None in [receiver_id, content]:
+        if target_id is None:
             await self.send(
                 json.dumps(
-                    {
-                        "type": "error",
-                        "message": "Please provide 'receiver_id' and 'content'",
-                    }
+                    {"type": "error", "message": "Please provide `target_id`"}
+                )
+            )
+            return
+
+        if content is None:
+            await self.send(
+                json.dumps(
+                    {"type": "error", "message": "Please provide `content`"}
                 )
             )
             return
 
         try:
-            receiver = await sync_to_async(User.objects.get)(login=receiver_id)
+            receiver = await sync_to_async(User.objects.get)(id=target_id)
         except User.DoesNotExist:
             await self.send(
                 json.dumps({"type": "error", "message": "targeted user does not exist"})
             )
             return
-        subtype = event["subtype"]
-        if subtype == "privmsg":
-            await self.handle_privmsg(event)
 
-            # JSON request for chat should be formatted like that :
-            #   {
-            #      "query_type": "msg" (the only argument available for the moment is "msg")
-            #      "subtype": "privmsg" or "grpmsg"
-            #       "target": "losylves"
-            #       "sender": "mayoub"
-            #       "content": "Bonjour les copains" (the content of the message)
-            #   }
-
-            if self.user.id is receiver.id:
-                await self.send(
-                    json.dumps(
-                        {
-                            "type": "error",
-                            "message": "You cannot send message to yourself",
-                        }
-                    )
+        if self.user.id == receiver.id:
+            await self.send(
+                json.dumps(
+                    {"type": "error", "message": "You cannot send message to yourself"}
                 )
-                return
-
-            chat = await sync_to_async(Chat.objects.create)(
-                sender=self.user, receiver=receiver, content=content
             )
+            return
 
-            await self.channel_layer.group_send(
-                f"user_{self.user.login}",
-                {
-                    "type": "user.notification",
-                    "data": {
-                        "type": "message.sent",
-                        "to": UserSerializer(receiver).data,
-                        "content": content,
-                    },
-                },
-            )
-
-            await self.channel_layer.group_send(
-                f"user_{receiver.login}",
-                {
-                    "type": "user.notification",
-                    "data": {
-                        "type": "message.receive",
-                        "from": UserSerializer(self.user).data,
-                        "content": content,
-                    },
-                },
-            )
-
-    async def chat_message(self, event):
-        await self.send(text_data=json.dumps(event))
-
-    async def create_chat_async(self, message, sender, receiver):
-        user_receiver = await sync_to_async(get_object_or_404)(
-            User, display_name=receiver
-        )
-        user_sender = await sync_to_async(get_object_or_404)(User, display_name=sender)
         chat = await sync_to_async(Chat.objects.create)(
-            content=message, sender=user_sender, receiver=user_receiver
+            sender=self.user, receiver=receiver, content=content
+        )
+
+        await self.channel_layer.group_send(
+            f"user_{self.user.login}",
+            {
+                "type": "user.notification",
+                "data": {
+                    "type": "message.sent",
+                    "message": ChatSerializer(chat).data,
+                },
+            },
+        )
+
+        await self.channel_layer.group_send(
+            f"user_{receiver.login}",
+            {
+                "type": "user.notification",
+                "data": {
+                    "type": "message.receive",
+                    "message": ChatSerializer(chat).data,
+                },
+            },
         )
 
     async def user_notification(self, event):
