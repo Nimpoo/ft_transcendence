@@ -1,3 +1,20 @@
+.chat-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+}
+
+.font-conv-size {
+    font-size: 30px;
+}
+
+@media screen and (max-width: 575px) {
+    .font-conv-size {
+        font-size: 20px;
+    }
+}
+
 .box-1-wrap {
     width: 382px;
     height: 511px;
@@ -5,6 +22,13 @@
 	background-color: #d9d9d935;
     opacity: 0.25rem;
 	box-shadow: 5px 5px 0 1px rgba(0, 0, 0, 0.25);
+}
+
+@media screen and (max-width: 575px) {
+    .box-1-wrap {
+        width: 190px;
+        height: 230px;
+    }
 }
 
 .scrollab {
@@ -48,11 +72,25 @@
 	box-shadow: 5px 5px 0 1px rgba(0, 0, 0, 0.25);
 }
 
+@media screen and (max-width: 575px) {
+    .box-2-wrap {
+        width: 346px;
+        height: 230px;
+    }
+}
+
 .box-2-title {
     width: 892px;
     height: 65px;
     background-color: rgba(255, 255, 255, 0.423);
     border-radius: 1.5rem;
+}
+
+@media screen and (max-width: 575px) {
+    .box-2-title {
+        width: 346px;
+        height: 30px;
+    }
 }
 
 .input-style {
@@ -61,6 +99,13 @@
     height: 65px;
     border-radius: 1.5rem;
     border-color: transparent;
+}
+
+@media screen and (max-width: 575px) {
+    .input-style {
+        width: 346px;
+        height: 30px;
+    }
 }
 
 .input-style:focus {
@@ -80,6 +125,13 @@
     height: 395px;
     width: 880px;
     overflow-y: scroll;
+}
+
+@media screen and (max-width: 575px) {
+    .conv-box {
+        width: 346px;
+        height: 150px;
+    }
 }
 
 .text-box-style {
@@ -110,6 +162,11 @@
 
 .btn-text-style:hover {
     background-color: white;
+}
+
+.logo-send {
+    height: auto;
+    width: auto;
 }
 
 .dropplace {

@@ -172,162 +172,164 @@ function Chat(): React.JSX.Element {
 	}
 
 	return (
-		<div className="row">
-			<div className="col-4 box-1-wrap">
-				<div className="row box-1-title">
-					<div className="col-9 mt-3">
-						<p className="fs-4">Conversations</p>
+		<div className="chat-wrapper">
+			<div className="row">
+				<div className="col-4 box-1-wrap">
+					<div className="row box-1-title">
+						<div className="col-9 mt-3">
+							<p className="font-conv-size">Conversations</p>
+						</div>
+						<div className="col-3 mt-3">
+							<button type="button" className="btn" onClick={() => setSelectedConversation(undefined)}>
+								<Image className="image"
+									src={"/assets/svg/Cross.svg"}
+									width={25}
+									height={25}
+									alt="Cross"
+								/>
+							</button>
+						</div>
 					</div>
-					<div className="col-3 mt-3">
-						<button type="button" className="btn" onClick={() => setSelectedConversation(undefined)}>
-							<Image className="image"
-								src={"/assets/svg/Cross.svg"}
-								width={25}
-								height={25}
-								alt="Cross"
-							/>
-						</button>
-					</div>
-				</div>
-				<div className="vstack gap-3 scrollab">
-					{
-						conversations &&
-						conversations.map(
-							(conv, key) => {
-								const crspdt = conv.sender.id === session.id ? conv.receiver : conv.sender
+					<div className="vstack gap-3 scrollab">
+						{
+							conversations &&
+							conversations.map(
+								(conv, key) => {
+									const crspdt = conv.sender.id === session.id ? conv.receiver : conv.sender
 
-								return (
-									<div key={key}>
-										<input type="checkbox" className="btn-check" name={`conv-${crspdt.login}`} id={`btnconv-${crspdt.login}`} autoComplete="on" checked={selectedConversation?.id === crspdt.id} />
-										<label className="btn btn-outline-dark btn-1-conv" htmlFor={`btnconv-${crspdt.login}`} onClick={() => handleClick(crspdt)}>
-											<div
-												className="rounded-circle bg-cover"
-												style={
-													{
-													backgroundImage: `url("http://${window.location.hostname}:8000${crspdt.avatar}")`,
-													backgroundSize: "cover",
-													backgroundPosition: "center center",
-													backgroundRepeat: "no-repeat",
-													width: 60,
-													height: 60
-													}
-												}
-											/>
-											<div>
-												<h5 className="text-place">{crspdt.display_name}</h5>
-												<div className="text-truncate change-trunc">
-													{conv.content}
-												</div>
-											</div>
-										</label>
-									</div>
-								)
-							}
-						) || <Loading />
-					}
-				</div>
-			</div>
-			<div className="col-8 ms-3 box-2-wrap">
-				{
-					selectedConversation && (
-						<div>
-							<div className="row box-2-title rounded-bottom-0">
-								<ul style={{display: "flex"}} className="list-inline">
-									<li className="list-inline-item" style={{marginTop: "3px"}}>
-											<div
-												className="rounded-circle bg-cover"
-												style={
-													{
-														backgroundImage: `url("http://${window.location.hostname}:8000${selectedConversation.avatar}")`,
+									return (
+										<div key={key}>
+											<input type="checkbox" className="btn-check" name={`conv-${crspdt.login}`} id={`btnconv-${crspdt.login}`} autoComplete="on" checked={selectedConversation?.id === crspdt.id} />
+											<label className="btn btn-outline-dark btn-1-conv" htmlFor={`btnconv-${crspdt.login}`} onClick={() => handleClick(crspdt)}>
+												<div
+													className="rounded-circle bg-cover"
+													style={
+														{
+														backgroundImage: `url("http://${window.location.hostname}:8000${crspdt.avatar}")`,
 														backgroundSize: "cover",
 														backgroundPosition: "center center",
 														backgroundRepeat: "no-repeat",
 														width: 60,
 														height: 60
+														}
 													}
-												}
-											/>
-									</li>
-									<li className="list-inline-item">
-										<Link href={`/users/${selectedConversation.login}`}>
-											<h5 className="conv-name">{selectedConversation.display_name}</h5>
-										</Link>
-									</li>
-									<li className="list-inline-item dropplace">
-										<div className="dropdown">
-											<button className="dropbtn" data-bs-auto-close="true">
-												<Image className="icon"
-													src={"/assets/svg/Three-dots.svg"}
-													width={25}
-													height={10}
-													alt="parameters"
 												/>
-											</button>
+												<div>
+													<h5 className="text-place">{crspdt.display_name}</h5>
+													<div className="text-truncate change-trunc">
+														{conv.content}
+													</div>
+												</div>
+											</label>
 										</div>
-									</li>
-								</ul>
-							</div>
-							<div className="conv-box" ref={chatContainerRef}>
-								{
-									messages?.map((chat, index) => <ChatMessage key={index} chat={chat} />) || <Loading />
+									)
 								}
-							</div>
-							<form className="input-group" onSubmit={handleMessageSend}>
-								<input className="form-control text-box-style" name="msg" type="text" id="input" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" />
-								<button className="btn btn-text-style btn-light" type="submit" id="button-send">
-									<Image className="logo"
-										src={"/assets/svg/Send-logo.svg"}
-										width={21}
-										height={22}
-										alt="Send"
-									/>
-								</button>
-							</form>
-						</div>
-					) || (
-						<div>
-							<div className="row box-2-title rounded-bottom-0">
-								<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name(s) to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} />
-								{
-									results &&
-									<ul>
-										{
-											results.map(
-												(user, key) => {
-													if (session.id === user.id)
-													{
-														return <></>
+							) || <Loading />
+						}
+					</div>
+				</div>
+				<div className="col-8 ms-3 box-2-wrap">
+					{
+						selectedConversation && (
+							<div>
+								<div className="row box-2-title rounded-bottom-0">
+									<ul style={{display: "flex"}} className="list-inline">
+										<li className="list-inline-item" style={{marginTop: "3px"}}>
+												<div
+													className="rounded-circle bg-cover"
+													style={
+														{
+															backgroundImage: `url("http://${window.location.hostname}:8000${selectedConversation.avatar}")`,
+															backgroundSize: "cover",
+															backgroundPosition: "center center",
+															backgroundRepeat: "no-repeat",
+															width: 60,
+															height: 60
+														}
 													}
-
-													return (
-														<li key={key}>
-															<Link onClick={() => handleClick(user)} href="#">
-																{user.display_name}
-															</Link>
-														</li>
-													)
-												}
-											)
-										}
+												/>
+										</li>
+										<li className="list-inline-item">
+											<Link href={`/users/${selectedConversation.login}`}>
+												<h5 className="conv-name">{selectedConversation.display_name}</h5>
+											</Link>
+										</li>
+										<li className="list-inline-item dropplace">
+											<div className="dropdown">
+												<button className="dropbtn" data-bs-auto-close="true">
+													<Image className="icon"
+														src={"/assets/svg/Three-dots.svg"}
+														width={25}
+														height={10}
+														alt="parameters"
+													/>
+												</button>
+											</div>
+										</li>
 									</ul>
-								}
+								</div>
+								<div className="conv-box" ref={chatContainerRef}>
+									{
+										messages?.map((chat, index) => <ChatMessage key={index} chat={chat} />) || <Loading />
+									}
+								</div>
+								<form className="input-group" onSubmit={handleMessageSend}>
+									<input className="form-control text-box-style" name="msg" type="text" id="input" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" />
+									<button className="btn btn-text-style btn-light" type="submit" id="button-send">
+										<Image className="logo-send"
+											src={"/assets/svg/Send-logo.svg"}
+											width={21}
+											height={22}
+											alt="Send"
+										/>
+									</button>
+								</form>
 							</div>
-							<div className="conv-box" />
-							<div className="input-group">
-								<input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" disabled></input>
-								<button className="btn btn-text-style btn-light" type="submit" id="button-send" disabled>
-									<Image
-										className="logo"
-										src={"/assets/svg/Send-logo.svg"}
-										width={21}
-										height={22}
-										alt="Send"
-									/>
-								</button>
+						) || (
+							<div>
+								<div className="row box-2-title rounded-bottom-0">
+									<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name(s) to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} />
+									{
+										results &&
+										<ul>
+											{
+												results.map(
+													(user, key) => {
+														if (session.id === user.id)
+														{
+															return <></>
+														}
+
+														return (
+															<li key={key}>
+																<Link onClick={() => handleClick(user)} href="#">
+																	{user.display_name}
+																</Link>
+															</li>
+														)
+													}
+												)
+											}
+										</ul>
+									}
+								</div>
+								<div className="conv-box" />
+								<div className="input-group">
+									<input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" disabled></input>
+									<button className="btn btn-text-style btn-light" type="submit" id="button-send" disabled>
+										<Image
+											className="logo"
+											src={"/assets/svg/Send-logo.svg"}
+											width={21}
+											height={22}
+											alt="Send"
+										/>
+									</button>
+								</div>
 							</div>
-						</div>
-					)
-				}
+						)
+					}
+				</div>
 			</div>
 		</div>
 	)
