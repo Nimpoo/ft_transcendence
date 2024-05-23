@@ -9,8 +9,8 @@ import { useGame } from "@/providers/Game"
 
 import "@/styles/game/Game.css"
 
-let score1 = 0
-let score2 = 0
+var score1 = 0
+var score2 = 0
 
 interface Ball {
 	coord: [number, number],
@@ -94,7 +94,6 @@ function Canvas({
 			if (context) {
 				context.scale(dpi, dpi)
 
-/////////////////////////////////////////////////////
 // ????????????????? CONSTRUCTIONS ??????????????????
 				// * /*-------------- GROUND --------------*/
 				const ground = () => {
@@ -144,8 +143,6 @@ function Canvas({
 							)
 							context.restore()
 						},
-						// console.log("coordonée", square.coord, score1++)
-						// console.log("speed", square.dir, score2++)
 					}
 				}
 				// ! /*------------------------------------*/
@@ -208,10 +205,21 @@ function Canvas({
 					}
 				// ? /*------------------------------------*/
 
+				// * /*-------------- SCORES --------------*/
+				if (message && message.type === "game.point") {
+					if (message.player && message.score1 && message.player === "1") {
+						score1 = message.score1
+					}
+
+					if (message.player && message.score2 && message.player === "2") {
+						score2 = message.score2
+					}
+				}
+				// * /*------------------------------------*/
+
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////
 // !!!!!!!!!!!!!!!!!!!!! GAME !!!!!!!!!!!!!!!!!!!!!!!
 				// ? /*------------ DEMO MODE -------------*/
 				const demo = () => {
@@ -240,13 +248,6 @@ function Canvas({
 					// ? The score
 					context.fillText(`${score1}`, width / 5, height / 3.75)
 					context.fillText(`${score2}`, width * 4 / 5, height / 3.75)
-					if (message && message.type === "game.point") {
-						if (message.player && message.player === "1") {
-							score1 += 1
-						} else if (message.player && message.player === "2") {
-							score2 += 1
-						}
-					}	
 				}
 				// ? /*------------------------------------*/
 /////////////////////////////////////////////////////
@@ -255,7 +256,6 @@ function Canvas({
 				let animationFrameId: number
 
 				// * the animation loop
-				// console.log("THE GAME STATUS IS: ", gameStatus)
 				const animate = () => {
 					animationFrameId = window.requestAnimationFrame(animate)
 					if (gameStatus === "pending") {

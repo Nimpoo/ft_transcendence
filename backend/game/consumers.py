@@ -53,7 +53,21 @@ class GameConsumer(AsyncWebsocketConsumer):
 ###################################################?
 
   async def game_begin(self, text_data=None):
-    self.loop = asyncio.create_task(self.game_loop()) # ? Line 56
+    self.score1 = 0
+    self.score2 = 0
+
+    await self.channel_layer.group_send(self.room_group_name, {
+      'type': 'game.point',
+      'player': '1',
+      'score1': '0',
+    })
+
+    await self.channel_layer.group_send(self.room_group_name, {
+      'type': 'game.point',
+      'player': '2',
+      'score2': '0',
+    })
+    self.loop = asyncio.create_task(self.game_loop()) # ? Line 60
 
 ####################################################
 ####################################################
@@ -66,8 +80,6 @@ class GameConsumer(AsyncWebsocketConsumer):
       self.px_1, self.py_1 = 1 / 30, 1 / 2
       self.px_2, self.py_2 = 29 / 30, 1 / 2
       self.pw, self.ph = 1 / 125, 1 / 5
-
-      self.score1, self.score2 = 0, 0
 
       ball_info = {
         'coordinates': [self.x, self.y],
@@ -129,11 +141,12 @@ class GameConsumer(AsyncWebsocketConsumer):
     if self.x + self.vx + (self.w / 2) > 1.01:
       for room in WAITING_ROOMS:
         if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+          self.score1 += 1
           await self.channel_layer.group_send(self.room_group_name, {
             'type': 'game.point',
             'player': '1',
+            'score1': self.score1,
           })
-          self.score1 += 1
       self.vx *= -1
     # *
 
@@ -141,11 +154,12 @@ class GameConsumer(AsyncWebsocketConsumer):
     if self.x + self.vx - (self.w / 2) < -0.01:
       for room in WAITING_ROOMS:
         if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+          self.score2 += 1
           await self.channel_layer.group_send(self.room_group_name, {
             'type': 'game.point',
             'player': '2',
+            'score2': self.score2,
           })
-          self.score2 += 1
       self.vx *= -1
     # *
 
@@ -219,7 +233,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     ############### Launch The Game ################
     if data['type'] == 'game.begin':
-      await self.game_begin() # ? Line 22
+      await self.game_begin() # ? Line 55
     ################################################
 
     ############### Finish The Game ################
@@ -247,6 +261,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     ############### Creation a Room ################
     if data['type'] == 'game.create':
+      self.score1, self.score2 = 0, 0
       room_uuid = uuid4()
       self.room_group_name = f'game_room_{room_uuid}'
 
@@ -273,6 +288,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     ################ Joining a Room ################
     elif data['type'] == 'game.join':
+      self.score1, self.score2 = 0, 0
       for room in WAITING_ROOMS:
         if room['room_uuid'] and len(room['players']) < room['limit']:
           self.room_group_name = f'game_room_{room['room_uuid']}'
