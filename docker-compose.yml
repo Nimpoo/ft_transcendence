@@ -56,14 +56,6 @@ services:
       start_period: 10s
     restart: always
 
-  adminer:
-    image: adminer
-    ports:
-      - 8080:8080
-    depends_on:
-      - postgres
-    restart: always
-
   nginx:
     image: nginx
     ports:
@@ -72,6 +64,7 @@ services:
       - ./backend/static:/static:ro
       - ./backend/media:/media:ro
       - ./nginx/ft_transcendence.conf:/etc/nginx/conf.d/ft_transcendence.conf
+      - ./nginx/certificates:/certificates
     depends_on:
       - pong
     restart: always

@@ -15,7 +15,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 	useEffect(() => {
 		const handleFetch = async () => {
 			const response = await toast.promise(
-				fetch(`http://${window.location.hostname}:8000/users/get/?login=${encodeURIComponent(params.login)}`),
+				fetch(`https://${window.location.hostname}:8000/users/get/?login=${encodeURIComponent(params.login)}`),
 				{
 					loading: `Fetching user ${params.login}`,
 					success: `User ${params.login} fetched`,
@@ -55,7 +55,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 			<div
 				className="rounded-circle bg-cover"
 				style={{
-					backgroundImage: `url("http://${window.location.hostname}:8000${user.avatar}")`,
+					backgroundImage: `url("https://${window.location.hostname}:8000${user.avatar}")`,
 					backgroundSize: "cover",
 					backgroundPosition: "center center",
 					backgroundRepeat: "no-repeat",

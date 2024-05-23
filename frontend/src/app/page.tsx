@@ -86,7 +86,7 @@ function Home(): React.JSX.Element {
 								<div
 									className="rounded-circle bg-cover"
 									style={{
-										backgroundImage: `url("http://${window.location.hostname}:8000${session.avatar}")`,
+										backgroundImage: `url("https://${window.location.hostname}:8000${session.avatar}")`,
 										backgroundSize: "cover",
 										backgroundPosition: "center center",
 										backgroundRepeat: "no-repeat",

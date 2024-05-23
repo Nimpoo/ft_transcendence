@@ -89,7 +89,7 @@ function Chat(): React.JSX.Element {
 		const userSearch = async () => {
 			if (search)
 			{
-				const response = await fetch(`http://${window.location.hostname}:8000/users/search?q=${encodeURIComponent(search)}`)
+				const response = await fetch(`https://${window.location.hostname}:8000/users/search?q=${encodeURIComponent(search)}`)
 
 				if (response?.ok)
 				{
@@ -205,7 +205,7 @@ function Chat(): React.JSX.Element {
 													className="rounded-circle bg-cover"
 													style={
 														{
-														backgroundImage: `url("http://${window.location.hostname}:8000${crspdt.avatar}")`,
+														backgroundImage: `url("https://${window.location.hostname}:8000${crspdt.avatar}")`,
 														backgroundSize: "cover",
 														backgroundPosition: "center center",
 														backgroundRepeat: "no-repeat",
@@ -239,7 +239,7 @@ function Chat(): React.JSX.Element {
 													className="rounded-circle bg-cover"
 													style={
 														{
-															backgroundImage: `url("http://${window.location.hostname}:8000${selectedConversation.avatar}")`,
+															backgroundImage: `url("https://${window.location.hostname}:8000${selectedConversation.avatar}")`,
 															backgroundSize: "cover",
 															backgroundPosition: "center center",
 															backgroundRepeat: "no-repeat",

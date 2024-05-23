@@ -23,7 +23,7 @@ export function SocketProvider({
 
 		if (session) {
 			const connectSocket = () => {
-				ws = new WebSocket(`ws://${window.location.hostname}:8000/users/?token=${session.token}`)
+				ws = new WebSocket(`wss://${window.location.hostname}:8000/users/?token=${session.token}`)
 
 				ws.onopen = function(this, event) {
 					toast.success("connected")

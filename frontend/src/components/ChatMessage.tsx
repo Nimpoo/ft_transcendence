@@ -28,7 +28,7 @@ function Message(
 						className="rounded-circle bg-cover"
 						style={
 							{
-								backgroundImage: `url("http://${window.location.hostname}:8000${chat.sender.avatar}")`,
+								backgroundImage: `url("https://${window.location.hostname}:8000${chat.sender.avatar}")`,
 								backgroundSize: "cover",
 								backgroundPosition: "center center",
 								backgroundRepeat: "no-repeat",
@@ -50,7 +50,7 @@ function Message(
 						className="rounded-circle bg-cover"
 						style={
 							{
-								backgroundImage: `url("http://${window.location.hostname}:8000${chat.sender.avatar}")`,
+								backgroundImage: `url("https://${window.location.hostname}:8000${chat.sender.avatar}")`,
 								backgroundSize: "cover",
 								backgroundPosition: "center center",
 								backgroundRepeat: "no-repeat",

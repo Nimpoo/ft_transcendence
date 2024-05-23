@@ -12,7 +12,7 @@ function UserSearchBar(props: any): React.JSX.Element {
 		const handleSearch = async () => {
 			if (search)
 			{
-				const response = await fetch(`http://${window.location.hostname}:8000/users/search/?q=${encodeURIComponent(search)}`)
+				const response = await fetch(`https://${window.location.hostname}:8000/users/search/?q=${encodeURIComponent(search)}`)
 				const data = await response.json()
 				setResults(data)
 				clearTimeout(searchTimeout.current)

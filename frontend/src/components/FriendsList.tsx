@@ -53,7 +53,7 @@ function FriendsList(): React.JSX.Element {
 					className="rounded-circle bg-cover m-2"
 					style={
 						{
-							backgroundImage: `url("http://${window.location.hostname}:8000/media/${user.avatar}")`,
+							backgroundImage: `url("https://${window.location.hostname}:8000/media/${user.avatar}")`,
 							backgroundSize: "cover",
 							backgroundPosition: "center center",
 							backgroundRepeat: "no-repeat",
@@ -94,7 +94,7 @@ function FriendsList(): React.JSX.Element {
 					className="rounded-circle bg-cover m-2"
 					style={
 						{
-							backgroundImage: `url("http://${window.location.hostname}:8000/media/${user.avatar}")`,
+							backgroundImage: `url("https://${window.location.hostname}:8000/media/${user.avatar}")`,
 							backgroundSize: "cover",
 							backgroundPosition: "center center",
 							backgroundRepeat: "no-repeat",

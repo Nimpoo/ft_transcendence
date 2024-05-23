@@ -40,7 +40,7 @@ export function SessionProvider({
 		if (cookies.session) {
 			const handleFetch = async () => {
 				const api = (url: string | URL | Request, method: "GET"|"POST"|"DELETE" = "GET", body?: BodyInit) => toast.promise(
-					fetch(`http://${window.location.hostname}:8000${url}`, { headers: { Authorization: `Bearer ${cookies.session}` }, method, body }),
+					fetch(`https://${window.location.hostname}:8000${url}`, { headers: { Authorization: `Bearer ${cookies.session}` }, method, body }),
 					{loading: `Fetching ${url}`, success: `${url} fetched`, error: `Unable to fetch ${url}`}
 				)
 
