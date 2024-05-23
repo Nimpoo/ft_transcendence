@@ -1,10 +1,14 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-import json, asyncio
+import json, asyncio, math
 from uuid import uuid4
 
 
 WAITING_ROOMS = []
+
+MAX_BOUNCE_ANGLE = 5 * math.pi / 12
+ACCELERATION_FACTOR = 1.10
+MAX_SPEED = 0.015
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -17,13 +21,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             if (self.py_2 - self.ph / 2) - 0.01 <= 0:
               self.py_2 = 0 + self.ph / 2
             else:
-              self.py_2 -= 0.01
+              self.py_2 -= 0.021
 
           elif text_data['key'] == 'down' and self.py_2 >= 0:
             if (self.py_2 + self.ph / 2) + 0.01 >= 1:
               self.py_2 = 1 - self.ph / 2
             else:
-              self.py_2 += 0.01
+              self.py_2 += 0.021
 
         except Exception as e:
           print(e)
@@ -54,7 +58,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     try:
       self.x, self.y = 1 / 2, 1 / 2
       self.w, self.h = 1 / 35, 1 / 35
-      self.vx, self.vy = 1 / 600, 1 / 200
+      self.vx, self.vy = (1 / 200), 0
 
       self.px_1, self.py_1 = 1 / 30, 1 / 2
       self.px_2, self.py_2 = 29 / 30, 1 / 2
@@ -91,9 +95,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     # ? Player 1 paddle collision
     if self.x + self.vx + -(self.w / 2) < self.px_1 + -(self.pw / 2):
-      if self.py_1 + (self.ph / 2) > self.y + self.vy + (self.h / 2) > self.py_1 + -(self.ph / 2) or self.py_1 + (self.ph / 2) > self.y + self.vy + -(self.h / 2) > self.py_1 + -(self.ph / 2):
-        print(f'{self.y + self.vy + -(self.h / 2)} --- {self.py_1 + (self.ph / 2)} : {self.py_1 + -(self.ph / 2)}')
-        self.vx *= -1
+      if self.py_1 - (self.ph / 2) < self.y + self.vy < self.py_1 + (self.ph / 2):
+        relative_intersect_y = (self.py_1 - self.y) / (self.ph / 2)
+        bounce_angle = relative_intersect_y * MAX_BOUNCE_ANGLE
+        self.vx = self.ball_speed * math.cos(bounce_angle)
+        self.vy = -self.ball_speed * math.sin(bounce_angle)
+        if self.ball_speed <= MAX_SPEED:
+          self.ball_speed *= ACCELERATION_FACTOR
     # ?
 
     if (self.x + self.vx + (self.w / 2) > 1.01 or self.x + self.vx - (self.w / 2) < -0.01):
@@ -101,13 +109,20 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     # ? Player 2 paddle collision
     if self.x + self.vx + (self.w / 2) > self.px_2 + (self.pw / 2):
-      if self.py_2 + -(self.ph / 2) < self.y + self.vy + -(self.h / 2) < self.py_2 + (self.ph / 2) or self.py_2 + -(self.ph / 2) < self.y + self.vy + (self.h / 2) < self.py_2 + (self.ph / 2):
-        print(f'{self.y + self.vy + -(self.h / 2)} --- {self.py_2 + (self.ph / 2)} : {self.py_2 + -(self.ph / 2)}')
-        self.vx *= -1
+      if self.py_2 - (self.ph / 2) < self.y + self.vy < self.py_2 + (self.ph / 2):
+        relative_intersect_y = (self.py_2 - self.y) / (self.ph / 2)
+        bounce_angle = relative_intersect_y * MAX_BOUNCE_ANGLE
+        self.vx = -self.ball_speed * math.cos(bounce_angle)
+        self.vy = -self.ball_speed * math.sin(bounce_angle)
+        if self.ball_speed <= MAX_SPEED:
+          self.ball_speed *= ACCELERATION_FACTOR
     # ?
 
     if (self.y + self.vy + (self.h / 2) > 1 or self.y + self.vy - (self.h / 2) < 0):
       self.vy *= -1
+
+    self.x += self.vx
+    self.y += self.vy
 
     ball_info['coordinates'] = [self.x, self.y]
     ball_info['dimensions'] = [self.w, self.h]
@@ -124,14 +139,12 @@ class GameConsumer(AsyncWebsocketConsumer):
       'type': 'game.update',
       'new_position': ball_info,
     }))
-
-    self.x += self.vx
-    self.y += self.vy
 ####################################################
 ####################################################
 
 ################## * Connection * ##################
   async def connect(self):
+    self.ball_speed = 0.005
     await self.accept()
 ###################################################*
 
@@ -147,13 +160,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             if (self.py_1 - self.ph / 2) - 0.01 <= 0:
               self.py_1 = 0 + self.ph / 2
             else:
-              self.py_1 -= 0.01
+              self.py_1 -= 0.021
 
           elif data['key'] == 'down' and self.py_1 >= 0:
             if (self.py_1 + self.ph / 2) + 0.01 >= 1:
               self.py_1 = 1 - self.ph / 2
             else:
-              self.py_1 += 0.01
+              self.py_1 += 0.021
 
           ball_info = {
             'coordinates': [self.x, self.y],
