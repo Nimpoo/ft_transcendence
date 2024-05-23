@@ -240,10 +240,13 @@ function Canvas({
 					// ? The score
 					context.fillText(`${score1}`, width / 5, height / 3.75)
 					context.fillText(`${score2}`, width * 4 / 5, height / 3.75)
-
-					// ? The collisions
-						// square.coord[0] += square.dir[0]
-						// square.coord[1] += square.dir[1]
+					if (message && message.type === "game.point") {
+						if (message.player && message.player === "1") {
+							score1 += 1
+						} else if (message.player && message.player === "2") {
+							score2 += 1
+						}
+					}	
 				}
 				// ? /*------------------------------------*/
 /////////////////////////////////////////////////////

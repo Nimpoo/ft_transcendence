@@ -82,6 +82,11 @@ export function GameProvider({
 					}
 					break
 				}
+
+				case "game.point":{
+					setMessage(data)
+					break
+				}
 			}
 		}
 

@@ -41,6 +41,9 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def game_update(self, text_data):
     await self.send(json.dumps(text_data))
     
+  async def game_point(self, text_data):
+    await self.send(json.dumps(text_data))
+    
   async def game_break(self, text_data):
     try:
       cancel = self.loop.cancel()
@@ -63,6 +66,8 @@ class GameConsumer(AsyncWebsocketConsumer):
       self.px_1, self.py_1 = 1 / 30, 1 / 2
       self.px_2, self.py_2 = 29 / 30, 1 / 2
       self.pw, self.ph = 1 / 125, 1 / 5
+
+      self.score1, self.score2 = 0, 0
 
       ball_info = {
         'coordinates': [self.x, self.y],
@@ -104,9 +109,6 @@ class GameConsumer(AsyncWebsocketConsumer):
           self.ball_speed *= ACCELERATION_FACTOR
     # ?
 
-    if (self.x + self.vx + (self.w / 2) > 1.01 or self.x + self.vx - (self.w / 2) < -0.01):
-      self.vx *= -1
-
     # ? Player 2 paddle collision
     if self.x + self.vx + (self.w / 2) > self.px_2 + (self.pw / 2):
       if self.py_2 - (self.ph / 2) < self.y + self.vy < self.py_2 + (self.ph / 2):
@@ -118,8 +120,34 @@ class GameConsumer(AsyncWebsocketConsumer):
           self.ball_speed *= ACCELERATION_FACTOR
     # ?
 
+    # ? Collision woth the top or bot of the screen
     if (self.y + self.vy + (self.h / 2) > 1 or self.y + self.vy - (self.h / 2) < 0):
       self.vy *= -1
+    # ?
+
+    # * ball in the P2 side ---> P1 hit the point
+    if self.x + self.vx + (self.w / 2) > 1.01:
+      for room in WAITING_ROOMS:
+        if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.point',
+            'player': '1',
+          })
+          self.score1 += 1
+      self.vx *= -1
+    # *
+
+    # * ball in the P1 side ---> P2 hit the point
+    if self.x + self.vx - (self.w / 2) < -0.01:
+      for room in WAITING_ROOMS:
+        if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.point',
+            'player': '2',
+          })
+          self.score2 += 1
+      self.vx *= -1
+    # *
 
     self.x += self.vx
     self.y += self.vy
