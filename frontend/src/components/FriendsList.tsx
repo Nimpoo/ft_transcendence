@@ -35,6 +35,14 @@ function FriendsList(): React.JSX.Element {
 	}, [session])
 
 	const FriendsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
+		const [online, setOnline] = useState<boolean>()
+
+		useEffect(() => {
+			fetch(`https://${window.location.hostname}:8000/users/online/?user=${user.id}`)
+				.then(response => response.json())
+				.then(data => setOnline(data["online"]))
+		}, [user])
+
 		const handleRemove = () => {
 			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: user.id }))
 				.catch(() => toast.error("Remove failed, try again"))
@@ -66,6 +74,7 @@ function FriendsList(): React.JSX.Element {
 					<Link href={`/users/${user.login}`}>
 						<h5>{user.display_name}</h5>
 					</Link>
+					<h6>{online != undefined && (online ? "online" : "not online")}</h6>
 					<div className="btn-group">
 						<button className="btn btn-success" onClick={handleRemove}>remove</button>
 						<button className="btn btn-danger" onClick={handleBlock}>block</button>

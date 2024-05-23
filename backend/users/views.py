@@ -145,9 +145,28 @@ def search(request: HttpRequest) -> JsonResponse:
     return JsonResponse([UserSerializer(user).data for user in results], safe=False)
 
 
+@require_GET
 def get_online_users(request: HttpRequest):
+    target_id = request.GET.get("user")
+
+    if target_id is not None:
+        
+        try:
+            id = int(target_id)
+        except ValueError:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "You must provide valid integer."}, status=400
+            )
+
+        try:
+            target = User.objects.get(id=target_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "Not Found", "message": "The provided id does not match a user."}, status=404)
+
+        return JsonResponse({"online": target.id in [consumer.user.id for consumer in all_consumers]})
+
     return JsonResponse(
-        [UserSerializer(consumer.user).data for consumer in set(all_consumers)],
+        [UserSerializer(consumer.user).data for consumer in all_consumers],
         safe=False,
     )
 
