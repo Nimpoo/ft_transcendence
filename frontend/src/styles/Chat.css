@@ -15,6 +15,12 @@
     }
 }
 
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    .font-conv-size {
+        font-size: 20px;
+    }
+}
+
 .box-1-wrap {
     width: 382px;
     height: 511px;
@@ -28,6 +34,13 @@
     .box-1-wrap {
         width: 190px;
         height: 230px;
+    }
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    .box-1-wrap {
+        width: 180px;
+        height: 290px;
     }
 }
 
@@ -79,6 +92,13 @@
     }
 }
 
+@media screen and (min-width: 576px) and (max-width: 767px) {
+   .box-2-wrap {
+        width: 370px;
+        height: 290px;
+   } 
+}
+
 .box-2-title {
     width: 892px;
     height: 65px;
@@ -90,6 +110,13 @@
     .box-2-title {
         width: 346px;
         height: 30px;
+    }
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    .box-2-title {
+        width: 370px;
+        height: 40px;
     }
 }
 
@@ -105,6 +132,13 @@
     .input-style {
         width: 346px;
         height: 30px;
+    }
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    .input-style {
+        width: 370px;
+        height: 40px;
     }
 }
 
@@ -131,6 +165,13 @@
     .conv-box {
         width: 346px;
         height: 150px;
+    }
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    .conv-box {
+        width: 370px;
+        height: 200px;
     }
 }
 
@@ -164,9 +205,20 @@
     background-color: white;
 }
 
-.logo-send {
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    .btn-text-style {
+        height: 39px;
+    }
+}
+
+.img-chat {
     height: auto;
     width: auto;
+}
+
+.logo-send {
+    height: 21px;
+    width: 20px;
 }
 
 .dropplace {

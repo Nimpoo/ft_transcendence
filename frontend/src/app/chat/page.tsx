@@ -181,7 +181,7 @@ function Chat(): React.JSX.Element {
 						</div>
 						<div className="col-3 mt-3">
 							<button type="button" className="btn" onClick={() => setSelectedConversation(undefined)}>
-								<Image className="image"
+								<Image className="img-chat"
 									src={"/assets/svg/Cross.svg"}
 									width={25}
 									height={25}
@@ -257,7 +257,7 @@ function Chat(): React.JSX.Element {
 										<li className="list-inline-item dropplace">
 											<div className="dropdown">
 												<button className="dropbtn" data-bs-auto-close="true">
-													<Image className="icon"
+													<Image className="img-chat"
 														src={"/assets/svg/Three-dots.svg"}
 														width={25}
 														height={10}
@@ -276,7 +276,7 @@ function Chat(): React.JSX.Element {
 								<form className="input-group" onSubmit={handleMessageSend}>
 									<input className="form-control text-box-style" name="msg" type="text" id="input" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" />
 									<button className="btn btn-text-style btn-light" type="submit" id="button-send">
-										<Image className="logo-send"
+										<Image className="img-chat"
 											src={"/assets/svg/Send-logo.svg"}
 											width={21}
 											height={22}
@@ -318,7 +318,7 @@ function Chat(): React.JSX.Element {
 									<input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" disabled></input>
 									<button className="btn btn-text-style btn-light" type="submit" id="button-send" disabled>
 										<Image
-											className="logo"
+											className="logo-send"
 											src={"/assets/svg/Send-logo.svg"}
 											width={21}
 											height={22}
