@@ -29,7 +29,6 @@ function GamingRoom(): React.JSX.Element | null {
 	useEffect(() => {
 		if (gameStatus === "in-game") {
 			const keyhandler = (e: any) => {
-				console.log(e.key)
 				if (e.key === "z" || e.key === "Z") {
 					if (sendMessage) {
 						sendMessage({

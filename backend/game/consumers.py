@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-import json, asyncio, math, random
+import json, asyncio, math, random, time
 from uuid import uuid4
 
 
@@ -37,13 +37,41 @@ class GameConsumer(AsyncWebsocketConsumer):
 
   async def game_join(self, text_data):
     await self.send(json.dumps(text_data))
-    
+
   async def game_update(self, text_data):
     await self.send(json.dumps(text_data))
-    
+
   async def game_point(self, text_data):
     await self.send(json.dumps(text_data))
-    
+
+  async def game_countdown(self, text_data):
+    self.countdown = False
+
+################## AT START ###################
+    if text_data['when'] == 'begin':
+      for seconds in range(3, -1, -1):
+        await self.send(text_data=json.dumps({
+          'type': 'game.countdown',
+          'when': 'begin',
+          'seconds': seconds,
+        }))
+        await asyncio.sleep(1)
+
+      self.countdown = True
+####################################################
+
+################## HIT A POINT ###################
+    elif text_data['when'] == 'in-game':
+      for seconds in range(1, -1, -1):
+        await self.send(text_data=json.dumps({
+          'type': 'game.countdown',
+          'when': 'in-game',
+          'seconds': seconds,
+        }))
+      await asyncio.sleep(1)
+      self.countdown = True
+####################################################
+
   async def game_break(self, text_data):
     try:
       cancel = self.loop.cancel()
@@ -101,6 +129,11 @@ class GameConsumer(AsyncWebsocketConsumer):
         'new_position': ball_info,
       }))
       while True:
+        # ? Countdown for starting a game and when a player hit a point
+        if not self.countdown:
+          await asyncio.sleep(0.016) # 60fps
+          continue
+
         await asyncio.sleep(0.016) # 60fps
         update = await self.update_data(ball_info, update) # ? Line 99
         if update == 0:
@@ -174,6 +207,10 @@ class GameConsumer(AsyncWebsocketConsumer):
             'player': '1',
             'score1': self.score1,
           })
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.countdown',
+            'when': 'in-game'
+          })
           return 1
     # *
 
@@ -186,6 +223,10 @@ class GameConsumer(AsyncWebsocketConsumer):
             'type': 'game.point',
             'player': '2',
             'score2': self.score2,
+          })
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.countdown',
+            'when': 'in-game'
           })
           return 2
     # *
@@ -262,6 +303,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     ############### Launch The Game ################
     if data['type'] == 'game.begin':
+      await self.channel_layer.group_send(self.room_group_name, {
+        'type': 'game.countdown',
+        'when': 'begin',
+      })
       await self.game_begin() # ? Line 55
     ################################################
 

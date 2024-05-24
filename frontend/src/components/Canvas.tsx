@@ -9,6 +9,8 @@ import { useGame } from "@/providers/Game"
 
 import "@/styles/game/Game.css"
 
+var time = 0
+
 var score1 = 0
 var score2 = 0
 
@@ -217,6 +219,17 @@ function Canvas({
 				}
 				// * /*------------------------------------*/
 
+				// * /*------------ COUNTDOWN -------------*/
+				if (message && message.type === "game.countdown") {
+					if (message.when === "begin") {
+						time = message.seconds
+					}
+
+					if (message.when === "in-game") {
+						time = 10
+					}
+				}
+				// * /*------------------------------------*/
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
 
@@ -227,6 +240,17 @@ function Canvas({
 
 					ground()
 
+					if (time !== 0) {
+						if (time !== 10) {
+							context.font = "120px Pong"
+							context.fillText(`${time}`, width / 2, height / 2)
+							return
+						} else {
+							time = 0
+							return
+						}
+					}
+
 					context.fillText("0", width / 5, height / 3.75)
 					context.fillText("0", width * 4 / 5, height / 3.75)
 				}
@@ -235,8 +259,19 @@ function Canvas({
 				// ? /*----------- PLAYING MODE -----------*/
 				const playing = () => {
 					context.clearRect(0, 0, canvas.width, canvas.height)
-	
+
 					ground()
+
+					if (time !== 0) {
+						if (time !== 10) {
+							context.font = "120px Pong"
+							context.fillText(`${time}`, width / 2, height / 2)
+							return
+						} else {
+							time = 0
+							return
+						}
+					}
 
 					// ? The ball
 					square.draw()
