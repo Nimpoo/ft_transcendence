@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-import json, asyncio, math
+import json, asyncio, math, random
 from uuid import uuid4
 
 
@@ -72,6 +72,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 ####################################################
 ####################################################
   async def game_loop(self):
+    update = 1
+    
     try:
       self.x, self.y = 1 / 2, 1 / 2
       self.w, self.h = 1 / 35, 1 / 35
@@ -100,7 +102,32 @@ class GameConsumer(AsyncWebsocketConsumer):
       }))
       while True:
         await asyncio.sleep(0.016) # 60fps
-        await self.update_data(ball_info) # ? Line 93
+        update = await self.update_data(ball_info, update) # ? Line 99
+        if update == 0:
+          continue
+        else:
+          self.x, self.y = 1 / 2, 1 / 2
+          self.w, self.h = 1 / 35, 1 / 35
+          if update == 1:
+            self.vx, self.vy = -(1 / 200), random.uniform(-0.005, 0.005)
+          else:
+            self.vx, self.vy = (1 / 200), random.uniform(-0.005, 0.005)
+
+
+          self.px_1, self.py_1 = 1 / 30, 1 / 2
+          self.px_2, self.py_2 = 29 / 30, 1 / 2
+          self.pw, self.ph = 1 / 125, 1 / 5
+          
+          await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'game.update',
+            'new_position': ball_info,
+          })
+          await self.send(text_data=json.dumps({
+            'type': 'game.update',
+            'new_position': ball_info,
+          }))
+          update = 0
+          continue
     except asyncio.CancelledError:
       print('GAME LOOP WAS INTERUPTED')
       del ball_info, self.x, self.y, self.w, self.h, self.py_1, self.py_2, self.px_1, self.px_2, self.loop
@@ -108,7 +135,7 @@ class GameConsumer(AsyncWebsocketConsumer):
       pass
 ####################################################
 ####################################################
-  async def update_data(self, ball_info: dict[str, list[float]]):
+  async def update_data(self, ball_info: dict[str, list[float]], update: int) -> int:
 
     # ? Player 1 paddle collision
     if self.x + self.vx + -(self.w / 2) < self.px_1 + -(self.pw / 2):
@@ -147,7 +174,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             'player': '1',
             'score1': self.score1,
           })
-      self.vx *= -1
+          return 1
     # *
 
     # * ball in the P1 side ---> P2 hit the point
@@ -160,7 +187,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             'player': '2',
             'score2': self.score2,
           })
-      self.vx *= -1
+          return 2
     # *
 
     self.x += self.vx
@@ -181,6 +208,8 @@ class GameConsumer(AsyncWebsocketConsumer):
       'type': 'game.update',
       'new_position': ball_info,
     }))
+    
+    return 0
 ####################################################
 ####################################################
 
