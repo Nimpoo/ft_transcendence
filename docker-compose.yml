@@ -1,38 +1,70 @@
-version: '3'
-
 services:
 
   ping:
     build:
-      context: frontend/
+      context: frontend
       args:
-        - NEXT_PUBLIC_REDIRECT_URI=${NEXT_PUBLIC_REDIRECT_URI}
-        - NEXT_PUBLIC_CLIENT_ID=${NEXT_PUBLIC_CLIENT_ID}
+        - NEXT_PUBLIC_REDIRECT_URI=${REDIRECT_URI}
+        - NEXT_PUBLIC_CLIENT_ID=${CLIENT_ID}
         - CLIENT_SECRET=${CLIENT_SECRET}
     ports:
       - 3000:3000
-    env_file: .env
-    depends_on:
-      - pong
-    restart: unless-stopped
+    restart: always
 
   pong:
-    build:
-      context: backend/
-      args:
-        - JWT_SECRET=${JWT_SECRET}
-        - POSTGRES_HOST=${POSTGRES_HOST}
-        - POSTGRES_DB=${POSTGRES_DB}
-        - POSTGRES_USER=${POSTGRES_USER}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - 8000:8000
-    env_file: .env
+    build: backend
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./backend/media:/media
+      - ./backend/static:/static
     depends_on:
-      - postgres
-    restart: unless-stopped
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
 
   postgres:
     image: postgres
-    env_file: .env
-    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always
+
+  redis:
+    image: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always
+
+  nginx:
+    image: nginx
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend/static:/static:ro
+      - ./backend/media:/media:ro
+      - ./nginx/ft_transcendence.conf:/etc/nginx/conf.d/ft_transcendence.conf
+      - ./nginx/certificates:/certificates
+    depends_on:
+      - pong
+    restart: always

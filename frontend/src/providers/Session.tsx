@@ -1,27 +1,26 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from "react"
 import { useCookies } from "react-cookie"
 import toast from "react-hot-toast"
 
-interface Session {
-	id: number,
-	nickname: string
-}
 
-interface Error {
-	error: string,
-	message: string
+interface Session extends User { // token undefied when setSession
+	api: (url: string | URL | Request, method?: "GET"|"POST"|"DELETE", body?: BodyInit) => Promise<Response>
+	token: string
+	dfa_secret: string | null
 }
 
 type Status = "loading"|"connected"|"disconnected"
 
 const SessionContext = createContext<{
 	session: Session|null,
-	status: Status
+	status: Status,
+	setSession: Dispatch<SetStateAction<Session | null>>|null
 }>({
 	session: null,
-	status: "loading"
+	status: "loading",
+	setSession: null
 })
 
 export function useSession() {
@@ -38,44 +37,29 @@ export function SessionProvider({
 	const [cookies, setCookie, removeCookie] = useCookies(["session"])
 
 	useEffect(() => {
-		const handleFetch = async () => {
-
-			const response = await toast.promise(
-				fetch(
-					"/api/users/me",
-					{
-						headers: {
-							Authorization: `Bearer ${cookies.session}`
-						}
-					}
-				),
-				{
-					loading: "Fetching /users/me",
-					success: "/users/me fetched",
-					error: "Unable to fetch /users/me"
-				}
-			)
-
-			const data = await response.json()
-
-			if (response.status != 200) {
-				toast.error(data.message)
-				removeCookie("session")
-				setStatus("disconnected")
-				setSession(null)
-			}
-
-			else {
-				setStatus("connected")
-				setSession(data)
-				toast(`Hi, ${data.nickname}!`, {icon: "👋"})
-			}
-
-		}
-
 		if (cookies.session) {
+			const handleFetch = async () => {
+				const api = (url: string | URL | Request, method: "GET"|"POST"|"DELETE" = "GET", body?: BodyInit) => toast.promise(
+					fetch(`https://${window.location.hostname}:8000${url}`, { headers: { Authorization: `Bearer ${cookies.session}` }, method, body }),
+					{loading: `Fetching ${url}`, success: `${url} fetched`, error: `Unable to fetch ${url}`}
+				)
+
+				const response = await api("/users/me/")
+
+				if (response.status != 200) {
+					throw new Error(`/users/me returned ${response.status}`)
+				}
+
+				else {
+					const data = await response.json()
+					setSession({...data, api, token: cookies.session})
+					setStatus("connected")
+				}
+			}
+			
 			handleFetch().catch(e => {
-				toast.error("Something went wrong, try again.")
+				toast.error(e.message)
+				removeCookie("session")
 				setStatus("disconnected")
 				setSession(null)
 			})
@@ -83,11 +67,10 @@ export function SessionProvider({
 			setStatus("disconnected")
 			setSession(null)
 		}
-
 	}, [cookies, removeCookie])
 
 	return (
-		<SessionContext.Provider value={{ session, status }}>
+		<SessionContext.Provider value={{session, status, setSession}}>
 			{children}
 		</SessionContext.Provider>
 	)

@@ -9,6 +9,8 @@ import { useEffect } from "react"
 import { useSession } from "@/providers/Session"
 
 import "@/styles/profile/Profile.css"
+import FriendsList from "@/components/FriendsList"
+import Loading from "../loading"
 
 function Profile(): React.JSX.Element {
 	const router = useRouter()
@@ -22,7 +24,7 @@ function Profile(): React.JSX.Element {
 	}, [router, status])
 
 	if (session == null || status != "connected") {
-		return <></> // todo loading
+		return <Loading />
 	}
 
 	return (
@@ -31,13 +33,18 @@ function Profile(): React.JSX.Element {
 
 				<div className="bento" style={{height: "48%"}}>
 					<div className="default-wrapper">
-						<Image style={{borderRadius: "50%"}} priority
-							src={"https://thispersondoesnotexist.com"}
-							width={200}
-							height={200}
-							alt="Your profile picture"
+						<div
+							className="rounded-circle bg-cover"
+							style={{
+								backgroundImage: `url("https://${window.location.hostname}:8000${session.avatar}")`,
+								backgroundSize: "cover",
+								backgroundPosition: "center center",
+								backgroundRepeat: "no-repeat",
+								width: "200px",
+								height: "200px"
+							}}
 						/>
-						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>{session.nickname}</h1>
+						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>{session.display_name}</h1>
 					</div>
 				</div>
 
@@ -101,7 +108,7 @@ function Profile(): React.JSX.Element {
 			</div>
 
 			<div className="bento" style={{width: "310px"}}>
-				{/* FRIENDS */}
+				<FriendsList />
 			</div>
 		</main>
 	)

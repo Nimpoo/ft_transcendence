@@ -12,7 +12,7 @@ function Header(): React.JSX.Element {
 	const { createModal } = useModal()
 
 	function play(value: "luffy" | "zoro" | "nami" | "usopp") {
-		let audioObject:HTMLAudioElement = new Audio(`sound/${value}.wav`)
+		let audioObject:HTMLAudioElement = new Audio(`/assets/sounds/${value}.wav`)
 		audioObject.volume = 0.3
 		audioObject.autoplay = true
 	}
@@ -35,7 +35,7 @@ function Header(): React.JSX.Element {
 					className="button-selector"
 				>
 					<Image
-						src={"/svg/linkedin_logo.svg"}
+						src={"/assets/svg/linkedin_logo.svg"}
 						width={40}
 						height={40}
 						alt="LinkedIn logo"
@@ -49,7 +49,7 @@ function Header(): React.JSX.Element {
 				>
 					<Image
 						style={{margin: "0.25rem"}}
-						src={"/svg/github_logo.svg"}
+						src={"/assets/svg/github_logo.svg"}
 						width={32}
 						height={32}
 						alt="GitHub logo"
@@ -63,7 +63,7 @@ function Header(): React.JSX.Element {
 				>
 					<Image
 						style={{margin: "0.25rem"}}
-						src={"/svg/mail_logo.svg"}
+						src={"/assets/svg/mail_logo.svg"}
 						width={32}
 						height={32}
 						alt="Mail logo"
@@ -94,7 +94,7 @@ function Header(): React.JSX.Element {
 					className="button-selector"
 				>
 					<Image
-						src={"/svg/linkedin_logo.svg"}
+						src={"/assets/svg/linkedin_logo.svg"}
 						width={40}
 						height={40}
 						alt="LinkedIn logo"
@@ -108,7 +108,7 @@ function Header(): React.JSX.Element {
 				>
 					<Image
 						style={{margin: "0.25rem"}}
-						src={"/svg/github_logo.svg"}
+						src={"/assets/svg/github_logo.svg"}
 						width={32}
 						height={32}
 						alt="GitHub logo"
@@ -122,7 +122,7 @@ function Header(): React.JSX.Element {
 				>
 					<Image
 						style={{margin: "0.25rem"}}
-						src={"/svg/mail_logo.svg"}
+						src={"/assets/svg/mail_logo.svg"}
 						width={32}
 						height={32}
 						alt="Mail logo"
@@ -153,7 +153,7 @@ function Header(): React.JSX.Element {
 					className="button-selector"
 				>
 					<Image
-						src={"/svg/linkedin_logo.svg"}
+						src={"/assets/svg/linkedin_logo.svg"}
 						width={40}
 						height={40}
 						alt="LinkedIn logo"
@@ -167,7 +167,7 @@ function Header(): React.JSX.Element {
 				>
 					<Image
 						style={{margin: "0.25rem"}}
-						src={"/svg/github_logo.svg"}
+						src={"/assets/svg/github_logo.svg"}
 						width={32}
 						height={32}
 						alt="GitHub logo"
@@ -181,7 +181,7 @@ function Header(): React.JSX.Element {
 				>
 					<Image
 						style={{margin: "0.25rem"}}
-						src={"/svg/mail_logo.svg"}
+						src={"/assets/svg/mail_logo.svg"}
 						width={32}
 						height={32}
 						alt="Mail logo"
@@ -212,7 +212,7 @@ function Header(): React.JSX.Element {
 					className="button-selector"
 				>
 					<Image
-						src={"/svg/linkedin_logo.svg"}
+						src={"/assets/svg/linkedin_logo.svg"}
 						width={40}
 						height={40}
 						alt="LinkedIn logo"
@@ -226,7 +226,7 @@ function Header(): React.JSX.Element {
 				>
 					<Image
 						style={{margin: "0.25rem"}}
-						src={"/svg/github_logo.svg"}
+						src={"/assets/svg/github_logo.svg"}
 						width={32}
 						height={32}
 						alt="GitHub logo"
@@ -240,7 +240,7 @@ function Header(): React.JSX.Element {
 				>
 					<Image
 						style={{margin: "0.25rem"}}
-						src={"/svg/mail_logo.svg"}
+						src={"/assets/svg/mail_logo.svg"}
 						width={32}
 						height={32}
 						alt="Mail logo"
@@ -280,9 +280,9 @@ function Header(): React.JSX.Element {
 			{/* ---------------------------------------------------------------- */}
 
 			<Link href="/">
-				<h1 className="title">
+				<div className="title-header">
 					The Transcendence
-				</h1>
+				</div>
 			</Link>
 
 			{/* ------------------------- ZORO - NOAH -------------------------- */}
