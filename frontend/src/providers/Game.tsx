@@ -11,6 +11,7 @@ const GameContext = createContext<{
 	gameStatus: "pending" | "in-game" | "finished",
 	setGameStatus: React.Dispatch<React.SetStateAction<"pending" | "in-game" | "finished">>,
 	players: string[],
+	winner: string[],
 	play: (value: "paddle" | "wall" | "score") => void,
 }>({
 	sendMessage: (message: any) => {},
@@ -18,6 +19,7 @@ const GameContext = createContext<{
 	gameStatus: "pending",
 	setGameStatus: () => {},
 	players: [],
+	winner: [],
 	play: function() {},
 })
 
@@ -37,6 +39,7 @@ export function GameProvider({
 	const [ws, setWs] = useState<WebSocket | null>(null)
 	const [message, setMessage] = useState<any>()
 	const [gameStatus, setGameStatus] = useState<"pending" | "in-game" | "finished">("pending")
+	const [winner, setWinner] = useState<string[]>(["display_name", "id"])
 
 	function play(value: "paddle" | "wall" | "score") {
 		let audioObject:HTMLAudioElement = new Audio(`/sound/game/${value}.wav`)
@@ -104,6 +107,13 @@ export function GameProvider({
 					setMessage(data)
 					break
 				}
+
+				case "game.finished": {
+					setGameStatus("finished")
+					setWinner([data.winner, data.id])
+					setMessage(data)
+					break
+				}
 			}
 		}
 
@@ -127,7 +137,7 @@ export function GameProvider({
 	}
 
 	return (
-		<GameContext.Provider value={{ players, sendMessage, message, gameStatus, setGameStatus, play }}>
+		<GameContext.Provider value={{ players, sendMessage, message, gameStatus, setGameStatus, winner, play }}>
 			{children}
 		</GameContext.Provider>
 	)

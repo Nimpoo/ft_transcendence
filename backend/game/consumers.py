@@ -44,6 +44,18 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def game_point(self, text_data):
     await self.send(json.dumps(text_data))
 
+  async def game_finished(self, text_data):
+    if hasattr(self, "game_loop"):
+      try:
+        cancel = self.loop.cancel()
+        print(f'cancel [DISCONNECT]: {cancel}')
+      except Exception as e:
+        await self.channel_layer.group_send(self.room_group_name, {
+          'type': 'game.break',
+        })
+        pass
+    await self.send(json.dumps(text_data))
+
   async def game_countdown(self, text_data):
     self.countdown = False
 
@@ -219,8 +231,13 @@ class GameConsumer(AsyncWebsocketConsumer):
           })
           await self.channel_layer.group_send(self.room_group_name, {
             'type': 'game.countdown',
-            'when': 'in-game'
+            'when': 'in-game',
           })
+          if self.score1 == 10:
+            await self.channel_layer.group_send(self.room_group_name, {
+              'type': 'game.finished',
+              'winner': room['players'][0],
+            })
           return 1
     # *
 
@@ -236,8 +253,13 @@ class GameConsumer(AsyncWebsocketConsumer):
           })
           await self.channel_layer.group_send(self.room_group_name, {
             'type': 'game.countdown',
-            'when': 'in-game'
+            'when': 'in-game',
           })
+          if self.score2 == 10:
+            await self.channel_layer.group_send(self.room_group_name, {
+              'type': 'game.finished',
+              'winner': room['players'][1],
+            })
           return 2
     # *
 

@@ -62,16 +62,17 @@ function Canvas({
 
 	const router = useRouter()
 
+	const { session } = useSession()
+	const { createModal } = useModal()
+	const { message, sendMessage, gameStatus, setGameStatus, winner, play } = useGame()
+
 	// ? /*--------- End Game Screen ----------*/
 	const endGame =
 	<button>
-		PLACEHOLDER
+		<p>{winner[0]}</p>
+		<p>{winner[1]}</p>
 	</button>
 	// ? /*------------------------------------*/
-
-	const { session } = useSession()
-	const { createModal } = useModal()
-	const { message, sendMessage, gameStatus, setGameStatus, play } = useGame()
 
 	const ref = useRef<HTMLCanvasElement>(null)
 
