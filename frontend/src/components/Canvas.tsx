@@ -216,6 +216,17 @@ function Canvas({
 					if (message.player && message.score2 && message.player === "2") {
 						score2 = message.score2
 					}
+				} else if (message && (message.type === "game.create" || message.type === "game.join")) {
+					try {
+						score1 = message.score1
+					} catch {
+						score1 = 0
+					}
+					try {
+						score2 = message.score2
+					} catch {
+						score2 = 0
+					}
 				}
 				// * /*------------------------------------*/
 
@@ -228,7 +239,8 @@ function Canvas({
 					}
 
 					if (message.when === "in-game") {
-						time = 10
+						play("score")
+						time = -1
 					}
 				}
 				// * /*------------------------------------*/
@@ -243,7 +255,7 @@ function Canvas({
 					ground()
 
 					if (time !== 0) {
-						if (time !== 10) {
+						if (time > 0) {
 							context.font = "120px Pong"
 							context.fillText(`${time}`, width / 2, height / 2)
 							return
@@ -265,7 +277,7 @@ function Canvas({
 					ground()
 
 					if (time !== 0) {
-						if (time !== 10) {
+						if (time !== -1) {
 							context.font = "120px Pong"
 							context.fillText(`${time}`, width / 2, height / 2)
 							return

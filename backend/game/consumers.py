@@ -164,6 +164,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             'new_position': ball_info,
           }))
           update = 0
+          self.ball_speed = 0.005
           continue
     except asyncio.CancelledError:
       print('GAME LOOP WAS INTERUPTED')
@@ -360,6 +361,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         'room_uuid': str(room_uuid),
         'players': [self.username],
         'message': f'A new room was created by {data['user']}.',
+        'score1': self.score1,
+        'score2': self.score2,
       }))
       WAITING_ROOMS.append({
         'room_uuid': str(room_uuid),
@@ -383,10 +386,12 @@ class GameConsumer(AsyncWebsocketConsumer):
           )
           room['players'].append(self.username)
           await self.channel_layer.group_send(self.room_group_name, {
-              'type': 'game.join',
-              'room_uuid': room['room_uuid'],
-              'players': room['players'],
-              'message': f'{data['user']} has joined the room.',
+            'type': 'game.join',
+            'room_uuid': room['room_uuid'],
+            'players': room['players'],
+            'message': f'{data['user']} has joined the room.',
+            'score1': self.score1,
+            'score2': self.score2,
           })
           break
 
