@@ -317,7 +317,8 @@ function Canvas({
 						if (sendMessage) {
 							sendMessage({
 								"type": "game.finished",
-								"user": session?.nickname,
+								"user": session?.display_name,
+								"id": session?.id.toString(),
 							})
 						}
 						router.push("/game")

@@ -1,5 +1,7 @@
 "use client"
 
+import { Ubuntu } from "next/font/google"
+
 import Link from "next/link"
 import Image from "next/image"
 import CountUp from "react-countup"
@@ -12,6 +14,10 @@ import FriendsList from "@/components/FriendsList"
 import UserSearchBar from "@/components/UserSearchBar"
 import Loading from "./loading"
 
+const ubu = Ubuntu ({
+	subsets: ["latin"],
+	weight: "700",
+})
 
 function Home(): React.JSX.Element {
 	const { session, status } = useSession()

@@ -21,7 +21,8 @@ function Game(): React.JSX.Element {
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.create",
-				"user": session?.nickname,
+				"user": session?.display_name,
+				"id": session?.id.toString(),
 			})
 		}
 	}
@@ -30,7 +31,8 @@ function Game(): React.JSX.Element {
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.join",
-				"user": session?.nickname,
+				"user": session?.display_name,
+				"id": session?.id.toString(),
 			})
 		}
 	}

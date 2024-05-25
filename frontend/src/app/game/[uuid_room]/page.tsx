@@ -33,18 +33,20 @@ function GamingRoom(): React.JSX.Element | null {
 					if (sendMessage) {
 						sendMessage({
 							"type": "game.paddle",
-							"user": session?.nickname,
+							"user": session?.display_name,
+							"id": session?.id.toString(),
 							"key": "up",
-							"player": `${players && players[0] === session?.nickname ? "1" : "2"}`
+							"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
 						})
 					}
 				} else if (e.key === "s" || e.key === "S") {
 					if (sendMessage) {
 						sendMessage({
 							"type": "game.paddle",
-							"user": session?.nickname,
+							"user": session?.display_name,
+							"id": session?.id.toString(),
 							"key": "down",
-							"player": `${players && players[0] === session?.nickname ? "1" : "2"}`
+							"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
 						})
 					}
 				}
@@ -63,7 +65,8 @@ function GamingRoom(): React.JSX.Element | null {
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.begin",
-				"user": session?.nickname,
+				"user": session?.display_name,
+				"id": session?.id.toString(),
 			})
 		}
 	}
@@ -83,7 +86,7 @@ function GamingRoom(): React.JSX.Element | null {
 				<h5>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</h5>
 			</div>
 			<Canvas />
-			{begin && players[0] === session?.nickname && (
+			{begin && players[0] === session?.display_name && (
 				<div>
 					{players[1] ? (
 						<button 

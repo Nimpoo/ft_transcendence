@@ -45,7 +45,7 @@ export function GameProvider({
 	}
 
 	useEffect(() => {
-		const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/game/`)
+		const ws = new WebSocket(`wss://${window.location.hostname}:8000/game/`)
 
 		ws.onopen = (event: Event) => {
 			console.log("Websocket Open ✅")
