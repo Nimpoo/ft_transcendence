@@ -11,12 +11,14 @@ const GameContext = createContext<{
 	gameStatus: "pending" | "in-game" | "finished",
 	setGameStatus: React.Dispatch<React.SetStateAction<"pending" | "in-game" | "finished">>,
 	players: string[],
+	play: (value: "paddle" | "wall" | "score") => void,
 }>({
 	sendMessage: (message: any) => {},
 	message: undefined,
 	gameStatus: "pending",
 	setGameStatus: () => {},
 	players: [],
+	play: function() {},
 })
 
 export function useGame() {
@@ -35,6 +37,12 @@ export function GameProvider({
 	const [ws, setWs] = useState<WebSocket | null>(null)
 	const [message, setMessage] = useState<any>()
 	const [gameStatus, setGameStatus] = useState<"pending" | "in-game" | "finished">("pending")
+
+	function play(value: "paddle" | "wall" | "score") {
+		let audioObject:HTMLAudioElement = new Audio(`/sound/game/${value}.wav`)
+		audioObject.volume = 1
+		audioObject.autoplay = true
+	}
 
 	useEffect(() => {
 		const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/game/`)
@@ -81,6 +89,9 @@ export function GameProvider({
 					if (gameStatus !== "in-game") {
 						setGameStatus("in-game")
 					}
+					if (data.new_position.sound) {
+						play(data.new_position.sound)
+					}
 					break
 				}
 
@@ -116,7 +127,7 @@ export function GameProvider({
 	}
 
 	return (
-		<GameContext.Provider value={{ players, sendMessage, message, gameStatus, setGameStatus }}>
+		<GameContext.Provider value={{ players, sendMessage, message, gameStatus, setGameStatus, play }}>
 			{children}
 		</GameContext.Provider>
 	)

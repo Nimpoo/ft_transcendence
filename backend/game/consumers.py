@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-import json, asyncio, math, random, time
+import json, asyncio, math, random
 from uuid import uuid4
 
 
@@ -49,12 +49,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 ################## AT START ###################
     if text_data['when'] == 'begin':
-      for seconds in range(3, -1, -1):
-        await self.send(text_data=json.dumps({
+      sounds = ['', 'wall', 'paddle', 'score']
+      for i, seconds in enumerate(range(3, -1, -1)):
+        data = {
           'type': 'game.countdown',
           'when': 'begin',
           'seconds': seconds,
-        }))
+        }
+        if i < len(sounds):
+          data['sound'] = sounds[i]
+        await self.send(text_data=json.dumps(data))
         await asyncio.sleep(1)
 
       self.countdown = True
@@ -150,7 +154,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           self.px_1, self.py_1 = 1 / 30, 1 / 2
           self.px_2, self.py_2 = 29 / 30, 1 / 2
           self.pw, self.ph = 1 / 125, 1 / 5
-          
+
           await self.channel_layer.group_send(self.room_group_name, {
             'type': 'game.update',
             'new_position': ball_info,
@@ -179,6 +183,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.vy = -self.ball_speed * math.sin(bounce_angle)
         if self.ball_speed <= MAX_SPEED:
           self.ball_speed *= ACCELERATION_FACTOR
+
+        ball_info['sound'] = 'paddle'
     # ?
 
     # ? Player 2 paddle collision
@@ -190,11 +196,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.vy = -self.ball_speed * math.sin(bounce_angle)
         if self.ball_speed <= MAX_SPEED:
           self.ball_speed *= ACCELERATION_FACTOR
+
+        ball_info['sound'] = 'paddle'
     # ?
 
     # ? Collision woth the top or bot of the screen
     if (self.y + self.vy + (self.h / 2) > 1 or self.y + self.vy - (self.h / 2) < 0):
       self.vy *= -1
+      ball_info['sound'] = 'wall'
     # ?
 
     # * ball in the P2 side ---> P1 hit the point
@@ -249,6 +258,8 @@ class GameConsumer(AsyncWebsocketConsumer):
       'type': 'game.update',
       'new_position': ball_info,
     }))
+    if 'sound' in ball_info:
+      del ball_info['sound']
     
     return 0
 ####################################################

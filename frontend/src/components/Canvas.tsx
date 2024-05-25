@@ -71,7 +71,7 @@ function Canvas({
 
 	const { session } = useSession()
 	const { createModal } = useModal()
-	const { message, sendMessage, gameStatus, setGameStatus } = useGame()
+	const { message, sendMessage, gameStatus, setGameStatus, play } = useGame()
 
 	const ref = useRef<HTMLCanvasElement>(null)
 
@@ -222,6 +222,8 @@ function Canvas({
 				// * /*------------ COUNTDOWN -------------*/
 				if (message && message.type === "game.countdown") {
 					if (message.when === "begin") {
+						if (message.sound)
+							play(message.sound)
 						time = message.seconds
 					}
 
