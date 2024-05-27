@@ -1,5 +1,9 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from .models import create_game_stats, User
+
+from channels.db import database_sync_to_async
+
 import json, asyncio, math, random
 from uuid import uuid4
 
@@ -9,6 +13,7 @@ WAITING_ROOMS = []
 MAX_BOUNCE_ANGLE = 5 * math.pi / 12
 ACCELERATION_FACTOR = 1.10
 MAX_SPEED = 0.015
+END_GAME = 10
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -54,6 +59,52 @@ class GameConsumer(AsyncWebsocketConsumer):
           'type': 'game.break',
         })
         pass
+
+    for room in WAITING_ROOMS:
+      if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+        room['players'].remove(self.username)
+        if not room['players']:
+          WAITING_ROOMS.remove(room)
+        elif room['host'] == self.username:
+          room['host'] = room['players'][0]
+        await self.channel_layer.group_send(self.room_group_name, {
+          'type': 'game.quit',
+          'players': room['players'],
+          'message': f'{self.username} has left the room.',
+        })
+        break
+
+      await self.channel_layer.group_discard(
+        self.room_group_name,
+        self.channel_name
+      )
+
+    try:
+      for room in WAITING_ROOMS:
+        if room['room_uuid'] == self.room_group_name.split('_')[-1]:
+          player_1 = room['players'][0]
+          player_2 = room['players'][1] if len(room['players']) > 1 else None
+          score1 = self.score1
+          score2 = self.score2
+
+          # Trouver les instances User correspondantes
+          user_1 = await database_sync_to_async(User.objects.get)(login=player_1)
+          user_2 = await database_sync_to_async(User.objects.get)(login=player_2) if player_2 else None
+
+          # Créer une instance GameStats
+          await database_sync_to_async(create_game_stats)(
+            room['room_uuid'],
+            player_1,
+            player_2,
+            score1,
+            score2
+          )
+          break
+
+    except Exception as e:
+      print(f'You are not the host: [{e}]')
+
+    self.score1, self.score2 = 0, 0
     await self.send(json.dumps(text_data))
 
   async def game_countdown(self, text_data):
@@ -233,7 +284,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             'type': 'game.countdown',
             'when': 'in-game',
           })
-          if self.score1 == 10:
+          if self.score1 == END_GAME:
             await self.channel_layer.group_send(self.room_group_name, {
               'type': 'game.finished',
               'winner': room['players'][0],
@@ -255,7 +306,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             'type': 'game.countdown',
             'when': 'in-game',
           })
-          if self.score2 == 10:
+          if self.score2 == END_GAME:
             await self.channel_layer.group_send(self.room_group_name, {
               'type': 'game.finished',
               'winner': room['players'][1],
@@ -298,6 +349,7 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def receive(self, text_data=None, bytes_data=None):
     data = json.loads(text_data)
     self.username = data.get('user', 'unknown_player')
+    self.id = data.get('id', 'ERROR')
     ############## Paddles Movements ###############
     if data['type'] == 'game.paddle':
       for room in WAITING_ROOMS:
