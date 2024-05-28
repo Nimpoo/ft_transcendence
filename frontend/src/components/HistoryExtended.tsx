@@ -6,6 +6,7 @@ import { useSession } from "@/providers/Session"
 
 import "@/styles/profile/Profile.css"
 import Link from "next/link"
+import toast from "react-hot-toast"
 
 function HistoryExtended(): React.JSX.Element {
 
@@ -14,16 +15,26 @@ function HistoryExtended(): React.JSX.Element {
 	const [Game, setGames] = useState<Game[]>()
 
 	useEffect(() => {
-		const fetchStats = async () => {
+		if (session)
+		{
+			const fetchStats = async () => {
+				const response = await toast.promise(
+					fetch(`https://${window.location.hostname}:8000/game/?user=${session?.id}`),
+					{
+						loading: `Fetching /game/?user=${session?.id}`,
+						success: `/game/?user=${session?.id} fetched`,
+						error: `Unable to fetch /game/?user=${session?.id}`
+					}
+				)
 
-			const response = await session?.api("/game")
-			if (response?.ok) {
-				const data = await response.json()
-				setGames(data)
+				if (response?.ok) {
+					const data = await response.json()
+					setGames(data)
+				}
 			}
-		}
 
-		fetchStats()
+			fetchStats()
+		}
 	}, [])
 
 	const formatDateTime = (datetime: string) => {
