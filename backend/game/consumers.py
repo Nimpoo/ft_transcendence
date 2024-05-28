@@ -72,13 +72,26 @@ class GameConsumer(AsyncWebsocketConsumer):
           user_1 = await sync_to_async(User.objects.get)(login=player_1)
           user_2 = await sync_to_async(User.objects.get)(login=player_2)
 
-          await sync_to_async(Game.objects.create)(
+          trophy_change = abs(score1 - score2) * 3
+
+          game = await sync_to_async(Game.objects.create)(
             player_1=user_1,
             player_2=user_2,
             score1=score1,
             score2=score2,
             room_uuid=room["room_uuid"],
           )
+
+          game.winner.trophies += trophy_change
+          if game.winner.highest_trophies < game.winner.trophies:
+            game.winner.highest_trophies = game.winner.trophies
+          await sync_to_async(game.winner.save)()
+
+          game.looser.trophies -= trophy_change
+          if game.looser.trophies < 0:
+            game.looser.trophies = 0
+          await sync_to_async(game.looser.save)()
+
           break
 
     except Exception as e:

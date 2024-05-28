@@ -71,7 +71,7 @@ function Home(): React.JSX.Element {
 						<div className="pseudo-trophy-wrapper truncate">
 							<h3 style={{fontSize: "1.5rem", lineHeight: "2rem"}}>{session.display_name}</h3>
 							<div className="trophies">
-								<CountUp duration={5} className="truncate" style={{paddingLeft: "0.5rem", paddingRight: "0.5rem"}} end={0} />
+								<CountUp duration={5} className="truncate" style={{paddingLeft: "0.5rem", paddingRight: "0.5rem"}} end={session.trophies} />
 								<Image priority
 									src={"/assets/ranking/trophy.png"}
 									width={35}
