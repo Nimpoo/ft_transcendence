@@ -31,7 +31,7 @@ function History(): React.JSX.Element {
 	return (
 		<>
 			{Game?.map((stat, index) => (
-				<div className="finished-games" key={index}>
+				<div className="finished-games-small" key={index}>
 					<div className="align-self-center ms-1">
 						<Image className="game"
 							src={"/assets/svg/pong.svg"}

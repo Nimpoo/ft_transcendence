@@ -203,10 +203,14 @@ class GameConsumer(AsyncWebsocketConsumer):
       await self.channel_layer.group_send(self.room_group_name, {
         "type": "game.update",
         "new_position": ball_info,
+        "score1": self.score1,
+        "score2": self.score2,
       })
       await self.send(text_data=json.dumps({
         "type": "game.update",
         "new_position": ball_info,
+        "score1": self.score1,
+        "score2": self.score2,
       }))
       while True:
         # ? Countdown for starting a game and when a player hit a point
@@ -234,10 +238,14 @@ class GameConsumer(AsyncWebsocketConsumer):
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.update",
             "new_position": ball_info,
+            "score1": self.score1,
+            "score2": self.score2,
           })
           await self.send(text_data=json.dumps({
             "type": "game.update",
             "new_position": ball_info,
+            "score1": self.score1,
+            "score2": self.score2,
           }))
           update = 0
           self.ball_speed = 0.005
@@ -340,10 +348,14 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.channel_layer.group_send(self.room_group_name, {
       "type": "game.update",
       "new_position": ball_info,
+      "score1": self.score1,
+      "score2": self.score2,
     })
     await self.send(text_data=json.dumps({
       "type": "game.update",
       "new_position": ball_info,
+      "score1": self.score1,
+      "score2": self.score2,
     }))
     if "sound" in ball_info:
       del ball_info["sound"]
@@ -390,6 +402,8 @@ class GameConsumer(AsyncWebsocketConsumer):
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.update",
             "new_position": ball_info,
+            "score1": self.score1,
+            "score2": self.score2,
           })
 
         elif room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and data["player"] == "2":

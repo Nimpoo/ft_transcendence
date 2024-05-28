@@ -11,6 +11,7 @@ import { useSession } from "@/providers/Session"
 import "@/styles/profile/Profile.css"
 import FriendsList from "@/components/FriendsList"
 import Loading from "../loading"
+import HistoryExtended from "@/components/HistoryExtended"
 
 function Profile(): React.JSX.Element {
 	const router = useRouter()
@@ -103,8 +104,8 @@ function Profile(): React.JSX.Element {
 
 			</div>
 
-			<div className="bento" style={{width: "620px"}}>
-				{/* HISTORY GAMES */}
+			<div className="bento_history spaceY-between-btn-4" style={{width: "620px"}}>
+				<HistoryExtended />
 			</div>
 
 			<div className="bento" style={{width: "310px"}}>
