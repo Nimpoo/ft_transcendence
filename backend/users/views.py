@@ -24,8 +24,8 @@ from users.consumers import all_consumers
 class Index(View):
 
     def get(self, request: HttpRequest):
-        users = User.objects.all().order_by("id")[:10].values("id", "login", "display_name", "avatar", "created_at")
-        return JsonResponse(list(users), safe=False)
+        users = User.objects.all().order_by("id")[:10]
+        return JsonResponse(list([UserSerializer(user).data for user in users]), safe=False)
 
     def post(self, request: HttpRequest):  # Create user
         if len(request.body) == 0:

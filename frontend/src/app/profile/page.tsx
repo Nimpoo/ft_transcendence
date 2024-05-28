@@ -51,7 +51,7 @@ function Profile(): React.JSX.Element {
 				<div className="bento" style={{height: "48%"}}>
 					<div className="stats-wrapper">
 						<div className="trophies-ranking">
-							<CountUp duration={5} className="trophies-number truncate" end={0} />
+							<CountUp duration={5} className="trophies-number truncate" end={session.trophies} />
 							<Image priority
 								src={"/assets/ranking/trophy.png"}
 								width={72}
@@ -82,22 +82,22 @@ function Profile(): React.JSX.Element {
 								alt="Trophy"
 							/>
 						</div>
-						<CountUp duration={5} className="truncate" end={0} />
+						<CountUp duration={5} className="truncate" end={session.highest_trophies} />
 					</div>
 
 					<div className="stats-info">
 						<span>Games played</span>
-						<CountUp duration={5} className="truncate" end={0} />
+						<CountUp duration={5} className="truncate" end={session.games_played} />
 					</div>
 
 					<div className="stats-info" style={{color: "rgb(34 197 94)"}}>
 						<span>Victories</span>
-						<CountUp duration={5} className="truncate" end={0} />
+						<CountUp duration={5} className="truncate" end={session.victories} />
 					</div>
 
 					<div className="stats-info" style={{color: "rgb(239 68 68)"}}>
 						<span>Defeats</span>
-						<CountUp duration={5} className="truncate" end={0} />
+						<CountUp duration={5} className="truncate" end={session.defeats} />
 					</div>
 				</div>
 

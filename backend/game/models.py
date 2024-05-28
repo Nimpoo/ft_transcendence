@@ -14,13 +14,13 @@ class Game(models.Model):
   score2 = models.IntegerField(blank=False)
 
   @property
-  def winner(self):
+  def winner(self) -> User:
     if self.score1 > self.score2:
       return self.player_1
     return self.player_2
 
   @property
-  def looser(self):
+  def looser(self) -> User:
     if self.score1 > self.score2:
       return self.player_2
     return self.player_1

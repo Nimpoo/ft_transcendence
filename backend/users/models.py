@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 
 class User(models.Model):
@@ -10,8 +11,29 @@ class User(models.Model):
     dfa_secret = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    friends = models.ManyToManyField("self", blank=True, symmetrical=True)
-    blocked = models.ManyToManyField("self", blank=True, symmetrical=False)
+    friends = models.ManyToManyField("self")
+    blocked = models.ManyToManyField("self", symmetrical=False)
+
+    trophies = models.IntegerField(default=0)
+    highest_trophies = models.IntegerField(default=0)
+
+    @property
+    def games_played(self) -> int:
+        from game.models import Game
+
+        return len(Game.objects.filter(Q(player_1=self) | Q(player_2=self)))
+
+    @property
+    def victories(self) -> int:
+        from game.models import Game
+
+        return len([game for game in Game.objects.filter(Q(player_1=self) | Q(player_2=self)) if game.winner.id == self.id])
+
+    @property
+    def defeats(self) -> int:
+        from game.models import Game
+
+        return len([game for game in Game.objects.filter(Q(player_1=self) | Q(player_2=self)) if game.looser.id == self.id])
 
     def __str__(self) -> str:
         return self.login
