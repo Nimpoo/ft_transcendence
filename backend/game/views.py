@@ -1,18 +1,32 @@
-from django.http import JsonResponse
-from django.utils.decorators import method_decorator
-from django.views import View
+from django.http import HttpRequest, JsonResponse
 from django.db.models import Q
 
-from game.serializers import GameStatSerializer
 from users.models import User
-from utils.decorators import need_user
-
 from game.models import Game
+from game.serializers import GameStatSerializer
 
 
-class GameStatsView(View):
+def get_games(request: HttpRequest) -> JsonResponse:
+    target_id = request.GET.get("user")
 
-  @method_decorator(need_user, name="dispatch")
-  def get(self, request, user: User):
-    game_stats = Game.objects.filter(Q(player_1=user) | Q(player_2=user)).order_by("-id")
-    return JsonResponse(list([GameStatSerializer(game_stat).data for game_stat in game_stats]), safe=False)
+    if target_id is None:
+        return JsonResponse(
+            {"error": "Bad Request", "message": "Missing 'user'."},
+            status=400,
+        )
+
+    try:
+        target = User.objects.get(id=target_id)
+    except ValueError:
+        return JsonResponse(
+            {"error": "Bad Request", "message": "You must provide a valid integer."},
+            status=400,
+        )
+    except User.DoesNotExist:
+        return JsonResponse(
+            {"error": "Not Found", "message": "The provided id does not match a user."},
+            status=404
+        )
+
+    game_stats = Game.objects.filter(Q(player_1=target) | Q(player_2=target)).order_by("-id")
+    return JsonResponse([GameStatSerializer(game_stat).data for game_stat in game_stats], safe=False)

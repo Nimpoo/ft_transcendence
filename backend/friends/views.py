@@ -17,7 +17,7 @@ import json
 
 @need_user
 def get_friend_request(request: HttpRequest, user: User) -> JsonResponse:
-    query_id = request.GET.get("user_id")
+    query_id = request.GET.get("user")
 
     if query_id is None:
         return JsonResponse(
@@ -58,12 +58,29 @@ def get_friend_request(request: HttpRequest, user: User) -> JsonResponse:
 class Friend(View):
     channel_layer = get_channel_layer()
 
-    @method_decorator((need_user), name="dispatch")
-    def get(self, request: HttpRequest, user: User) -> JsonResponse:
-        return JsonResponse(
-            list(user.friends.values("id", "login", "display_name", "avatar", "created_at")),
-            safe=False,
-        )
+    def get(self, request: HttpRequest) -> JsonResponse:
+        target_id = request.GET.get("user")
+
+        if target_id is None:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "Missing 'user'."},
+                status=400,
+            )
+
+        try:
+            target = User.objects.get(id=target_id)
+        except ValueError:
+            return JsonResponse(
+                {"error": "Bad Request", "message": "You must provide a valid integer."},
+                status=400,
+            )
+        except User.DoesNotExist:
+            return JsonResponse(
+                {"error": "Not Found", "message": "The provided id does not match a user."},
+                status=404
+            )
+
+        return JsonResponse([UserSerializer(user).data for user in target.friends.all()], safe=False)
 
     @method_decorator((need_user), name="dispatch")
     def post(self, request: HttpRequest, user: User) -> JsonResponse:
