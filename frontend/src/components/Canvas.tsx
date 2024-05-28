@@ -76,11 +76,12 @@ function Canvas({
 
 	const ref = useRef<HTMLCanvasElement>(null)
 
-	var coord_maj:	[number, number] = [0, 0]
-	var dim_maj:		[number, number] = [0, 0]
-	var dir_maj:		[number, number] = [0, 0]
-
 	useEffect(() => {
+
+		var coord_maj: [number, number] = [0, 0]
+		var dim_maj:   [number, number] = [0, 0]
+		var dir_maj:   [number, number] = [0, 0]
+
 		// * get the current ref
 		const canvas = ref.current
 

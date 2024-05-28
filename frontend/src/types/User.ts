@@ -4,5 +4,5 @@ interface User
 	login: string
 	display_name: string
 	avatar: string
-	created_at: Date
+	created_at: string
 }

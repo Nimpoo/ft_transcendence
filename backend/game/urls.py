@@ -4,5 +4,5 @@ from game import views
 
 
 urlpatterns = [
-  path('', views.GameStats.as_view()),
+  path("", views.GameStatsView.as_view(), name="index"),
 ]

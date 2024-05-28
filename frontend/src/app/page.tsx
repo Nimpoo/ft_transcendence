@@ -12,6 +12,8 @@ import "@/styles/Rainbow.css"
 import { useSession } from "@/providers/Session"
 import FriendsList from "@/components/FriendsList"
 import UserSearchBar from "@/components/UserSearchBar"
+import History from "@/components/History"
+
 import Loading from "./loading"
 
 const ubu = Ubuntu ({
@@ -33,50 +35,7 @@ function Home(): React.JSX.Element {
 
 				<div className="history-bento space-between-btn-4">
 					<div className="vstack gap-3 scrollab">
-						<div className="finished-games">
-							<div className="align-self-center ms-1">
-								<Image className="game"
-									src={"/assets/svg/pong.svg"}
-									width={61}
-									height={61}
-									alt="Pong logo"
-								/>
-							</div>
-							<div className="align-self-center ms-1">
-								<Image className="separator"
-									src={"/assets/svg/line.svg"}
-									width={1}
-									height={66}
-									alt="Line"
-								/>
-							</div>
-							<div className="flex-column align-self-center ms-4">
-								<div className="usernames">noalexan VS Giuugiu</div>
-								<div className="score">10 - 8</div>
-							</div>
-						</div>
-						<div className="finished-games">
-							<div className="align-self-center ms-1">
-								<Image className="game"
-									src={"/assets/svg/pong.svg"}
-									width={61}
-									height={61}
-									alt="Pong logo"
-								/>
-							</div>
-							<div className="align-self-center ms-1">
-								<Image className="separator"
-									src={"/assets/svg/line.svg"}
-									width={1}
-									height={66}
-									alt="Line"
-								/>
-							</div>
-							<div className="flex-column align-self-center ms-4">
-								<div className="usernames">MrVodki VS Nimpô</div>
-								<div className="score">10 - 5</div>
-							</div>
-						</div>
+						<History />
 					</div>
 				</div>
 

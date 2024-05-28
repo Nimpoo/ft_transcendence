@@ -1,11 +1,14 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-
-from .models import create_game_stats, User
-
-from channels.db import database_sync_to_async
-
-import json, asyncio, math, random
+from asgiref.sync import sync_to_async
 from uuid import uuid4
+
+from users.models import User
+from game.models import Game
+
+import json
+import asyncio
+import math
+import random
 
 
 WAITING_ROOMS = []
@@ -20,15 +23,15 @@ class GameConsumer(AsyncWebsocketConsumer):
 ############# ? Channel Send Message ? ##############
   async def game_paddles(self, text_data):
     for room in WAITING_ROOMS:
-      if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players'] and text_data['player'] == '2':
+      if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and text_data["player"] == "2":
         try:
-          if text_data['key'] == 'up' and self.py_2 <= 1:
+          if text_data["key"] == "up" and self.py_2 <= 1:
             if (self.py_2 - self.ph / 2) - 0.01 <= 0:
               self.py_2 = 0 + self.ph / 2
             else:
               self.py_2 -= 0.021
 
-          elif text_data['key'] == 'down' and self.py_2 >= 0:
+          elif text_data["key"] == "down" and self.py_2 >= 0:
             if (self.py_2 + self.ph / 2) + 0.01 >= 1:
               self.py_2 = 1 - self.ph / 2
             else:
@@ -50,77 +53,74 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.send(json.dumps(text_data))
 
   async def game_finished(self, text_data):
-    if hasattr(self, "game_loop"):
-      try:
-        cancel = self.loop.cancel()
-        print(f'cancel [DISCONNECT]: {cancel}')
-      except Exception as e:
-        await self.channel_layer.group_send(self.room_group_name, {
-          'type': 'game.break',
-        })
-        pass
-
-    for room in WAITING_ROOMS:
-      if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
-        room['players'].remove(self.username)
-        if not room['players']:
-          WAITING_ROOMS.remove(room)
-        elif room['host'] == self.username:
-          room['host'] = room['players'][0]
-        await self.channel_layer.group_send(self.room_group_name, {
-          'type': 'game.quit',
-          'players': room['players'],
-          'message': f'{self.username} has left the room.',
-        })
-        break
-
-      await self.channel_layer.group_discard(
-        self.room_group_name,
-        self.channel_name
-      )
+    try:
+      cancel = self.loop.cancel()
+      print(f"cancel [DISCONNECT]: {cancel}")
+    except Exception as e:
+      await self.channel_layer.group_send(self.room_group_name,{
+        "type": "game.break",
+      })
 
     try:
       for room in WAITING_ROOMS:
-        if room['room_uuid'] == self.room_group_name.split('_')[-1]:
-          player_1 = room['players'][0]
-          player_2 = room['players'][1] if len(room['players']) > 1 else None
+        if room["room_uuid"] == self.room_group_name.split("_")[-1]:
+          player_1 = room["players"][0]
+          player_2 = room["players"][1]
           score1 = self.score1
           score2 = self.score2
 
-          # Trouver les instances User correspondantes
-          user_1 = await database_sync_to_async(User.objects.get)(login=player_1)
-          user_2 = await database_sync_to_async(User.objects.get)(login=player_2) if player_2 else None
+          user_1 = await sync_to_async(User.objects.get)(login=player_1)
+          user_2 = await sync_to_async(User.objects.get)(login=player_2)
 
-          # Créer une instance GameStats
-          await database_sync_to_async(create_game_stats)(
-            room['room_uuid'],
-            player_1,
-            player_2,
-            score1,
-            score2
+          await sync_to_async(Game.objects.create)(
+            player_1=user_1,
+            player_2=user_2,
+            score1=score1,
+            score2=score2,
+            room_uuid=room["room_uuid"],
           )
           break
 
     except Exception as e:
-      print(f'You are not the host: [{e}]')
+      await self.send(json.dumps({'error': f'You are not the host: [{e}]'}))
+
+    for room in WAITING_ROOMS:
+      if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
+        room["players"].remove(self.username)
+        if not room["players"]:
+          WAITING_ROOMS.remove(room)
+        elif room["host"] == self.username:
+          room["host"] = room["players"][0]
+        await self.channel_layer.group_send(self.room_group_name, {
+          "type": "game.quit",
+          "players": room["players"],
+          "message": f"{self.username} has left the room.",
+        })
+        break
 
     self.score1, self.score2 = 0, 0
+
+    await self.channel_layer.group_discard(
+      self.room_group_name,
+      self.channel_name
+    )
+
     await self.send(json.dumps(text_data))
 
   async def game_countdown(self, text_data):
     self.countdown = False
 
 ################## AT START ###################
-    if text_data['when'] == 'begin':
-      sounds = ['', 'wall', 'paddle', 'score']
+    if text_data["when"] == "begin":
+      sounds = ["", "wall", "paddle", "score"]
       for i, seconds in enumerate(range(3, -1, -1)):
         data = {
-          'type': 'game.countdown',
-          'when': 'begin',
-          'seconds': seconds,
+          "type": "game.countdown",
+          "when": "begin",
+          "seconds": seconds,
         }
         if i < len(sounds):
-          data['sound'] = sounds[i]
+          data["sound"] = sounds[i]
         await self.send(text_data=json.dumps(data))
         await asyncio.sleep(1)
 
@@ -128,12 +128,12 @@ class GameConsumer(AsyncWebsocketConsumer):
 ####################################################
 
 ################## HIT A POINT ###################
-    elif text_data['when'] == 'in-game':
+    elif text_data["when"] == "in-game":
       for seconds in range(1, -1, -1):
         await self.send(text_data=json.dumps({
-          'type': 'game.countdown',
-          'when': 'in-game',
-          'seconds': seconds,
+          "type": "game.countdown",
+          "when": "in-game",
+          "seconds": seconds,
         }))
       await asyncio.sleep(1)
       self.countdown = True
@@ -142,7 +142,7 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def game_break(self, text_data):
     try:
       cancel = self.loop.cancel()
-      print(f'cancel [CHANNELS]: {cancel}')
+      print(f"cancel [CHANNELS]: {cancel}")
     except Exception as e:
       pass
 ###################################################?
@@ -152,15 +152,15 @@ class GameConsumer(AsyncWebsocketConsumer):
     self.score2 = 0
 
     await self.channel_layer.group_send(self.room_group_name, {
-      'type': 'game.point',
-      'player': '1',
-      'score1': '0',
+      "type": "game.point",
+      "player": "1",
+      "score1": "0",
     })
 
     await self.channel_layer.group_send(self.room_group_name, {
-      'type': 'game.point',
-      'player': '2',
-      'score2': '0',
+      "type": "game.point",
+      "player": "2",
+      "score2": "0",
     })
     self.loop = asyncio.create_task(self.game_loop()) # ? Line 60
 
@@ -179,21 +179,21 @@ class GameConsumer(AsyncWebsocketConsumer):
       self.pw, self.ph = 1 / 125, 1 / 5
 
       ball_info = {
-        'coordinates': [self.x, self.y],
-        'dimensions': [self.w, self.h],
-        'speed': [self.vx, self.vy],
-        'paddle_coord_1': [self.px_1, self.py_1],
-        'paddle_coord_2': [self.px_2, self.py_2],
-        'paddle_dimensions': [self.pw, self.ph],
+        "coordinates": [self.x, self.y],
+        "dimensions": [self.w, self.h],
+        "speed": [self.vx, self.vy],
+        "paddle_coord_1": [self.px_1, self.py_1],
+        "paddle_coord_2": [self.px_2, self.py_2],
+        "paddle_dimensions": [self.pw, self.ph],
       }
 
       await self.channel_layer.group_send(self.room_group_name, {
-        'type': 'game.update',
-        'new_position': ball_info,
+        "type": "game.update",
+        "new_position": ball_info,
       })
       await self.send(text_data=json.dumps({
-        'type': 'game.update',
-        'new_position': ball_info,
+        "type": "game.update",
+        "new_position": ball_info,
       }))
       while True:
         # ? Countdown for starting a game and when a player hit a point
@@ -219,18 +219,18 @@ class GameConsumer(AsyncWebsocketConsumer):
           self.pw, self.ph = 1 / 125, 1 / 5
 
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.update',
-            'new_position': ball_info,
+            "type": "game.update",
+            "new_position": ball_info,
           })
           await self.send(text_data=json.dumps({
-            'type': 'game.update',
-            'new_position': ball_info,
+            "type": "game.update",
+            "new_position": ball_info,
           }))
           update = 0
           self.ball_speed = 0.005
           continue
     except asyncio.CancelledError:
-      print('GAME LOOP WAS INTERUPTED')
+      print("GAME LOOP WAS INTERUPTED")
       del ball_info, self.x, self.y, self.w, self.h, self.py_1, self.py_2, self.px_1, self.px_2, self.loop
 
       pass
@@ -248,7 +248,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         if self.ball_speed <= MAX_SPEED:
           self.ball_speed *= ACCELERATION_FACTOR
 
-        ball_info['sound'] = 'paddle'
+        ball_info["sound"] = "paddle"
     # ?
 
     # ? Player 2 paddle collision
@@ -261,33 +261,33 @@ class GameConsumer(AsyncWebsocketConsumer):
         if self.ball_speed <= MAX_SPEED:
           self.ball_speed *= ACCELERATION_FACTOR
 
-        ball_info['sound'] = 'paddle'
+        ball_info["sound"] = "paddle"
     # ?
 
     # ? Collision woth the top or bot of the screen
     if (self.y + self.vy + (self.h / 2) > 1 or self.y + self.vy - (self.h / 2) < 0):
       self.vy *= -1
-      ball_info['sound'] = 'wall'
+      ball_info["sound"] = "wall"
     # ?
 
     # * ball in the P2 side ---> P1 hit the point
     if self.x + self.vx + (self.w / 2) > 1.01:
       for room in WAITING_ROOMS:
-        if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+        if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
           self.score1 += 1
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.point',
-            'player': '1',
-            'score1': self.score1,
+            "type": "game.point",
+            "player": "1",
+            "score1": self.score1,
           })
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.countdown',
-            'when': 'in-game',
+            "type": "game.countdown",
+            "when": "in-game",
           })
           if self.score1 == END_GAME:
             await self.channel_layer.group_send(self.room_group_name, {
-              'type': 'game.finished',
-              'winner': room['players'][0],
+              "type": "game.finished",
+              "winner": room["players"][0],
             })
           return 1
     # *
@@ -295,21 +295,21 @@ class GameConsumer(AsyncWebsocketConsumer):
     # * ball in the P1 side ---> P2 hit the point
     if self.x + self.vx - (self.w / 2) < -0.01:
       for room in WAITING_ROOMS:
-        if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
+        if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
           self.score2 += 1
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.point',
-            'player': '2',
-            'score2': self.score2,
+            "type": "game.point",
+            "player": "2",
+            "score2": self.score2,
           })
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.countdown',
-            'when': 'in-game',
+            "type": "game.countdown",
+            "when": "in-game",
           })
           if self.score2 == END_GAME:
             await self.channel_layer.group_send(self.room_group_name, {
-              'type': 'game.finished',
-              'winner': room['players'][1],
+              "type": "game.finished",
+              "winner": room["players"][1],
             })
           return 2
     # *
@@ -317,23 +317,23 @@ class GameConsumer(AsyncWebsocketConsumer):
     self.x += self.vx
     self.y += self.vy
 
-    ball_info['coordinates'] = [self.x, self.y]
-    ball_info['dimensions'] = [self.w, self.h]
-    ball_info['speed'] = [self.vx, self.vy]
-    ball_info['paddle_coord_1'] = [self.px_1, self.py_1]
-    ball_info['paddle_coord_2'] = [self.px_2, self.py_2]
-    ball_info['paddle_dimensions'] = [self.pw, self.ph]
+    ball_info["coordinates"] = [self.x, self.y]
+    ball_info["dimensions"] = [self.w, self.h]
+    ball_info["speed"] = [self.vx, self.vy]
+    ball_info["paddle_coord_1"] = [self.px_1, self.py_1]
+    ball_info["paddle_coord_2"] = [self.px_2, self.py_2]
+    ball_info["paddle_dimensions"] = [self.pw, self.ph]
 
     await self.channel_layer.group_send(self.room_group_name, {
-      'type': 'game.update',
-      'new_position': ball_info,
+      "type": "game.update",
+      "new_position": ball_info,
     })
     await self.send(text_data=json.dumps({
-      'type': 'game.update',
-      'new_position': ball_info,
+      "type": "game.update",
+      "new_position": ball_info,
     }))
-    if 'sound' in ball_info:
-      del ball_info['sound']
+    if "sound" in ball_info:
+      del ball_info["sound"]
     
     return 0
 ####################################################
@@ -348,68 +348,68 @@ class GameConsumer(AsyncWebsocketConsumer):
 #################### ? Receive ? ###################
   async def receive(self, text_data=None, bytes_data=None):
     data = json.loads(text_data)
-    self.username = data.get('user', 'unknown_player')
-    self.id = data.get('id', 'ERROR')
+    self.username = data.get("user", "unknown_player")
+    self.id = data.get("id", "ERROR")
     ############## Paddles Movements ###############
-    if data['type'] == 'game.paddle':
+    if data["type"] == "game.paddle":
       for room in WAITING_ROOMS:
-        if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players'] and data['player'] == '1':
-          if data['key'] == 'up' and self.py_1 <= 1:
+        if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and data["player"] == "1":
+          if data["key"] == "up" and self.py_1 <= 1:
             if (self.py_1 - self.ph / 2) - 0.01 <= 0:
               self.py_1 = 0 + self.ph / 2
             else:
               self.py_1 -= 0.021
 
-          elif data['key'] == 'down' and self.py_1 >= 0:
+          elif data["key"] == "down" and self.py_1 >= 0:
             if (self.py_1 + self.ph / 2) + 0.01 >= 1:
               self.py_1 = 1 - self.ph / 2
             else:
               self.py_1 += 0.021
 
           ball_info = {
-            'coordinates': [self.x, self.y],
-            'dimensions': [self.w, self.h],
-            'speed': [self.vx, self.vy],
-            'paddle_coord_1': [self.px_1, self.py_1],
-            'paddle_coord_2': [self.px_2, self.py_2],
-            'paddle_dimensions': [self.pw, self.ph],
+            "coordinates": [self.x, self.y],
+            "dimensions": [self.w, self.h],
+            "speed": [self.vx, self.vy],
+            "paddle_coord_1": [self.px_1, self.py_1],
+            "paddle_coord_2": [self.px_2, self.py_2],
+            "paddle_dimensions": [self.pw, self.ph],
           }
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.update',
-            'new_position': ball_info,
+            "type": "game.update",
+            "new_position": ball_info,
           })
 
-        elif room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players'] and data['player'] == '2':
+        elif room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and data["player"] == "2":
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.paddles',
-            'key': data['key'],
-            'player': '2',
+            "type": "game.paddles",
+            "key": data["key"],
+            "player": "2",
           })
     ################################################
 
     ############### Launch The Game ################
-    if data['type'] == 'game.begin':
+    if data["type"] == "game.begin":
       await self.channel_layer.group_send(self.room_group_name, {
-        'type': 'game.countdown',
-        'when': 'begin',
+        "type": "game.countdown",
+        "when": "begin",
       })
       await self.game_begin() # ? Line 55
     ################################################
 
     ############### Finish The Game ################
-    if data['type'] == 'game.finished':
-      if hasattr(self, 'room_group_name'):
+    if data["type"] == "game.finished":
+      if hasattr(self, "room_group_name"):
         for room in WAITING_ROOMS:
-          if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
-            room['players'].remove(self.username)
-            if not room['players']:
+          if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
+            room["players"].remove(self.username)
+            if not room["players"]:
               WAITING_ROOMS.remove(room)
-            elif room['host'] == self.username:
-              room['host'] = room['players'][0]
+            elif room["host"] == self.username:
+              room["host"] = room["players"][0]
             await self.channel_layer.group_send(self.room_group_name, {
-              'type': 'game.quit',
-              'players': room['players'],
-              'message': f'{self.username} has left the room.',
+              "type": "game.quit",
+              "players": room["players"],
+              "message": f"{self.username} has left the room.",
             })
             break
 
@@ -419,11 +419,11 @@ class GameConsumer(AsyncWebsocketConsumer):
         )
     ################################################
 
-    ############### Creation a Room ################
-    if data['type'] == 'game.create':
+    ############## Creation of a Room ##############
+    if data["type"] == "game.create":
       self.score1, self.score2 = 0, 0
       room_uuid = uuid4()
-      self.room_group_name = f'game_room_{room_uuid}'
+      self.room_group_name = f"game_room_{room_uuid}"
 
       await self.channel_layer.group_add(
         self.room_group_name,
@@ -431,48 +431,48 @@ class GameConsumer(AsyncWebsocketConsumer):
       )
 
       await self.send(text_data=json.dumps({
-        'type': 'game.create',
-        'room_uuid': str(room_uuid),
-        'players': [self.username],
-        'message': f'A new room was created by {data['user']}.',
-        'score1': self.score1,
-        'score2': self.score2,
+        "type": "game.create",
+        "room_uuid": str(room_uuid),
+        "players": [self.username],
+        "message": f"A new room was created by {data["user"]}.",
+        "score1": self.score1,
+        "score2": self.score2,
       }))
       WAITING_ROOMS.append({
-        'room_uuid': str(room_uuid),
-        'host': self.username,
-        'limit': 2,
-        'players': [
+        "room_uuid": str(room_uuid),
+        "host": self.username,
+        "limit": 2,
+        "players": [
           self.username,
         ],
       })
     ################################################
 
     ################ Joining a Room ################
-    elif data['type'] == 'game.join':
+    elif data["type"] == "game.join":
       self.score1, self.score2 = 0, 0
       for room in WAITING_ROOMS:
-        if room['room_uuid'] and len(room['players']) < room['limit']:
-          self.room_group_name = f'game_room_{room['room_uuid']}'
+        if room["room_uuid"] and len(room["players"]) < room["limit"]:
+          self.room_group_name = f"game_room_{room["room_uuid"]}"
           await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
           )
-          room['players'].append(self.username)
+          room["players"].append(self.username)
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.join',
-            'room_uuid': room['room_uuid'],
-            'players': room['players'],
-            'message': f'{data['user']} has joined the room.',
-            'score1': self.score1,
-            'score2': self.score2,
+            "type": "game.join",
+            "room_uuid": room["room_uuid"],
+            "players": room["players"],
+            "message": f"{data["user"]} has joined the room.",
+            "score1": self.score1,
+            "score2": self.score2,
           })
           break
 
       else:
         await self.send(text_data=json.dumps({
-          'type': 'game.null',
-          'message': 'No lobby found.',
+          "type": "game.null",
+          "message": "No lobby found.",
         }))
         return
     ################################################
@@ -480,29 +480,29 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 ################ ! Deconnection ! #################
   async def disconnect(self, close_code):
-    if hasattr(self, 'room_group_name'):
+    if hasattr(self, "room_group_name"):
 
       if hasattr(self, "game_loop"):
         try:
           cancel = self.loop.cancel()
-          print(f'cancel [DISCONNECT]: {cancel}')
+          print(f"cancel [DISCONNECT]: {cancel}")
         except Exception as e:
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.break',
+            "type": "game.break",
           })
           pass
 
       for room in WAITING_ROOMS:
-        if room['room_uuid'] == self.room_group_name.split('_')[-1] and self.username in room['players']:
-          room['players'].remove(self.username)
-          if not room['players']:
+        if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
+          room["players"].remove(self.username)
+          if not room["players"]:
             WAITING_ROOMS.remove(room)
-          elif room['host'] == self.username:
-            room['host'] = room['players'][0]
+          elif room["host"] == self.username:
+            room["host"] = room["players"][0]
           await self.channel_layer.group_send(self.room_group_name, {
-            'type': 'game.quit',
-            'players': room['players'],
-            'message': f'{self.username} has left the room.',
+            "type": "game.quit",
+            "players": room["players"],
+            "message": f"{self.username} has left the room.",
           })
           break
 
