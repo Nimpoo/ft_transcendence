@@ -318,7 +318,6 @@ function Chat(): React.JSX.Element {
 									<input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" disabled></input>
 									<button className="btn btn-text-style btn-light" type="submit" id="button-send" disabled>
 										<Image
-											className="logo-send"
 											src={"/assets/svg/Send-logo.svg"}
 											width={21}
 											height={22}
