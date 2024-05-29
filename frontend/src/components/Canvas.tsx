@@ -148,6 +148,12 @@ function Canvas({
 							context.restore()
 						},
 					}
+
+					if (message.score1) {
+						score1 = message.score1
+					} if (message.score2) {
+						score2 = message.score2
+					}
 				}
 				// ! /*------------------------------------*/
 
