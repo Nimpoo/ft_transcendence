@@ -93,7 +93,7 @@ a {
 }
 
 .big-button-xl {
-	width: 25rem;
+	width: 26rem;
 	height: 215px;
 
 	border-radius: 1.5rem;
@@ -117,6 +117,10 @@ a {
 
 .big-button-xl:active {
 	background-color: rgb(217 217 217 / 0.6);
+}
+
+.margin-btn {
+	margin-right: 200px;
 }
 
 .truncate {

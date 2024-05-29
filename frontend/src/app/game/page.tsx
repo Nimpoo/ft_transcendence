@@ -38,16 +38,21 @@ function Game(): React.JSX.Element {
 	}
 
 	return (
-		<div style={{display: "flex", justifyContent: "center"}}>
+		<div className="mt-auto">
+			<div style={{display: "flex", justifyContent: "center"}}>
+				<button onClick={joinGame} className={ `margin-btn big-button-xl ${ubu.className}` }>
+					<span className="stroke rainbow-text">JOIN A GAME</span>
+				</button>
 
-			<button onClick={joinGame} className={ "big-button-xl " + ubu.className }>
-				<span className="stroke rainbow-text">JOIN A GAME</span>
-			</button>
-
-			<button onClick={createGame} className={ "big-button-xl " + ubu.className }>
-				<span className="stroke rainbow-text">CREATE A ROOM</span>
-			</button>
-
+				<button onClick={createGame} className={ `big-button-xl ${ubu.className}` }>
+					<span className="stroke rainbow-text">CREATE A ROOM</span>
+				</button>
+			</div>
+			<div className="mt-3" style={{display: "flex", justifyContent: "center"}}>
+				<button className={ `big-button-xl ${ubu.className}` }>
+					<span className="stroke rainbow-text text-break">TORNAMENT</span>
+				</button>
+			</div>
 		</div>
 	)
 }
