@@ -10,6 +10,7 @@ import Loading from "@/app/loading"
 import CountUp from "react-countup"
 import Image from "next/image"
 import FriendsList from "@/components/FriendsList"
+import HistoryExtended from "@/components/HistoryExtended"
 
 function UserProfile({ params }: { params: { login: string } }): React.JSX.Element {
 	const router = useRouter()
@@ -165,7 +166,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 			</div>
 
 			<div className="bento" style={{width: "620px"}}>
-				{/* HISTORY GAMES */}
+				<HistoryExtended user={user} />
 			</div>
 
 			<div className="bento" style={{width: "310px"}}>

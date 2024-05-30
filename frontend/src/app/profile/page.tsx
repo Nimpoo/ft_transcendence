@@ -61,13 +61,13 @@ function Profile(): React.JSX.Element {
 							/>
 						</div>
 						<div className="trophies-ranking" style={{marginTop: "0.25rem"}}>
-						<h3 className="ranking-ladder">Challenger - I</h3>
-						<Image priority
-							src={"/assets/ranking/challenger_1.png"}
-							width={45}
-							height={45}
-							alt="Challenger - I"
-						/>
+							<h3 className="ranking-ladder">Challenger - I</h3>
+							<Image priority
+								src={"/assets/ranking/challenger_1.png"}
+								width={45}
+								height={45}
+								alt="Challenger - I"
+							/>
 						</div>
 					</div>
 

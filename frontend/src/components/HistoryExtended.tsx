@@ -8,26 +8,38 @@ import "@/styles/profile/Profile.css"
 import Link from "next/link"
 import toast from "react-hot-toast"
 
-function HistoryExtended(): React.JSX.Element {
-
+function HistoryExtended({
+	user
+}: {
+	user?: User
+}): React.JSX.Element
+{
 	const { session } = useSession()
-
 	const [Game, setGames] = useState<Game[]>()
 
+	if (session)
+	{
+		if (user === undefined)
+		{
+			user = session
+		}
+	}
+
 	useEffect(() => {
-		if (session)
+		if (user)
 		{
 			const fetchStats = async () => {
 				const response = await toast.promise(
-					fetch(`https://${window.location.hostname}:8000/game/?user=${session?.id}`),
+					fetch(`https://${window.location.hostname}:8000/game/?user=${user?.id}`),
 					{
-						loading: `Fetching /game/?user=${session?.id}`,
-						success: `/game/?user=${session?.id} fetched`,
-						error: `Unable to fetch /game/?user=${session?.id}`
+						loading: `Fetching /game/?user=${user?.id}`,
+						success: `/game/?user=${user?.id} fetched`,
+						error: `Unable to fetch /game/?user=${user?.id}`
 					}
 				)
 
-				if (response?.ok) {
+				if (response?.ok)
+				{
 					const data = await response.json()
 					setGames(data)
 				}
@@ -35,7 +47,7 @@ function HistoryExtended(): React.JSX.Element {
 
 			fetchStats()
 		}
-	}, [])
+	}, [user])
 
 	const formatDateTime = (datetime: string) => {
 		const date = new Date(datetime)
@@ -51,14 +63,14 @@ function HistoryExtended(): React.JSX.Element {
 	}
 
 	return (
-		<>
+		<ul>
 			{Game?.map((stat, index) => {
 				const isPlayer1 = stat.player_1.login === session?.login
 				const isVictory = isPlayer1 ? (stat.score1 > stat.score2) : (stat.score2 > stat.score1)
 				const formattedDateTime = formatDateTime(stat.created_at)
 
 				return(
-					<div className="finished-games" key={index}
+					<li className="finished-games" key={index}
 					style={{
 						flexDirection: "row",
 						alignItems: "center",
@@ -87,16 +99,16 @@ function HistoryExtended(): React.JSX.Element {
 						</div>
 
 						<div className="bubble-info"
-						style={{
-							backgroundColor: isVictory
-							? "rgba(10, 167, 10, 1)"
-							: "rgba(255, 0, 0, 1)",
-						}}>
+							style={{
+								backgroundColor: isVictory
+								? "rgba(10, 167, 10, 1)"
+								: "rgba(255, 0, 0, 1)",
+							}}>
 							<div>
 								{isVictory ? (
-									<h2>VICTOIRE</h2>
+									<h2>VICTORY</h2>
 								) : (
-									<h2>DÉFAITE</h2>
+									<h2>DEFEAT</h2>
 								)}
 							</div>
 
@@ -129,10 +141,10 @@ function HistoryExtended(): React.JSX.Element {
 								</div>
 							</Link>
 						</div>
-					</div>
+					</li>
 				)
 			})}
-		</>
+		</ul>
 	)
 }
 
