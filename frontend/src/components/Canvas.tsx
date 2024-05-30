@@ -68,10 +68,12 @@ function Canvas({
 
 	// ? /*--------- End Game Screen ----------*/
 	const endGame =
-	<button>
-		<p>{winner[0]}</p>
-		<p>{winner[1]}</p>
-	</button>
+	<>
+		<div style={{display: "flex", flexDirection: "column", textAlign: "center"}}>
+			<h3>The winner is ...</h3>
+			<h1>{score1 < 10 && score2 < 10 ? "Nobody, someone exit the game." : winner[0]}</h1>
+		</div>
+	</>
 	// ? /*------------------------------------*/
 
 	const ref = useRef<HTMLCanvasElement>(null)
