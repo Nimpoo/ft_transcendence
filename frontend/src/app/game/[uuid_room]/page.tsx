@@ -21,10 +21,18 @@ function GamingRoom(): React.JSX.Element | null {
 
 	const [begin, setBegin] = useState<boolean>(true)
 
-	const { session } = useSession()
+	const { session, status } = useSession()
 	const { players, sendMessage, gameStatus } = useGame()
 
 	const router = useRouter()
+
+	useEffect(() => {
+		if (status == "disconnected") {
+			toast.error("You are not connected")
+			router.push("/")
+		}
+	}, [router, status])
+
 
 	useEffect(() => {
 		if (gameStatus === "in-game") {

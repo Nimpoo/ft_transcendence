@@ -2,10 +2,13 @@
 
 import { Ubuntu } from "next/font/google"
 
+import { useEffect } from "react"
 import { useSession } from "@/providers/Session"
 import { useGame } from "@/providers/Game"
+import { useRouter } from "next/navigation"
 
 import "@/styles/Rainbow.css"
+import toast from "react-hot-toast"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -14,8 +17,17 @@ const ubu = Ubuntu ({
 
 function Game(): React.JSX.Element {
 
-	const { session } = useSession()
+	const router = useRouter()
+
+	const { session, status } = useSession()
 	const { sendMessage } = useGame()
+
+	useEffect(() => {
+		if (status == "disconnected") {
+			toast.error("You are not connected")
+			router.push("/")
+		}
+	}, [router, status])
 
 	const createGame = () => {
 		if (sendMessage) {
