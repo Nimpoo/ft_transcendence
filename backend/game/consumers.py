@@ -479,7 +479,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     elif data["type"] == "game.join":
       self.score1, self.score2 = 0, 0
       for room in WAITING_ROOMS:
-        if room["room_uuid"] and len(room["players"]) < room["limit"]:
+        if room["room_uuid"] and len(room["players"]) < room["limit"] and self.username != room["players"][0]:
           self.room_group_name = f"game_room_{room["room_uuid"]}"
           await self.channel_layer.group_add(
             self.room_group_name,
