@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 
 import "@/styles/Rainbow.css"
 import toast from "react-hot-toast"
+import Loading from "@/app/loading"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -20,7 +21,7 @@ function Game(): React.JSX.Element {
 	const router = useRouter()
 
 	const { session, status } = useSession()
-	const { sendMessage } = useGame()
+	const { sendMessage, ws } = useGame()
 
 	useEffect(() => {
 		if (status == "disconnected") {
@@ -49,6 +50,9 @@ function Game(): React.JSX.Element {
 		}
 	}
 
+	if (ws === null) {
+		return <Loading />
+	}
 	return (
 		<div className="mt-auto">
 			<div style={{display: "flex", justifyContent: "center"}}>

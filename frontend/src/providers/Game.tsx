@@ -13,6 +13,7 @@ const GameContext = createContext<{
 	players: string[],
 	winner: string[],
 	play: (value: "paddle" | "wall" | "score") => void,
+	ws: null | WebSocket,
 }>({
 	sendMessage: (message: any) => {},
 	message: undefined,
@@ -21,6 +22,7 @@ const GameContext = createContext<{
 	players: [],
 	winner: [],
 	play: function() {},
+	ws: null,
 })
 
 export function useGame() {
@@ -137,7 +139,7 @@ export function GameProvider({
 	}
 
 	return (
-		<GameContext.Provider value={{ players, sendMessage, message, gameStatus, setGameStatus, winner, play }}>
+		<GameContext.Provider value={{ players, sendMessage, message, gameStatus, setGameStatus, winner, play, ws }}>
 			{children}
 		</GameContext.Provider>
 	)
