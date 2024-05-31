@@ -63,14 +63,14 @@ function HistoryExtended({
 	}
 
 	return (
-		<ul>
+		<ul className="spaceY-between-btn-4" style={{width: "100%", paddingLeft: "0rem"}}>
 			{Game?.map((stat, index) => {
 				const isPlayer1 = stat.player_1.login === session?.login
 				const isVictory = isPlayer1 ? (stat.score1 > stat.score2) : (stat.score2 > stat.score1)
 				const formattedDateTime = formatDateTime(stat.created_at)
 
 				return(
-					<li className="finished-games" key={index}
+					<li className="finished-games" key={index} 
 					style={{
 						flexDirection: "row",
 						alignItems: "center",
@@ -100,9 +100,10 @@ function HistoryExtended({
 
 						<div className="bubble-info"
 							style={{
-								backgroundColor: isVictory
-								? "rgba(10, 167, 10, 1)"
-								: "rgba(255, 0, 0, 1)",
+								backgroundColor:
+									isVictory
+									? "rgba(10, 167, 10, 1)"
+									: "rgba(255, 0, 0, 1)",
 							}}>
 							<div>
 								{isVictory ? (

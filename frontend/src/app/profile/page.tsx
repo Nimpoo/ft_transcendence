@@ -104,7 +104,7 @@ function Profile(): React.JSX.Element {
 
 			</div>
 
-			<div className="bento_history spaceY-between-btn-4" style={{width: "620px"}}>
+			<div className="bento_history" style={{width: "620px", overflowY: "scroll"}}>
 				<HistoryExtended />
 			</div>
 

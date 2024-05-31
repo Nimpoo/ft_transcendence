@@ -81,7 +81,7 @@ function GamingRoom(): React.JSX.Element | null {
 
 	useEffect(() => {
 		if (!players.length) {
-			toast.error("DÉGAGE DE LÀ TAS RIEN À FAIRE ICI BORDEL")
+			toast.error("Unauthorized access to this lobby")
 			router.push("/game")
 			return
 		}

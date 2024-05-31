@@ -165,7 +165,7 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 
 			</div>
 
-			<div className="bento" style={{width: "620px"}}>
+			<div className="bento" style={{width: "620px", overflowY: "scroll"}}>
 				<HistoryExtended user={user} />
 			</div>
 
