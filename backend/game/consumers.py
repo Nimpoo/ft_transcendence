@@ -15,7 +15,10 @@ WAITING_ROOMS = []
 
 MAX_BOUNCE_ANGLE = 5 * math.pi / 12
 ACCELERATION_FACTOR = 1.10
+
 MAX_SPEED = 0.015
+SPEED_INCREMENT = 0.021
+
 END_GAME = 10
 
 class GameConsumer(AsyncWebsocketConsumer):
@@ -29,13 +32,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             if (self.py_2 - self.ph / 2) - 0.01 <= 0:
               self.py_2 = 0 + self.ph / 2
             else:
-              self.py_2 -= 0.021
+              self.py_2 -= SPEED_INCREMENT
 
           elif text_data["key"] == "down" and self.py_2 >= 0:
             if (self.py_2 + self.ph / 2) + 0.01 >= 1:
               self.py_2 = 1 - self.ph / 2
             else:
-              self.py_2 += 0.021
+              self.py_2 += SPEED_INCREMENT
 
         except Exception as e:
           print(e)
