@@ -14,7 +14,7 @@ if [ -f ".env" ]; then
 
 fi
 
-printf "Some variables will be asked, press \`enter\` for none.\n\n"
+printf "Some variables will be asked, press \`enter\` for none.\nGet all informations from one of your apps on https://profile.intra.42.fr/oauth/applications\n\n"
 
 cat << EOF > .env
 # 42's api keys
