@@ -478,23 +478,52 @@ class GameConsumer(AsyncWebsocketConsumer):
     ################ Joining a Room ################
     elif data["type"] == "game.join":
       self.score1, self.score2 = 0, 0
-      for room in WAITING_ROOMS:
-        if room["room_uuid"] and len(room["players"]) < room["limit"] and self.username != room["players"][0]:
-          self.room_group_name = f"game_room_{room["room_uuid"]}"
-          await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-          )
-          room["players"].append(self.username)
-          await self.channel_layer.group_send(self.room_group_name, {
-            "type": "game.join",
-            "room_uuid": room["room_uuid"],
-            "players": room["players"],
-            "message": f"{data["user"]} has joined the room.",
-            "score1": self.score1,
-            "score2": self.score2,
-          })
-          break
+
+    # * ############### MATCHMAKING ################
+      diff = 0
+      me = await sync_to_async(User.objects.get)(login=self.username)
+
+      min_diff = float('inf')
+      room_index = -1
+
+      for i, room in enumerate(WAITING_ROOMS):
+        if room["room_uuid"] and len(room["players"]) < room["limit"]:
+          player_1 = await sync_to_async(User.objects.get)(login=room["players"][0])
+          if len(room["players"]) == 1:
+
+            my_trophies = me.trophies
+
+            diff = abs(my_trophies - player_1.trophies)
+
+            if diff < min_diff:
+              min_diff = diff
+              room_index = i
+          else:
+            player_2 = await sync_to_async(User.objects.get)(login=room["players"][1])
+
+            diff = abs(player_1.trophies - player_2.trophies)
+
+            if diff < min_diff:
+              min_diff = diff
+              room_index = i
+
+      if room_index != -1:
+        room = WAITING_ROOMS[room_index]
+        self.room_group_name = f"game_room_{room["room_uuid"]}"
+        await self.channel_layer.group_add(
+          self.room_group_name,
+          self.channel_name
+        )
+        room["players"].append(self.username)
+        await self.channel_layer.group_send(self.room_group_name, {
+          "type": "game.join",
+          "room_uuid": room["room_uuid"],
+          "players": room["players"],
+          "message": f"{data["user"]} has joined the room.",
+          "score1": self.score1,
+          "score2": self.score2,
+        })
+    # * ############################################
 
       else:
         await self.send(text_data=json.dumps({
@@ -502,6 +531,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           "message": "No lobby found.",
         }))
         return
+
     ################################################
 ###################################################?
 
