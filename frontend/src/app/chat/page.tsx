@@ -254,17 +254,10 @@ function Chat(): React.JSX.Element {
 												<h5 className="conv-name">{selectedConversation.display_name}</h5>
 											</Link>
 										</li>
-										<li className="list-inline-item dropplace">
-											<div className="dropdown">
-												<button className="dropbtn" data-bs-auto-close="true">
-													<Image className="img-chat"
-														src={"/assets/svg/Three-dots.svg"}
-														width={25}
-														height={10}
-														alt="parameters"
-													/>
-												</button>
-											</div>
+										<li className="list-inline-item item-width-height">
+											<button type="button" className="btn btn-danger btn-place">
+												<div>Block</div>
+											</button>
 										</li>
 									</ul>
 								</div>

@@ -123,28 +123,16 @@
     background-color: white;
 }
 
-.dropplace {
-    margin-top: 18px;
-    margin-left: 650px;
+.item-width-height {
+    height: 63px;
+    width: 717px;
 }
 
-.dropdown {
+.btn-place {
     position: relative;
     display: inline-block;
-}
-
-.dropbtn {
-    background-color: transparent;
-    color: transparent;
-    border: none;
-}
-
-.dropdown-content {
-    background-color: transparent;
-    min-width: 10rem;
-    position: absolute;
-    top: 100%;
-    right: 0;
+    margin-top: 13px;
+    margin-left: 610px;
 }
 
 .link-color {
