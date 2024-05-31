@@ -10,5 +10,10 @@ class UserSerializer(serializers.ModelSerializer):
             "login",
             "display_name",
             "avatar",
+            "trophies",
+            "highest_trophies",
+            "games_played",
+            "victories",
+            "defeats",
             "created_at",
         )
