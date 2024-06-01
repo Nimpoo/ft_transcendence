@@ -50,6 +50,17 @@ function Game(): React.JSX.Element {
 		}
 	}
 
+	const tournament = () => {
+		if (sendMessage) {
+			sendMessage({
+				"type": "game.tournament",
+				"user": session?.display_name,
+				"id": session?.id.toString(),
+				"limit": 4,
+			})
+		}
+	}
+
 	if (ws === null) {
 		return <Loading />
 	}
@@ -64,7 +75,7 @@ function Game(): React.JSX.Element {
 					<span className="stroke rainbow-text">CREATE A ROOM</span>
 				</button>
 			</div>
-			<div className="mt-3" style={{display: "flex", justifyContent: "center"}}>
+			<div onClick={tournament} className="mt-3" style={{display: "flex", justifyContent: "center"}}>
 				<button className={ `big-button-xl ${ubu.className}` }>
 					<span className="stroke rainbow-text text-break">TORNAMENT</span>
 				</button>

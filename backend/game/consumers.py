@@ -12,6 +12,7 @@ import random
 
 
 WAITING_ROOMS = []
+TOURNAMENT_ROOMS = []
 
 MAX_BOUNCE_ANGLE = 5 * math.pi / 12
 ACCELERATION_FACTOR = 1.10
@@ -534,7 +535,34 @@ class GameConsumer(AsyncWebsocketConsumer):
           "message": "No lobby found.",
         }))
         return
+    ################################################
 
+    ################## TOURNAMENT ##################
+    elif data["type"] == "game.tournament":
+      tournament_uuid = uuid4()
+      self.tournament_group_name = f"game_tournament_{tournament_uuid}"
+
+      await self.channel_layer.group_add(
+        self.tournament_group_name,
+        self.channel_name
+      )
+
+      await self.send(text_data=json.dumps({
+        "type": "game.create",
+        "tournament_uuid": str(tournament_uuid),
+        "participants": [self.username],
+        "message": f"A new tournament was created by {data["user"]}.",
+        "score1": self.score1,
+        "score2": self.score2,
+      }))
+      TOURNAMENT_ROOMS.append({
+        "tournament_uuid": str(tournament_uuid),
+        "host": self.username,
+        "limit": 4,
+        "participants": [
+          self.username,
+        ],
+      })
     ################################################
 ###################################################?
 
