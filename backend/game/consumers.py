@@ -552,12 +552,10 @@ class GameConsumer(AsyncWebsocketConsumer):
       )
 
       await self.send(text_data=json.dumps({
-        "type": "game.create",
+        "type": "game.tournament",
         "tournament_uuid": str(tournament_uuid),
         "participants": [self.username],
         "message": f"A new tournament was created by {data["user"]}.",
-        "score1": self.score1,
-        "score2": self.score2,
       }))
       TOURNAMENT_ROOMS.append({
         "tournament_uuid": str(tournament_uuid),

@@ -124,7 +124,7 @@ export function GameProvider({
 					toast(data.message, {icon: "🍖"})
 					setParticipants(data.participants)
 					setGameStatus("pending")
-					router.push(`/game/${data.tournament_uuid}`)
+					router.push(`/game/tournament/${data.tournament_uuid}`)
 					break
 				}
 			}

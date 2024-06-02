@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation"
 import "@/styles/Rainbow.css"
 import toast from "react-hot-toast"
 import Loading from "@/app/loading"
-import Link from "next/link"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -31,20 +30,21 @@ function Game(): React.JSX.Element {
 		}
 	}, [router, status])
 
-	const createGame = () => {
+	const createTournament = () => {
 		if (sendMessage) {
 			sendMessage({
-				"type": "game.create",
+				"type": "game.tournament",
 				"user": session?.display_name,
 				"id": session?.id.toString(),
+				"limit": 4,
 			})
 		}
 	}
 
-	const joinGame = () => {
+	const joinTournament = () => {
 		if (sendMessage) {
 			sendMessage({
-				"type": "game.join",
+				"type": "game.join_tournament",
 				"user": session?.display_name,
 				"id": session?.id.toString(),
 			})
@@ -57,21 +57,14 @@ function Game(): React.JSX.Element {
 	return (
 		<div className="mt-auto">
 			<div style={{display: "flex", justifyContent: "center"}}>
-				<button onClick={joinGame} className={ `margin-btn big-button-xl ${ubu.className}` }>
-					<span className="stroke rainbow-text">JOIN A GAME</span>
-				</button>
-
-				<button onClick={createGame} className={ `big-button-xl ${ubu.className}` }>
-					<span className="stroke rainbow-text">CREATE A ROOM</span>
+				<button onClick={joinTournament} className={ `big-button-xl ${ubu.className}` }>
+					<span className="stroke rainbow-text">JOIN TOURNAMENT</span>
 				</button>
 			</div>
-
 			<div className="mt-3" style={{display: "flex", justifyContent: "center"}}>
-				<Link href={"/game/tournament"}>
-					<button className={ `big-button-xl ${ubu.className}` }>
-						<span className="stroke rainbow-text text-break">TOURNAMENT</span>
-					</button>
-				</Link>
+				<button onClick={createTournament} className={ `big-button-xl ${ubu.className}` }>
+					<span className="stroke rainbow-text text-break">CREATE TOURNAMENT</span>
+				</button>
 			</div>
 		</div>
 	)
