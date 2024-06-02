@@ -492,6 +492,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 
       for i, room in enumerate(WAITING_ROOMS):
         if room["room_uuid"] and len(room["players"]) < room["limit"]:
+
+          if room["host"] == self.username or room["players"][0] == self.username:
+            break
+
           player_1 = await sync_to_async(User.objects.get)(login=room["players"][0])
           if len(room["players"]) == 1:
 
