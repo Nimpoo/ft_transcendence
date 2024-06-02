@@ -25,6 +25,18 @@ END_GAME = 10
 class GameConsumer(AsyncWebsocketConsumer):
 
 ############# ? Channel Send Message ? ##############
+
+
+
+  async def game_tournamentJoin(self, text_data):
+    await self.send(json.dumps(text_data))
+
+  async def game_tournamentQuit(self, text_data):
+    await self.send(json.dumps(text_data))
+
+
+
+
   async def game_paddles(self, text_data):
     for room in WAITING_ROOMS:
       if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and text_data["player"] == "2":
@@ -544,10 +556,10 @@ class GameConsumer(AsyncWebsocketConsumer):
     ################## TOURNAMENT ##################
     elif data["type"] == "game.tournament":
       tournament_uuid = uuid4()
-      self.tournament_group_name = f"game_tournament_{tournament_uuid}"
+      self.tournament_name = f"tournament_room_{tournament_uuid}"
 
       await self.channel_layer.group_add(
-        self.tournament_group_name,
+        self.tournament_name,
         self.channel_name
       )
 
@@ -565,6 +577,34 @@ class GameConsumer(AsyncWebsocketConsumer):
           self.username,
         ],
       })
+
+    elif data["type"] == "game.tournamentJoin":
+      for room in TOURNAMENT_ROOMS:
+        if room["tournament_uuid"] and len(room["participants"]) < room["limit"] and (room["host"] != self.username or self.username not in room["participants"]):
+
+          self.tournament_name = f"tournament_room_{room["tournament_uuid"]}"
+          await self.channel_layer.group_add(
+            self.tournament_name,
+            self.channel_name
+          )
+          room["participants"].append(self.username)
+          await self.channel_layer.group_send(self.tournament_name, {
+            "type": "game.tournamentJoin",
+            "tournament_uuid": room["tournament_uuid"],
+            "participants": room["participants"],
+            "message": f"{data["user"]} has joined the tournament.",
+          })
+          break
+
+      else:
+        await self.send(text_data=json.dumps({
+          "type": "game.null",
+          "message": "No tournament found.",
+        }))
+        return
+    
+    # elif data["type"] == "game.tournamentQuit":
+      
     ################################################
 ###################################################?
 
@@ -596,10 +636,35 @@ class GameConsumer(AsyncWebsocketConsumer):
           })
           break
 
-      await self.channel_layer.group_discard(
-        self.room_group_name,
-        self.channel_name
-      )
+      if self.room_group_name:
+        await self.channel_layer.group_discard(
+          self.room_group_name,
+          self.channel_name
+        )
+
+
+
+    if hasattr(self, "tournament_name"):
+
+      for room in TOURNAMENT_ROOMS:
+        if room["tournament_uuid"] == self.tournament_name.split("_")[-1] and self.username in room["participants"]:
+          room["participants"].remove(self.username)
+          if not room["participants"]:
+            TOURNAMENT_ROOMS.remove(room)
+          elif room["host"] == self.username:
+            room["host"] = room["participants"][0]
+          await self.channel_layer.group_send(self.tournament_name, {
+            "type": "game.tournamentQuit",
+            "participants": room["participants"],
+            "message": f"{self.username} has left the tournament.",
+          })
+          break
+
+      if self.tournament_name:
+        await self.channel_layer.group_discard(
+          self.tournament_name,
+          self.channel_name
+        )
 
     await self.close()
 ###################################################!

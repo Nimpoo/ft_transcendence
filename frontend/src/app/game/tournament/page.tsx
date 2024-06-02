@@ -44,7 +44,7 @@ function Game(): React.JSX.Element {
 	const joinTournament = () => {
 		if (sendMessage) {
 			sendMessage({
-				"type": "game.join_tournament",
+				"type": "game.tournamentJoin",
 				"user": session?.display_name,
 				"id": session?.id.toString(),
 			})

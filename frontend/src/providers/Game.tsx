@@ -127,6 +127,22 @@ export function GameProvider({
 					router.push(`/game/tournament/${data.tournament_uuid}`)
 					break
 				}
+
+				case "game.tournamentJoin": {
+					toast(data.message, {icon: "⚔️"})
+					setParticipants(data.participants)
+					setGameStatus("pending")
+					router.push(`/game/tournament/${data.tournament_uuid}`)
+					break
+				}
+
+				case "game.tournamentQuit": {
+					setMessage(data)
+					setParticipants(data.participants)
+					// setGameStatus("finished")
+					toast(data.message, {icon: "🔨"})
+					break
+				}
 			}
 		}
 

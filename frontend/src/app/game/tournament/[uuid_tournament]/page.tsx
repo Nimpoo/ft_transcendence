@@ -19,7 +19,7 @@ const ubu = Ubuntu ({
 function TournamentRoom(): React.JSX.Element | null {
 
 	const { status } = useSession()
-	const { participants,  } = useGame()
+	const { participants } = useGame()
 
 	const router = useRouter()
 
@@ -30,9 +30,34 @@ function TournamentRoom(): React.JSX.Element | null {
 		}
 	}, [router, status])
 
+	useEffect(() => {
+		if (!participants.length) {
+			toast.error("Unauthorized access to this tournament.")
+			router.push("/game")
+			return
+		}
+	}, [participants.length, router])
 
 	return (
-		<></>
+		<>
+			{participants && (
+				<div>
+					{participants[0]
+						? <h1>{participants[0]}</h1>
+						: <h1>Waiting for a participant ...</h1>
+					} {participants[1]
+						? <h1>{participants[1]}</h1>
+						: <h1>Waiting for a participant ...</h1>
+					} {participants[2]
+						? <h1>{participants[2]}</h1>
+						: <h1>Waiting for a participant ...</h1>
+					} {participants[3]
+						? <h1>{participants[3]}</h1>
+						: <h1>Waiting for a participant ...</h1>
+					}
+				</div>
+			)}
+		</>
 	)
 }
 
