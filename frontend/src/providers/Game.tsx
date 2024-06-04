@@ -143,6 +143,14 @@ export function GameProvider({
 					toast(data.message, {icon: "🔨"})
 					break
 				}
+
+				case "game.tournamentLaunch": {
+					toast(data.message, {icon: "⚔️"})
+					setPlayers(data.players)
+					setGameStatus("pending")
+					router.push(`/game/tournament/${data.tournament_uuid}/${data.room_uuid}`)
+					break
+				}
 			}
 		}
 
