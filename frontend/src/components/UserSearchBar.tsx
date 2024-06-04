@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
+import "@/styles/UserSearchBar.css"
+
 function UserSearchBar(props: any): React.JSX.Element {
 	const [search, setSearch] = useState<string>("")
 	const [results, setResults] = useState<User[]>()
@@ -34,13 +36,13 @@ function UserSearchBar(props: any): React.JSX.Element {
 
 	return (
 		<div style={{width: "100%"}}>
-			<input type="text" onChange={e => setSearch(e.target.value)} />
+			<input className="input-style-1" type="text" placeholder="Search usernames..." onChange={e => setSearch(e.target.value)} />
 			{results &&
 				<ul>
 					{results.map((user, key) => (
 						<li key={key}>
 							<Link href={`/users/${user.login}`}>
-								{user.display_name}
+								<a>{user.display_name}</a>
 							</Link>
 						</li>
 					))}
