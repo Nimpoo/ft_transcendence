@@ -284,7 +284,7 @@ function Chat(): React.JSX.Element {
 									<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name(s) to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} />
 									{
 										results &&
-										<ul>
+										<ul className="ul-class">
 											{
 												results.map(
 													(user, key) => {
@@ -294,9 +294,9 @@ function Chat(): React.JSX.Element {
 														}
 
 														return (
-															<li key={key}>
+															<li className="li-class" key={key}>
 																<Link onClick={() => handleClick(user)} href="#">
-																	{user.display_name}
+																	<a className="a-class">{user.display_name}</a>
 																</Link>
 															</li>
 														)

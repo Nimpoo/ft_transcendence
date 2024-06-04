@@ -80,6 +80,24 @@
     box-shadow: none;
 }
 
+.ul-class {
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    padding: 0;
+}
+
+.li-class {
+    margin: 5px;
+    padding: 5px 10px;
+}
+
+.a-class {
+    text-decoration: none;
+    color: black;
+    font-size: 15px;
+}
+
 .conv-name {
     color: black;
     margin-top: 20px;
