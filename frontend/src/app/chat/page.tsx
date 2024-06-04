@@ -73,10 +73,28 @@ function Chat(): React.JSX.Element {
 				{
 					let chat = data.message
 					setMessages(messages => messages ? [...messages, chat] : [chat])
+					
+					const existingConv = conversations?.find(
+						(conv) =>
+							(conv.sender.id === chat.sender.id && conv.receiver.id === chat.receiver.id) ||
+						(conv.sender.id === chat.receiver.id && conv.receiver.id === chat.sender.id)
+					);
+
+					if (!existingConv) {
+						const newConv: Chat = {
+							id: chat.id,
+							sender: chat.sender,
+							receiver: chat.receiver,
+							content: chat.content,
+							created_at: chat.created_at,
+						};
+
+						setConversations((conversations) => [...(conversations || []), newConv]);
+					}
 				}
 			}
 		}
-	}, [session, socket])
+	}, [session, socket, selectedConversation, conversations]);
 
 	useEffect(() => {
 		if (chatContainerRef.current)
@@ -284,7 +302,7 @@ function Chat(): React.JSX.Element {
 									<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name(s) to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} />
 									{
 										results &&
-										<ul className="ul-class">
+										<ul className="ulSearchBar">
 											{
 												results.map(
 													(user, key) => {
@@ -294,9 +312,9 @@ function Chat(): React.JSX.Element {
 														}
 
 														return (
-															<li className="li-class" key={key}>
+															<li className="liSearchBar" key={key}>
 																<Link onClick={() => handleClick(user)} href="#">
-																	<a className="a-class">{user.display_name}</a>
+																	<a className="aSearchBar">{user.display_name}</a>
 																</Link>
 															</li>
 														)

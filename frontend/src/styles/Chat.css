@@ -80,19 +80,19 @@
     box-shadow: none;
 }
 
-.ul-class {
+.ulSearchBar {
     display: flex;
     flex-wrap: wrap;
     list-style-type: none;
     padding: 0;
 }
 
-.li-class {
+.liSearchBar {
     margin: 5px;
     padding: 5px 10px;
 }
 
-.a-class {
+.aSearchBar {
     text-decoration: none;
     color: black;
     font-size: 15px;
