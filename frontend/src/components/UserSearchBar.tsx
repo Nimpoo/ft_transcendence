@@ -38,11 +38,11 @@ function UserSearchBar(props: any): React.JSX.Element {
 		<div style={{width: "100%"}}>
 			<input className="input-style-1" type="text" placeholder="Search usernames..." onChange={e => setSearch(e.target.value)} />
 			{results &&
-				<ul>
+				<ul className="ul-class list-group">
 					{results.map((user, key) => (
-						<li key={key}>
+						<li className="li-class list-group-item" key={key}>
 							<Link href={`/users/${user.login}`}>
-								<a>{user.display_name}</a>
+								<a className="a-class">{user.display_name}</a>
 							</Link>
 						</li>
 					))}

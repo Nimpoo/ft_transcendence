@@ -175,15 +175,17 @@ function Chat(): React.JSX.Element {
 			const form = event.target as HTMLFormElement
 			const msg = form.msg
 
-			socket.send(
-				JSON.stringify(
-					{
-						"type": "message.send",
-						"target_id": selectedConversation.id,
-						"content": msg.value,
-					}
+			if (msg.value.trim()) {
+				socket.send(
+					JSON.stringify(
+						{
+							"type": "message.send",
+							"target_id": selectedConversation.id,
+							"content": msg.value,
+						}
+					)
 				)
-			)
+			}
 
 			msg.value = ""
 		}
@@ -251,7 +253,7 @@ function Chat(): React.JSX.Element {
 						selectedConversation && (
 							<div>
 								<div className="row box-2-title rounded-bottom-0">
-									<ul style={{display: "flex"}} className="list-inline">
+									<ul style={{display: "flex", width: "880px", height: "65px"}} className="list-inline">
 										<li className="list-inline-item" style={{marginTop: "3px"}}>
 												<div
 													className="rounded-circle bg-cover"
@@ -272,7 +274,7 @@ function Chat(): React.JSX.Element {
 												<h5 className="conv-name">{selectedConversation.display_name}</h5>
 											</Link>
 										</li>
-										<li className="list-inline-item item-width-height">
+										<li className="list-inline-item">
 											<button type="button" className="btn btn-danger btn-place">
 												<div>Block</div>
 											</button>
@@ -302,7 +304,7 @@ function Chat(): React.JSX.Element {
 									<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name(s) to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} />
 									{
 										results &&
-										<ul className="ulSearchBar">
+										<ul className="ulSearchBar list-group">
 											{
 												results.map(
 													(user, key) => {
@@ -312,7 +314,7 @@ function Chat(): React.JSX.Element {
 														}
 
 														return (
-															<li className="liSearchBar" key={key}>
+															<li className="liSearchBar list-group-item" key={key}>
 																<Link onClick={() => handleClick(user)} href="#">
 																	<a className="aSearchBar">{user.display_name}</a>
 																</Link>

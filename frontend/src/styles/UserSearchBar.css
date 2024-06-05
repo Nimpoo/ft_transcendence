@@ -12,19 +12,22 @@
     outline: none;
 }
 
-ul {
+.ul-class {
     display: flex;
     flex-wrap: wrap;
     list-style-type: none;
     padding: 0;
 }
 
-li {
-    margin: 5px;
+.li-class {
     padding: 5px 10px;
+    background-color: transparent;
+    border-color: transparent;
+    outline: none;
+    box-shadow: none;
 }
 
-a {
+.a-class {
     text-decoration: none;
     color: black;
     font-size: 20px;

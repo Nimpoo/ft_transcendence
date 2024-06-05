@@ -88,8 +88,11 @@
 }
 
 .liSearchBar {
-    margin: 5px;
     padding: 5px 10px;
+    background-color: transparent;
+    border-color: transparent;
+    outline: none;
+    box-shadow: none;
 }
 
 .aSearchBar {
@@ -141,16 +144,11 @@
     background-color: white;
 }
 
-.item-width-height {
-    height: 63px;
-    width: 717px;
-}
-
 .btn-place {
     position: relative;
     display: inline-block;
     margin-top: 13px;
-    margin-left: 610px;
+    margin-left: 600px;
 }
 
 .link-color {
