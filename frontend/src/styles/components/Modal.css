@@ -36,7 +36,7 @@
 .modal-wrapper-lg {
 	display: flex;
 	justify-content: space-between;
-	width: 900px;
+	width: 700px;
 }
 
 .modal-wrapper-sm {
@@ -50,7 +50,7 @@
 	flex-direction: row;
 	justify-content: space-between;
 
-	max-width: 48rem;
+	max-width: 670px;
 	padding: 1.5rem;
 	border: solid;
 	border-width: 4px;

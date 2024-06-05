@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useModal } from "@/providers/Modal"
 
 import "@/styles/components/Header.css"
+import "@/styles/components/Modal.css"
 
 function Header(): React.JSX.Element {
 
@@ -17,126 +18,8 @@ function Header(): React.JSX.Element {
 		audioObject.autoplay = true
 	}
 
-	{/* ------------------------ USOPP - LOUIS ------------------------- */}
+	{/* ------------------------ USOPP - NOAH ------------------------- */}
 	const usoppModal =
-	<div className="modal-wrapper-lg">
-		<Image priority className="modal-pfp"
-			src={"/assets/bogoss/Louis.jpg"}
-			width={400}
-			height={400}
-			alt="Louis Sylvestre"
-		/>
-		<div className="modal-info-wrapper spaceY-between-btn-4">
-			<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", textAlign: "center"}}>Louis Sylvestre</h1>
-			<div className="spaceY-between-btn-4">
-				<Link
-					target="_blank"
-					href="https://www.linkedin.com/in/louis-sylvestre-093264280/"
-					className="button-selector"
-				>
-					<Image
-						src={"/assets/svg/linkedin_logo.svg"}
-						width={40}
-						height={40}
-						alt="LinkedIn logo"
-					/>
-					<p className="text-for-button">Louis Sylvestre</p>
-				</Link>
-				<Link
-					target="_blank"
-					href="https://github.com/Vodki"
-					className="button-selector"
-				>
-					<Image
-						style={{margin: "0.25rem"}}
-						src={"/assets/svg/github_logo.svg"}
-						width={32}
-						height={32}
-						alt="GitHub logo"
-					/>
-					<p className="text-for-button">Vodki</p>
-				</Link>
-				<Link
-					target="_blank"
-					href="mailto:losylves@student.42nice.fr"
-					className="button-selector"
-				>
-					<Image
-						style={{margin: "0.25rem"}}
-						src={"/assets/svg/mail_logo.svg"}
-						width={32}
-						height={32}
-						alt="Mail logo"
-					/>
-					<p className="text-for-button">losylves@student.42nice.fr</p>
-				</Link>
-			</div>
-
-		</div>
-	</div>
-	{/* ---------------------------------------------------------------- */}
-
-	{/* ------------------------ NAMI - JUSTINE ------------------------ */}
-	const namiModal =
-	<div className="modal-wrapper-lg">
-		<Image priority className="modal-pfp"
-			src={"/assets/bogoss/Justine.jpg"}
-			width={250}
-			height={250}
-			alt="Justine Munoz"
-		/>
-		<div className="modal-info-wrapper spaceY-between-btn-4">
-			<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", textAlign: "center"}}>Justine Munoz</h1>
-			<div className="spaceY-between-btn-4">
-				<Link
-					target="_blank"
-					href="https://fr.wikipedia.org/wiki/Arctic_Monkeys"
-					className="button-selector"
-				>
-					<Image
-						src={"/assets/svg/linkedin_logo.svg"}
-						width={40}
-						height={40}
-						alt="LinkedIn logo"
-					/>
-					<p className="text-for-button">Justine Munoz</p>
-				</Link>
-				<Link
-					target="_blank"
-					href="https://github.com/jumunozz"
-					className="button-selector"
-				>
-					<Image
-						style={{margin: "0.25rem"}}
-						src={"/assets/svg/github_logo.svg"}
-						width={32}
-						height={32}
-						alt="GitHub logo"
-					/>
-					<p className="text-for-button">jumunozz</p>
-				</Link>
-				<Link
-					target="_blank"
-					href="mailto:jumunoz@student.42nice.fr"
-					className="button-selector"
-				>
-					<Image
-						style={{margin: "0.25rem"}}
-						src={"/assets/svg/mail_logo.svg"}
-						width={32}
-						height={32}
-						alt="Mail logo"
-					/>
-					<p className="text-for-button">jumunoz@student.42nice.fr</p>
-				</Link>
-			</div>
-
-		</div>
-	</div>
-	{/* ---------------------------------------------------------------- */}
-
-	{/* ------------------------- ZORO - NOAH -------------------------- */}
-	const zoroModal =
 	<div className="modal-wrapper-lg">
 		<Image priority className="modal-pfp"
 			src={"/assets/bogoss/NBG.jpg"}
@@ -194,13 +77,131 @@ function Header(): React.JSX.Element {
 	</div>
 	{/* ---------------------------------------------------------------- */}
 
+	{/* ------------------------ NAMI - JUSTINE ------------------------ */}
+	const namiModal =
+	<div className="modal-wrapper-lg">
+		<Image priority className="modal-pfp"
+			src={"/assets/bogoss/Justine.jpg"}
+			width={250}
+			height={250}
+			alt="Justine Munoz"
+		/>
+		<div className="modal-info-wrapper spaceY-between-btn-4">
+			<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", textAlign: "center"}}>Justine Munoz</h1>
+			<div className="spaceY-between-btn-4">
+				<Link
+					target="_blank"
+					href="linkedin.com/in/justine-munoz-393778300"
+					className="button-selector"
+				>
+					<Image
+						src={"/assets/svg/linkedin_logo.svg"}
+						width={40}
+						height={40}
+						alt="LinkedIn logo"
+					/>
+					<p className="text-for-button">Justine Munoz</p>
+				</Link>
+				<Link
+					target="_blank"
+					href="https://github.com/jumunozz"
+					className="button-selector"
+				>
+					<Image
+						style={{margin: "0.25rem"}}
+						src={"/assets/svg/github_logo.svg"}
+						width={32}
+						height={32}
+						alt="GitHub logo"
+					/>
+					<p className="text-for-button">jumunozz</p>
+				</Link>
+				<Link
+					target="_blank"
+					href="mailto:jumunoz@student.42nice.fr"
+					className="button-selector"
+				>
+					<Image
+						style={{margin: "0.25rem"}}
+						src={"/assets/svg/mail_logo.svg"}
+						width={32}
+						height={32}
+						alt="Mail logo"
+					/>
+					<p className="text-for-button">jumunoz@student.42nice.fr</p>
+				</Link>
+			</div>
+
+		</div>
+	</div>
+	{/* ---------------------------------------------------------------- */}
+
+	{/* ------------------------- ZORO - LOUIS -------------------------- */}
+	const zoroModal =
+	<div className="modal-wrapper-lg">
+		<Image priority className="modal-pfp"
+			src={"/assets/bogoss/Louis.jpg"}
+			width={250}
+			height={250}
+			alt="Louis Sylvestre"
+		/>
+		<div className="modal-info-wrapper spaceY-between-btn-4">
+			<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", textAlign: "center"}}>Louis Sylvestre</h1>
+			<div className="spaceY-between-btn-4">
+				<Link
+					target="_blank"
+					href="https://www.linkedin.com/in/louis-sylvestre-093264280/"
+					className="button-selector"
+				>
+					<Image
+						src={"/assets/svg/linkedin_logo.svg"}
+						width={40}
+						height={40}
+						alt="LinkedIn logo"
+					/>
+					<p className="text-for-button">Louis Sylvestre</p>
+				</Link>
+				<Link
+					target="_blank"
+					href="https://github.com/Vodki"
+					className="button-selector"
+				>
+					<Image
+						style={{margin: "0.25rem"}}
+						src={"/assets/svg/github_logo.svg"}
+						width={32}
+						height={32}
+						alt="GitHub logo"
+					/>
+					<p className="text-for-button">Vodki</p>
+				</Link>
+				<Link
+					target="_blank"
+					href="mailto:losylves@student.42nice.fr"
+					className="button-selector"
+				>
+					<Image
+						style={{margin: "0.25rem"}}
+						src={"/assets/svg/mail_logo.svg"}
+						width={32}
+						height={32}
+						alt="Mail logo"
+					/>
+					<p className="text-for-button">losylves@student.42nice.fr</p>
+				</Link>
+			</div>
+
+		</div>
+	</div>
+	{/* ---------------------------------------------------------------- */}
+
 	{/* ------------------------ LUFFY - MARWAN ------------------------ */}
 	const luffyModal =
 	<div className="modal-wrapper-lg">
 		<Image priority className="modal-pfp"
 			src={"/assets/bogoss/Marwan.jpg"}
-			width={400}
-			height={400}
+			width={250}
+			height={250}
 			alt="Marwan Ayoub"
 		/>
 		<div className="modal-info-wrapper spaceY-between-btn-4">
