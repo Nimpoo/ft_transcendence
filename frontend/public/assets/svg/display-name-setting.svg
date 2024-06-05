@@ -1,1 +1,119 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:cc="http://web.resource.org/cc/"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    id="svg1"
+    sodipodi:docname="item_rename.svg"
+    viewBox="0 0 60 60"
+    sodipodi:version="0.32"
+    _SVGFile__filename="oldscale/actions/item_rename.svg"
+    version="1.0"
+    y="0"
+    x="0"
+    inkscape:version="0.40"
+    sodipodi:docbase="/home/danny/work/flat/SVG/mono/scalable/actions"
+  >
+  <sodipodi:namedview
+      id="base"
+      bordercolor="#000000"
+      inkscape:pageshadow="2"
+      inkscape:window-y="0"
+      pagecolor="#ffffff"
+      inkscape:window-height="699"
+      inkscape:zoom="3.9198298"
+      inkscape:window-x="0"
+      borderopacity="1.0"
+      inkscape:current-layer="svg1"
+      inkscape:cx="88.677322"
+      inkscape:cy="8.0615761"
+      inkscape:window-width="1024"
+      inkscape:pageopacity="0.0"
+  />
+  <g
+      id="g1721"
+    >
+    <path
+        id="path1096"
+        style="stroke-linejoin:round;stroke:none;stroke-linecap:round;fill:none"
+        d="m42.534 9.8664h11.564m-5.507 0v39.208m-6.057 1.06h11.839"
+    />
+    <path
+        id="path1097"
+        style="stroke-linejoin:round;stroke:#none;stroke-width:5;fill:none"
+        d="m4.3517 40.677l7.9993-21.747c0.716-1.917 1.308-3.333 1.775-4.25 0.466-0.933 1.108-1.716 1.924-2.35 0.817-0.65 1.883-0.975 3.2-0.975 1.35 0 2.441 0.325 3.275 0.975 0.849 0.65 1.516 1.467 1.999 2.45 0.5 0.967 1.084 2.35 1.75 4.15l7.974 21.747c0.5 1.316 0.825 2.333 0.975 3.05 0.167 0.7 0.25 1.408 0.25 2.124 0 1.034-0.367 1.867-1.1 2.5-0.716 0.617-1.675 0.925-2.874 0.925-0.834 0-1.534-0.167-2.1-0.5-0.567-0.333-1.025-0.8-1.375-1.4-0.333-0.6-0.633-1.333-0.9-2.2l-1-3.274h-13.623l-1.025 3.274c-0.433 1.35-0.958 2.375-1.575 3.075-0.5999 0.683-1.5248 1.025-2.7747 1.025-1.1832 0-2.1497-0.308-2.8996-0.925-0.7333-0.633-1.0999-1.466-1.0999-2.5 0-0.616 0.0667-1.258 0.2-1.924 0.15-0.684 0.4916-1.767 1.0249-3.25zm19.297-6.549l-4.149-13.474h-0.1l-4.45 13.474h8.699z"
+    />
+  </g
+  >
+  <g
+      id="g1092"
+      transform="matrix(1.0323 0 0 1.0323 -1.505 -1.3554)"
+    >
+    <path
+        id="path862"
+        style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:4.2095;fill:none"
+        transform="matrix(1.1507 0 0 1.1507 -1.8809 -3.8516)"
+        d="m38.71 12.795h9.736m-4.636 0v33.008m-5.1 0.893h9.968"
+    />
+    <path
+        id="path837"
+        style="fill:#000000"
+        transform="scale(4.1328)"
+        d="m1.3728 9.8525l1.875-5.0977c0.168-0.4492 0.3066-0.7812 0.416-0.9961 0.1094-0.2187 0.2598-0.4023 0.4512-0.5508 0.1914-0.1523 0.4414-0.2285 0.75-0.2285 0.3164 0 0.5723 0.0762 0.7676 0.2285 0.1992 0.1524 0.3554 0.3438 0.4687 0.5743 0.1172 0.2265 0.2539 0.5507 0.4102 0.9726l1.8691 5.0977c0.1172 0.3085 0.1934 0.5465 0.2285 0.7145 0.0391 0.164 0.0586 0.33 0.0586 0.498 0 0.243-0.0859 0.438-0.2578 0.586-0.168 0.145-0.3926 0.217-0.6738 0.217-0.1953 0-0.3594-0.039-0.4922-0.117s-0.2402-0.188-0.3223-0.328c-0.0781-0.141-0.1484-0.313-0.2109-0.516l-0.2344-0.767h-3.1933l-0.2403 0.767c-0.1015 0.317-0.2246 0.557-0.3691 0.721-0.1406 0.16-0.3574 0.24-0.6504 0.24-0.2774 0-0.5039-0.072-0.6797-0.217-0.1719-0.148-0.2578-0.343-0.2578-0.586 0-0.144 0.0156-0.295 0.0469-0.451 0.0351-0.16 0.1152-0.414 0.2402-0.7615zm4.5234-1.5352l-0.9726-3.1582h-0.0235l-1.0429 3.1582h2.039z"
+    />
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>

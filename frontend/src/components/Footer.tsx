@@ -41,7 +41,7 @@ function Settings(): React.JSX.Element {
 
 	return (
 		<div className="modal-wrapper">
-			<h2 className="mb-3">Settings</h2>
+			<h2 className="text-title-settings">Settings</h2>
 
 			<div className="d-flex justify-content-between align-items-center mb-3">
 				<div>
@@ -185,6 +185,7 @@ function Settings(): React.JSX.Element {
 								<span className="ms-2">Display Name</span>
 							</div>
 								<input
+									className="put-your-name-there"
 									type="text"
 									name="display_name"
 									defaultValue={session.display_name}
@@ -213,15 +214,16 @@ function Settings(): React.JSX.Element {
 								<span className="ms-2">Avatar</span>
 							</div>
 								<input
+									className="put-your-new-avatar-there"
 									type="file"
 									name="avatar"
 								/>
 						</div>
 
-						<input type="submit" value="save" disabled={socket?.readyState !== WebSocket.OPEN} />
 					</form>
 
-					<div className="justify-content-center d-flex align-items-center">
+					<div className="justify-content-evenly d-flex align-items-center">
+						<input className="btn btn-success" type="submit" value="Save changes" disabled={socket?.readyState !== WebSocket.OPEN} />
 						<button type="button" className="btn btn-danger"
 							onClick={
 								() => {
