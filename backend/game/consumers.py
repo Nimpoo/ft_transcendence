@@ -21,7 +21,7 @@ ACCELERATION_FACTOR = 1.10
 MAX_SPEED = 0.015
 SPEED_INCREMENT = 0.021
 
-END_GAME = 2
+END_GAME = 10
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -32,10 +32,6 @@ class GameConsumer(AsyncWebsocketConsumer):
       self.room_group_name,
       self.channel_name
     )
-    await self.send(json.dumps(text_data))
-
-  async def game_finalCreate(self, text_data):
-    text_data["type"] = "game.nextStep"
     await self.send(json.dumps(text_data))
 
   async def game_finalJoin(self, text_data):
@@ -118,8 +114,9 @@ class GameConsumer(AsyncWebsocketConsumer):
           else:
             self.py_2 += SPEED_INCREMENT
 
-      except Exception as e:
-        print(e)
+      except Exception:
+        # ? Player 2 is not the host
+        pass
 
   async def game_quit(self, text_data):
     await self.send(json.dumps(text_data))
@@ -134,18 +131,12 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.send(json.dumps(text_data))
 
   async def game_finished(self, text_data):
-
-    await self.send(json.dumps({
-      "winner": text_data["winner"],
-      "username": self.username,
-      "is_winner_?": self.username == text_data["winner"],
-    }))
-
     try:
       cancel = self.loop.cancel()
       print(f"cancel [DISCONNECT]: {cancel}")
-    except Exception as e:
-      await self.channel_layer.group_send(self.room_group_name,{
+    except Exception:
+      # ? Player 2 is not the host
+      await self.channel_layer.group_send(self.room_group_name, {
         "type": "game.break",
       })
 
@@ -182,8 +173,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 
           break
 
-    except Exception as e:
-      await self.send(json.dumps({'error': f'You are not the host: [{e}]'}))
+    except Exception:
+      # ? Player 2 is not the host
+      pass
 
     is_found = False
 
@@ -191,10 +183,13 @@ class GameConsumer(AsyncWebsocketConsumer):
       if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
         is_found = True
         room["players"].remove(self.username)
+
         if not room["players"]:
           WAITING_ROOMS.remove(room)
+
         elif room["host"] == self.username:
           room["host"] = room["players"][0]
+
         await self.channel_layer.group_send(self.room_group_name, {
           "type": "game.quit",
           "players": room["players"],
@@ -212,6 +207,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         room = self.current_room
         self.room_group_name = room["final"]
         found = False
+
         for index in FINAL_ROOMS:
           if index["uuid"] == self.room_group_name:
             await self.send(json.dumps({
@@ -222,7 +218,9 @@ class GameConsumer(AsyncWebsocketConsumer):
               self.current_room["type"] = "game.endTournament"
               self.current_room["message"] = f"{text_data["winner"]} has won the tournament !"
 
+              # ! END OF THE MATCH AND TOURNAMENT
               await self.send(json.dumps(self.current_room))
+              # !
 
               await self.channel_layer.group_send(self.room_group_name,
                 self.current_room
@@ -241,6 +239,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                   TOURNAMENT_ROOMS.remove(index_t)
               self.current_room = {}
               return
+
           if index["uuid"] == room["final"]:
             index["players"].append(self.username)
             final_players = index["players"]
@@ -248,11 +247,6 @@ class GameConsumer(AsyncWebsocketConsumer):
               "type": "game.reloadPlayers",
               "list": final_players,
             })
-            # ENVOYE ICI UN GROUP SEND POUR QUE L'AUTRE ACTUALISE SA LISTE DE JOUEUR
-            await self.send(json.dumps({
-            "type": "j'ai trouvé alors je rajoute mon blaze dans la room !",
-            "la room": index,
-          }))
 
             await self.channel_layer.group_add(
               self.room_group_name,
@@ -269,6 +263,7 @@ class GameConsumer(AsyncWebsocketConsumer):
               "score1": 0,
               "score2": 0,
             }
+
             await self.channel_layer.group_send(self.room_group_name,
               self.current_room
             )
@@ -276,9 +271,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             return
 
         if not found:
-          await self.send(json.dumps({
-            "type": "j'ai pas trouvé alors je creer la room !"
-          }))
           FINAL_ROOMS.append({
             "uuid": room["final"],
             "players": [
@@ -309,7 +301,6 @@ class GameConsumer(AsyncWebsocketConsumer):
           await self.channel_layer.group_send(self.room_group_name,
             self.current_room
           )
-          await self.send(json.dumps({"current_room": self.current_room}))
           return
 
       else:
@@ -379,7 +370,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     try:
       cancel = self.loop.cancel()
       print(f"cancel [CHANNELS]: {cancel}")
-    except Exception as e:
+    except Exception:
+      # ? Player 2 is not the host
       pass
 ###################################################?
 
@@ -491,7 +483,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           self.ball_speed = 0.005
           continue
     except asyncio.CancelledError:
-      print("GAME LOOP WAS INTERUPTED")
+      # ! GAME LOOP WAS INTERUPTED
       del ball_info, self.x, self.y, self.w, self.h, self.py_1, self.py_2, self.px_1, self.px_2, self.loop
 
       pass
@@ -569,25 +561,15 @@ class GameConsumer(AsyncWebsocketConsumer):
         })
         if self.score2 == END_GAME:
 
-          await self.send(json.dumps({
-            "room_group_name_ICI": self.room_group_name,
-          }))
-
-          await self.send(json.dumps({"type": "truc de zinzin",
-                                      "room": self.current_room,
-                                      }))
-
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.finished",
             "winner": self.current_room["players"][1],
           })
 
-          await self.send(json.dumps({"type": "truc de foufou"}))
-
-          await self.send(json.dumps({
-            "type": "game.finished",
-            "winner": room["players"][1],
-          }))
+          # await self.send(json.dumps({
+          #   "type": "game.finished",
+          #   "winner": room["players"][1],
+          # }))
         return 2
     # *
 
@@ -876,14 +858,17 @@ class GameConsumer(AsyncWebsocketConsumer):
     if hasattr(self, "room_group_name"):
 
       if hasattr(self, "game_loop"):
+
         try:
           cancel = self.loop.cancel()
           print(f"cancel [DISCONNECT]: {cancel}")
-        except Exception as e:
+        except Exception:
+          # ? Player 2 is not the host
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.break",
           })
           pass
+
 
       for room in WAITING_ROOMS:
         if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:

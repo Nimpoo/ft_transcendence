@@ -56,7 +56,7 @@ export function GameProvider({
 		const ws = new WebSocket(`wss://${window.location.hostname}:8000/game/`)
 
 		ws.onopen = (event: Event) => {
-			console.log("Websocket Open ✅")
+			console.log("Connected to Pong ✅")
 		}
 
 		ws.onmessage = (event: any) => {
@@ -174,8 +174,9 @@ export function GameProvider({
 					router.push(`/game`)
 					break
 				}
-			}
 				// ! TOURNAMENT ! //
+
+			}
 		}
 
 		ws.onerror = (event: Event) => {
@@ -198,7 +199,17 @@ export function GameProvider({
 	}
 
 	return (
-		<GameContext.Provider value={{ players, sendMessage, message, gameStatus, setGameStatus, winner, participants, play, ws }}>
+		<GameContext.Provider value={{
+			players,
+			sendMessage,
+			message,
+			gameStatus,
+			setGameStatus,
+			winner,
+			participants,
+			play,
+			ws,
+		}}>
 			{children}
 		</GameContext.Provider>
 	)
