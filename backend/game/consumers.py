@@ -802,11 +802,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         "participants": [
           self.username,
         ],
+        "open": True,
       })
 
     elif data["type"] == "game.tournamentJoin":
       for room in TOURNAMENT_ROOMS:
-        if room["tournament_uuid"] and len(room["participants"]) < room["limit"] and (room["host"] != self.username or self.username not in room["participants"]):
+        if room["open"] == True and room["tournament_uuid"] and len(room["participants"]) < room["limit"] and (room["host"] != self.username or self.username not in room["participants"]):
 
           self.tournament_name = f"tournament_room_{room["tournament_uuid"]}"
           await self.channel_layer.group_add(
@@ -833,6 +834,9 @@ class GameConsumer(AsyncWebsocketConsumer):
       match1 = uuid4()
       match2 = uuid4()
       match3 = uuid4()
+      for room in TOURNAMENT_ROOMS:
+        if data["tournament_uuid"] == room["tournament_uuid"]:
+          room["open"] = False
       await self.channel_layer.group_send(self.tournament_name, {
         "type": "game.tournamentLaunch",
         "tournament_uuid": data["tournament_uuid"],

@@ -194,7 +194,8 @@ export function GameProvider({
 		if (ws && ws.readyState === WebSocket.OPEN) {
 			ws.send(JSON.stringify(message))
 		} else {
-			console.error("[SEND MESSAGE ERROR]: Websocket isn't open.")
+			router.refresh()
+			// console.error("[SEND MESSAGE ERROR]: Websocket isn't open.")
 		}
 	}
 
