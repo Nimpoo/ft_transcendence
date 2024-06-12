@@ -120,6 +120,7 @@ export function GameProvider({
 					break
 				}
 
+				// ! TOURNAMENT ! //
 				case "game.tournament": {
 					toast(data.message, {icon: "🍖"})
 					setParticipants(data.participants)
@@ -151,7 +152,30 @@ export function GameProvider({
 					router.push(`/game/tournament/${data.tournament_uuid}/${data.room_uuid}`)
 					break
 				}
+
+				case "game.nextStep": {
+					if (data["looser"]) {
+						toast(data.message, {icon: "🫵"})
+						router.push(`/game`)
+					} else {
+						toast(data.message)
+						setPlayers(data.players)
+						setParticipants(data.participants)
+						router.push(`/game/tournament/${data.tournament_uuid}/${data.final}`)
+					}
+					break
+				}
+
+				case "game.endTournament": {
+					console.log("LE TOURNOI IL EST FINI !")
+					toast(data.message, {icon: "🎉"})
+					setPlayers([])
+					setParticipants([])
+					router.push(`/game`)
+					break
+				}
 			}
+				// ! TOURNAMENT ! //
 		}
 
 		ws.onerror = (event: Event) => {

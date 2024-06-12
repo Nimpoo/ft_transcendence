@@ -13,6 +13,7 @@ import random
 
 WAITING_ROOMS = []
 TOURNAMENT_ROOMS = []
+FINAL_ROOMS = []
 
 MAX_BOUNCE_ANGLE = 5 * math.pi / 12
 ACCELERATION_FACTOR = 1.10
@@ -20,13 +21,26 @@ ACCELERATION_FACTOR = 1.10
 MAX_SPEED = 0.015
 SPEED_INCREMENT = 0.021
 
-END_GAME = 10
+END_GAME = 2
 
 class GameConsumer(AsyncWebsocketConsumer):
 
 ############# ? Channel Send Message ? ##############
 
+  async def game_endTournament(self, text_data):
+    await self.channel_layer.group_discard(
+      self.room_group_name,
+      self.channel_name
+    )
+    await self.send(json.dumps(text_data))
 
+  async def game_finalCreate(self, text_data):
+    text_data["type"] = "game.nextStep"
+    await self.send(json.dumps(text_data))
+
+  async def game_finalJoin(self, text_data):
+    text_data["type"] = "game.nextStep"
+    await self.send(json.dumps(text_data))
 
   async def game_tournamentJoin(self, text_data):
     await self.send(json.dumps(text_data))
@@ -34,16 +48,15 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def game_tournamentQuit(self, text_data):
     await self.send(json.dumps(text_data))
 
+  async def game_nextStep(self, text_data):
+    await self.send(json.dumps(text_data))
+
+  async def game_reloadPlayers(self, text_data):
+    self.current_room["players"] = text_data["list"]
+
   async def game_tournamentLaunch(self, text_data):
     for room in TOURNAMENT_ROOMS:
       if room["tournament_uuid"] == text_data["tournament_uuid"]:
-        # await self.send(json.dumps({
-        #   "text_data": text_data["tournament_uuid"],
-        #   "room": room["tournament_uuid"],
-        #   "participant_0": room["participants"][0],
-        #   "participant_1": room["participants"][1], 
-        #   "username": self.username,
-        # }))
 
         if room["participants"][0] == self.username or room["participants"][1] == self.username:
           self.room_group_name = text_data["matchs"][0]
@@ -59,6 +72,7 @@ class GameConsumer(AsyncWebsocketConsumer):
               room["participants"][0],
               room["participants"][1],
             ],
+            "final": text_data["matchs"][2], 
             "message": f"{self.username} has joined the room of the tournament",
             "score1": 0,
             "score2": 0,
@@ -71,7 +85,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
           )
-          await self.send(json.dumps({
+          self.current_room = {
             "type": "game.tournamentLaunch",
             "tournament_uuid": text_data["tournament_uuid"],
             "room_uuid": text_data["matchs"][1],
@@ -79,10 +93,12 @@ class GameConsumer(AsyncWebsocketConsumer):
               room["participants"][2],
               room["participants"][3],
             ],
-            "message": f"{self.username} has joined the room of the tournament.",
+            "final": text_data["matchs"][2],
+            "message": f"{self.username} has joined the room of the tournament",
             "score1": 0,
             "score2": 0,
-          }))
+          }
+          await self.send(json.dumps(self.current_room))
 
 
 
@@ -118,6 +134,13 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.send(json.dumps(text_data))
 
   async def game_finished(self, text_data):
+
+    await self.send(json.dumps({
+      "winner": text_data["winner"],
+      "username": self.username,
+      "is_winner_?": self.username == text_data["winner"],
+    }))
+
     try:
       cancel = self.loop.cancel()
       print(f"cancel [DISCONNECT]: {cancel}")
@@ -162,8 +185,11 @@ class GameConsumer(AsyncWebsocketConsumer):
     except Exception as e:
       await self.send(json.dumps({'error': f'You are not the host: [{e}]'}))
 
+    is_found = False
+
     for room in WAITING_ROOMS:
       if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
+        is_found = True
         room["players"].remove(self.username)
         if not room["players"]:
           WAITING_ROOMS.remove(room)
@@ -176,6 +202,138 @@ class GameConsumer(AsyncWebsocketConsumer):
         })
         break
 
+    if is_found == False:
+      await self.channel_layer.group_discard(
+        self.room_group_name,
+        self.channel_name
+      )
+
+      if self.username == text_data["winner"]:
+        room = self.current_room
+        self.room_group_name = room["final"]
+        found = False
+        for index in FINAL_ROOMS:
+          if index["uuid"] == self.room_group_name:
+            await self.send(json.dumps({
+              "index": index["players"],
+              "room": room["players"],
+            }))
+            if len(index["players"]) == 2:
+              self.current_room["type"] = "game.endTournament"
+              self.current_room["message"] = f"{text_data["winner"]} has won the tournament !"
+
+              await self.send(json.dumps(self.current_room))
+
+              await self.channel_layer.group_send(self.room_group_name,
+                self.current_room
+              )
+              await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+              )
+              await self.channel_layer.group_discard(
+                self.current_room["tournament_uuid"],
+                self.channel_name
+              )
+              FINAL_ROOMS.remove(index)
+              for index_t in TOURNAMENT_ROOMS:
+                if index_t["tournament_uuid"] == self.current_room["tournament_uuid"]:
+                  TOURNAMENT_ROOMS.remove(index_t)
+              self.current_room = {}
+              return
+          if index["uuid"] == room["final"]:
+            index["players"].append(self.username)
+            final_players = index["players"]
+            await self.channel_layer.group_send(index["uuid"], {
+              "type": "game.reloadPlayers",
+              "list": final_players,
+            })
+            # ENVOYE ICI UN GROUP SEND POUR QUE L'AUTRE ACTUALISE SA LISTE DE JOUEUR
+            await self.send(json.dumps({
+            "type": "j'ai trouvé alors je rajoute mon blaze dans la room !",
+            "la room": index,
+          }))
+
+            await self.channel_layer.group_add(
+              self.room_group_name,
+              self.channel_name
+            )
+
+            self.current_room = {
+              "type": "game.finalJoin",
+              "tournament_uuid": room["tournament_uuid"],
+              "room_uuid": room["final"],
+              "players": final_players,
+              "final": room["final"],
+              "message": f"{self.username} has joined the room of the tournament",
+              "score1": 0,
+              "score2": 0,
+            }
+            await self.channel_layer.group_send(self.room_group_name,
+              self.current_room
+            )
+            found = True
+            return
+
+        if not found:
+          await self.send(json.dumps({
+            "type": "j'ai pas trouvé alors je creer la room !"
+          }))
+          FINAL_ROOMS.append({
+            "uuid": room["final"],
+            "players": [
+              self.username,
+            ],
+          })
+
+          final_players = [
+            self.username,
+          ]
+
+          await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+          )
+
+          self.current_room = {
+            "type": "game.finalJoin",
+            "tournament_uuid": room["tournament_uuid"],
+            "room_uuid": room["final"],
+            "players": final_players,
+            "final": room["final"],
+            "message": f"{self.username} has joined the room of the tournament ",
+            "score1": 0,
+            "score2": 0,
+          }
+          self.room_group_name = room["final"]
+          await self.channel_layer.group_send(self.room_group_name,
+            self.current_room
+          )
+          await self.send(json.dumps({"current_room": self.current_room}))
+          return
+
+      else:
+        await self.send(json.dumps({
+          "type": "game.nextStep",
+          "looser": self.username,
+          "message": "AHAHAHAHAHAH BIG LOOSER", 
+        }))
+        await self.channel_layer.group_discard(
+          self.room_group_name,
+          self.channel_name
+        )
+        await self.channel_layer.group_discard(
+          self.current_room["tournament_uuid"],
+          self.channel_name
+        )
+
+        for index in TOURNAMENT_ROOMS:
+          if index["tournament_uuid"] == self.current_room["tournament_uuid"]:
+            index["participants"].remove(self.username)
+
+      self.current_room = {}
+      return
+
     self.score1, self.score2 = 0, 0
 
     await self.channel_layer.group_discard(
@@ -187,7 +345,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
   async def game_countdown(self, text_data):
     self.countdown = False
-    await self.send(json.dumps({"Room name in countdown": self.room_group_name,}))
 
 ################## AT START ###################
     if text_data["when"] == "begin":
@@ -411,10 +568,26 @@ class GameConsumer(AsyncWebsocketConsumer):
           "when": "in-game",
         })
         if self.score2 == END_GAME:
+
+          await self.send(json.dumps({
+            "room_group_name_ICI": self.room_group_name,
+          }))
+
+          await self.send(json.dumps({"type": "truc de zinzin",
+                                      "room": self.current_room,
+                                      }))
+
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.finished",
-            "winner": room["players"][1],
+            "winner": self.current_room["players"][1],
           })
+
+          await self.send(json.dumps({"type": "truc de foufou"}))
+
+          await self.send(json.dumps({
+            "type": "game.finished",
+            "winner": room["players"][1],
+          }))
         return 2
     # *
 
