@@ -14,6 +14,8 @@ var time = 0
 var score1 = 0
 var score2 = 0
 
+var start_score = false
+
 interface Ball {
 	coord: [number, number],
 	dimensions: [number, number],
@@ -226,17 +228,11 @@ function Canvas({
 					if (message.player && message.score2 && message.player === "2") {
 						score2 = message.score2
 					}
-				} else if (message && (message.type === "game.create" || message.type === "game.join")) {
-					try {
-						score1 = message.score1
-					} catch {
-						score1 = 0
-					}
-					try {
-						score2 = message.score2
-					} catch {
-						score2 = 0
-					}
+				}
+
+				if (message && (message.type === "game.create" || message.type === "game.join")) {
+					score1 = 0
+					score2 = 0
 				}
 				// * /*------------------------------------*/
 
@@ -321,6 +317,11 @@ function Canvas({
 						demo()
 
 					} else if (gameStatus === "in-game") {
+						if (start_score === false) {
+							score1 = 0
+							score2 = 0
+							start_score = true
+						}
 						playing()
 
 					} else if (gameStatus === "finished") {
@@ -331,6 +332,7 @@ function Canvas({
 								"id": session?.id.toString(),
 							})
 						}
+						start_score = false
 						router.push("/game")
 						createModal(endGame)
 						setGameStatus("pending")
