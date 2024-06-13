@@ -61,6 +61,9 @@ export function GameProvider({
 
 		ws.onmessage = (event: any) => {
 			const data = JSON.parse(event.data)
+			if (data["type"] !== "game.update") {
+				console.log(data)
+			}
 
 			switch (data["type"]) {
 				case "game.create": {
@@ -194,8 +197,7 @@ export function GameProvider({
 		if (ws && ws.readyState === WebSocket.OPEN) {
 			ws.send(JSON.stringify(message))
 		} else {
-			router.refresh()
-			// console.error("[SEND MESSAGE ERROR]: Websocket isn't open.")
+			console.error("[SEND MESSAGE ERROR]: Websocket isn't open.")
 		}
 	}
 
