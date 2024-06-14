@@ -21,7 +21,7 @@ ACCELERATION_FACTOR = 1.10
 MAX_SPEED = 0.015
 SPEED_INCREMENT = 0.021
 
-END_GAME = 10
+END_GAME = 2
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -610,250 +610,253 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 #################### ? Receive ? ###################
   async def receive(self, text_data=None, bytes_data=None):
-    data = json.loads(text_data)
-    self.username = data.get("user", "unknown_player")
-    self.id = data.get("id", "ERROR")
-    ############## Paddles Movements ###############
-    if data["type"] == "game.paddle":
-      room = self.current_room
-      if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and data["player"] == "1":
-        if data["key"] == "up" and self.py_1 <= 1:
-          if (self.py_1 - self.ph / 2) - 0.01 <= 0:
-            self.py_1 = 0 + self.ph / 2
-          else:
-            self.py_1 -= 0.021
+    try:
+      data = json.loads(text_data)
+      self.username = data.get("user", "unknown_player")
+      self.id = data.get("id", "ERROR")
+      ############## Paddles Movements ###############
+      if data["type"] == "game.paddle":
+        room = self.current_room
+        if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and data["player"] == "1":
+          if data["key"] == "up" and self.py_1 <= 1:
+            if (self.py_1 - self.ph / 2) - 0.01 <= 0:
+              self.py_1 = 0 + self.ph / 2
+            else:
+              self.py_1 -= 0.021
 
-        elif data["key"] == "down" and self.py_1 >= 0:
-          if (self.py_1 + self.ph / 2) + 0.01 >= 1:
-            self.py_1 = 1 - self.ph / 2
-          else:
-            self.py_1 += 0.021
+          elif data["key"] == "down" and self.py_1 >= 0:
+            if (self.py_1 + self.ph / 2) + 0.01 >= 1:
+              self.py_1 = 1 - self.ph / 2
+            else:
+              self.py_1 += 0.021
 
-        ball_info = {
-          "coordinates": [self.x, self.y],
-          "dimensions": [self.w, self.h],
-          "speed": [self.vx, self.vy],
-          "paddle_coord_1": [self.px_1, self.py_1],
-          "paddle_coord_2": [self.px_2, self.py_2],
-          "paddle_dimensions": [self.pw, self.ph],
-        }
+          ball_info = {
+            "coordinates": [self.x, self.y],
+            "dimensions": [self.w, self.h],
+            "speed": [self.vx, self.vy],
+            "paddle_coord_1": [self.px_1, self.py_1],
+            "paddle_coord_2": [self.px_2, self.py_2],
+            "paddle_dimensions": [self.pw, self.ph],
+          }
+          await self.channel_layer.group_send(self.room_group_name, {
+            "type": "game.update",
+            "new_position": ball_info,
+            "score1": self.score1,
+            "score2": self.score2,
+          })
+
+        elif room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and data["player"] == "2":
+          await self.channel_layer.group_send(self.room_group_name, {
+            "type": "game.paddles",
+            "key": data["key"],
+            "player": "2",
+          })
+      ################################################
+
+      ############### Launch The Game ################
+      if data["type"] == "game.begin":
         await self.channel_layer.group_send(self.room_group_name, {
-          "type": "game.update",
-          "new_position": ball_info,
-          "score1": self.score1,
-          "score2": self.score2,
+          "type": "game.countdown",
+          "when": "begin",
         })
+        await self.game_begin() # ? Line 55
+      ################################################
 
-      elif room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and data["player"] == "2":
-        await self.channel_layer.group_send(self.room_group_name, {
-          "type": "game.paddles",
-          "key": data["key"],
-          "player": "2",
-        })
-    ################################################
+      ############### Finish The Game ################
+      if data["type"] == "game.finished":
+        if hasattr(self, "room_group_name"):
+          for room in WAITING_ROOMS:
+            if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
+              room["players"].remove(self.username)
+              if not room["players"]:
+                WAITING_ROOMS.remove(room)
+              elif room["host"] == self.username:
+                room["host"] = room["players"][0]
+              await self.channel_layer.group_send(self.room_group_name, {
+                "type": "game.quit",
+                "players": room["players"],
+                "message": f"{self.username} has left the room.",
+              })
+              break
 
-    ############### Launch The Game ################
-    if data["type"] == "game.begin":
-      await self.channel_layer.group_send(self.room_group_name, {
-        "type": "game.countdown",
-        "when": "begin",
-      })
-      await self.game_begin() # ? Line 55
-    ################################################
+          await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+          )
+      ################################################
 
-    ############### Finish The Game ################
-    if data["type"] == "game.finished":
-      if hasattr(self, "room_group_name"):
-        for room in WAITING_ROOMS:
-          if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
-            room["players"].remove(self.username)
-            if not room["players"]:
-              WAITING_ROOMS.remove(room)
-            elif room["host"] == self.username:
-              room["host"] = room["players"][0]
-            await self.channel_layer.group_send(self.room_group_name, {
-              "type": "game.quit",
-              "players": room["players"],
-              "message": f"{self.username} has left the room.",
-            })
-            break
+      ############## Creation of a Room ##############
+      if data["type"] == "game.create":
+        self.score1, self.score2 = 0, 0
+        room_uuid = uuid4()
+        self.room_group_name = f"game_room_{room_uuid}"
 
-        await self.channel_layer.group_discard(
-          self.room_group_name,
-          self.channel_name
-        )
-    ################################################
-
-    ############## Creation of a Room ##############
-    if data["type"] == "game.create":
-      self.score1, self.score2 = 0, 0
-      room_uuid = uuid4()
-      self.room_group_name = f"game_room_{room_uuid}"
-
-      await self.channel_layer.group_add(
-        self.room_group_name,
-        self.channel_name
-      )
-
-      await self.send(text_data=json.dumps({
-        "type": "game.create",
-        "room_uuid": str(room_uuid),
-        "players": [self.username],
-        "message": f"A new room was created by {data["user"]}.",
-        "score1": self.score1,
-        "score2": self.score2,
-      }))
-      room = {
-        "room_uuid": str(room_uuid),
-        "host": self.username,
-        "limit": 2,
-        "players": [
-          self.username,
-        ],
-      }
-      WAITING_ROOMS.append(room)
-      self.current_room = room
-    ################################################
-
-    ################ Joining a Room ################
-    elif data["type"] == "game.join":
-      self.score1, self.score2 = 0, 0
-
-    # * ############### MATCHMAKING ################
-      diff = 0
-      me = await sync_to_async(User.objects.get)(login=self.username)
-
-      min_diff = float('inf')
-      room_index = -1
-
-      for i, room in enumerate(WAITING_ROOMS):
-        if room["room_uuid"] and len(room["players"]) < room["limit"]:
-
-          if room["host"] == self.username or room["players"][0] == self.username:
-            break
-
-          self.current_room = room
-
-          player_1 = await sync_to_async(User.objects.get)(login=room["players"][0])
-          if len(room["players"]) == 1:
-
-            my_trophies = me.trophies
-
-            diff = abs(my_trophies - player_1.trophies)
-
-            if diff < min_diff:
-              min_diff = diff
-              room_index = i
-          else:
-            player_2 = await sync_to_async(User.objects.get)(login=room["players"][1])
-
-            diff = abs(player_1.trophies - player_2.trophies)
-
-            if diff < min_diff:
-              min_diff = diff
-              room_index = i
-
-      if room_index != -1:
-        room = WAITING_ROOMS[room_index]
-        self.room_group_name = f"game_room_{room["room_uuid"]}"
         await self.channel_layer.group_add(
           self.room_group_name,
           self.channel_name
         )
-        room["players"].append(self.username)
-        await self.channel_layer.group_send(self.room_group_name, {
-          "type": "game.join",
-          "room_uuid": room["room_uuid"],
-          "players": room["players"],
-          "message": f"{data["user"]} has joined the room.",
+
+        await self.send(text_data=json.dumps({
+          "type": "game.create",
+          "room_uuid": str(room_uuid),
+          "players": [self.username],
+          "message": f"A new room was created by {data["user"]}.",
           "score1": self.score1,
           "score2": self.score2,
-        })
-    # * ############################################
-
-      else:
-        await self.send(text_data=json.dumps({
-          "type": "game.null",
-          "message": "No lobby found.",
         }))
-        return
-    ################################################
+        room = {
+          "room_uuid": str(room_uuid),
+          "host": self.username,
+          "limit": 2,
+          "players": [
+            self.username,
+          ],
+        }
+        WAITING_ROOMS.append(room)
+        self.current_room = room
+      ################################################
 
-    ################## TOURNAMENT ##################
-    elif data["type"] == "game.tournament":
-      tournament_uuid = uuid4()
-      self.tournament_name = f"tournament_room_{tournament_uuid}"
+      ################ Joining a Room ################
+      elif data["type"] == "game.join":
+        self.score1, self.score2 = 0, 0
 
-      await self.channel_layer.group_add(
-        self.tournament_name,
-        self.channel_name
-      )
+      # * ############### MATCHMAKING ################
+        diff = 0
+        me = await sync_to_async(User.objects.get)(login=self.username)
 
-      await self.send(text_data=json.dumps({
-        "type": "game.tournament",
-        "tournament_uuid": str(tournament_uuid),
-        "participants": [self.username],
-        "message": f"A new tournament was created by {data["user"]}.",
-      }))
-      TOURNAMENT_ROOMS.append({
-        "tournament_uuid": str(tournament_uuid),
-        "host": self.username,
-        "limit": 4,
-        "participants": [
-          self.username,
-        ],
-        "open": True,
-      })
+        min_diff = float('inf')
+        room_index = -1
 
-    elif data["type"] == "game.tournamentJoin":
-      for room in TOURNAMENT_ROOMS:
-        if (self.username not in room["participants"]) and room["open"] and room["tournament_uuid"] and len(room["participants"]) < room["limit"] and room["host"] != self.username:
+        for i, room in enumerate(WAITING_ROOMS):
+          if room["room_uuid"] and len(room["players"]) < room["limit"]:
 
-          self.tournament_name = f"tournament_room_{room["tournament_uuid"]}"
+            if room["host"] == self.username or room["players"][0] == self.username:
+              break
+
+            self.current_room = room
+
+            player_1 = await sync_to_async(User.objects.get)(login=room["players"][0])
+            if len(room["players"]) == 1:
+
+              my_trophies = me.trophies
+
+              diff = abs(my_trophies - player_1.trophies)
+
+              if diff < min_diff:
+                min_diff = diff
+                room_index = i
+            else:
+              player_2 = await sync_to_async(User.objects.get)(login=room["players"][1])
+
+              diff = abs(player_1.trophies - player_2.trophies)
+
+              if diff < min_diff:
+                min_diff = diff
+                room_index = i
+
+        if room_index != -1:
+          room = WAITING_ROOMS[room_index]
+          self.room_group_name = f"game_room_{room["room_uuid"]}"
           await self.channel_layer.group_add(
-            self.tournament_name,
+            self.room_group_name,
             self.channel_name
           )
-          room["participants"].append(self.username)
-          await self.channel_layer.group_send(self.tournament_name, {
-            "type": "game.tournamentJoin",
-            "tournament_uuid": room["tournament_uuid"],
-            "participants": room["participants"],
-            "message": f"{data["user"]} has joined the tournament.",
+          room["players"].append(self.username)
+          await self.channel_layer.group_send(self.room_group_name, {
+            "type": "game.join",
+            "room_uuid": room["room_uuid"],
+            "players": room["players"],
+            "message": f"{data["user"]} has joined the room.",
+            "score1": self.score1,
+            "score2": self.score2,
           })
-          break
+      # * ############################################
 
-      else:
+        else:
+          await self.send(text_data=json.dumps({
+            "type": "game.null",
+            "message": "No lobby found.",
+          }))
+          return
+      ################################################
+
+      ################## TOURNAMENT ##################
+      elif data["type"] == "game.tournament":
+        tournament_uuid = uuid4()
+        self.tournament_name = f"tournament_room_{tournament_uuid}"
+
+        await self.channel_layer.group_add(
+          self.tournament_name,
+          self.channel_name
+        )
+
         await self.send(text_data=json.dumps({
-          "type": "game.null",
-          "message": "No tournament found.",
+          "type": "game.tournament",
+          "tournament_uuid": str(tournament_uuid),
+          "participants": [self.username],
+          "message": f"A new tournament was created by {data["user"]}.",
         }))
-        return
+        TOURNAMENT_ROOMS.append({
+          "tournament_uuid": str(tournament_uuid),
+          "host": self.username,
+          "limit": 4,
+          "participants": [
+            self.username,
+          ],
+          "open": True,
+        })
 
-    elif data["type"] == "game.beginTournament":
-      match1 = uuid4()
-      match2 = uuid4()
-      match3 = uuid4()
-      for room in TOURNAMENT_ROOMS:
-        if data["tournament_uuid"] == room["tournament_uuid"]:
-          room["open"] = False
-      await self.channel_layer.group_send(self.tournament_name, {
-        "type": "game.tournamentLaunch",
-        "tournament_uuid": data["tournament_uuid"],
-        "message": "Tournament will begin.",
-        "matchs": [
-          str(match1),
-          str(match2),
-          str(match3),
-        ],
-      })
+      elif data["type"] == "game.tournamentJoin":
+        for room in TOURNAMENT_ROOMS:
+          if (self.username not in room["participants"]) and room["open"] and room["tournament_uuid"] and len(room["participants"]) < room["limit"] and room["host"] != self.username:
 
-    elif data["type"] == "game.tournamentGameBegin":
-      await self.channel_layer.group_send(self.room_group_name, {
-        "type": "game.countdown",
-        "when": "begin",
-      })
-      await self.game_tournamentGameBegin() # ? Line 55
+            self.tournament_name = f"tournament_room_{room["tournament_uuid"]}"
+            await self.channel_layer.group_add(
+              self.tournament_name,
+              self.channel_name
+            )
+            room["participants"].append(self.username)
+            await self.channel_layer.group_send(self.tournament_name, {
+              "type": "game.tournamentJoin",
+              "tournament_uuid": room["tournament_uuid"],
+              "participants": room["participants"],
+              "message": f"{data["user"]} has joined the tournament.",
+            })
+            break
+
+        else:
+          await self.send(text_data=json.dumps({
+            "type": "game.null",
+            "message": "No tournament found.",
+          }))
+          return
+
+      elif data["type"] == "game.beginTournament":
+        match1 = uuid4()
+        match2 = uuid4()
+        match3 = uuid4()
+        for room in TOURNAMENT_ROOMS:
+          if data["tournament_uuid"] == room["tournament_uuid"]:
+            room["open"] = False
+        await self.channel_layer.group_send(self.tournament_name, {
+          "type": "game.tournamentLaunch",
+          "tournament_uuid": data["tournament_uuid"],
+          "message": "Tournament will begin.",
+          "matchs": [
+            str(match1),
+            str(match2),
+            str(match3),
+          ],
+        })
+
+      elif data["type"] == "game.tournamentGameBegin":
+        await self.channel_layer.group_send(self.room_group_name, {
+          "type": "game.countdown",
+          "when": "begin",
+        })
+        await self.game_tournamentGameBegin() # ? Line 55
+    except Exception as e:
+      print(e)
     ################################################
 ###################################################?
 
