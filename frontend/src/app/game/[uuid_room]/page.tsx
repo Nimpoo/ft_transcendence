@@ -37,7 +37,7 @@ function GamingRoom(): React.JSX.Element | null {
 	useEffect(() => {
 		if (gameStatus === "in-game") {
 			const keyhandler = (e: any) => {
-				if (e.key === "z" || e.key === "Z") {
+				if (e.key === "w" || e.key === "W") {
 					if (sendMessage) {
 						sendMessage({
 							"type": "game.paddle",
