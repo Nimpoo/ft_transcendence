@@ -145,6 +145,7 @@ export function GameProvider({
 					setParticipants(data.participants)
 					// setGameStatus("finished")
 					toast(data.message, {icon: "🔨"})
+					router.push("/game")
 					break
 				}
 
@@ -174,7 +175,7 @@ export function GameProvider({
 					toast(data.message, {icon: "🎉"})
 					setPlayers([])
 					setParticipants([])
-					router.push(`/game`)
+					router.push("/game")
 					break
 				}
 				// ! TOURNAMENT ! //
