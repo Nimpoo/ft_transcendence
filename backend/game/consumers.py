@@ -42,9 +42,6 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.send(json.dumps(text_data))
 
   async def game_tournamentQuit(self, text_data):
-    if hasattr(self, "score1") and hasattr(self, "score2"):
-      text_data["score1"] = self.score1,
-      text_data["score2"] = self.score2,
     await self.send(json.dumps(text_data))
 
   async def game_nextStep(self, text_data):
@@ -925,12 +922,6 @@ class GameConsumer(AsyncWebsocketConsumer):
       if self.tournament_name:
         await self.channel_layer.group_discard(
           self.tournament_name,
-          self.channel_name
-        )
-
-      if self.room_group_name:
-        await self.channel_layer.group_discard(
-          self.room_group_name,
           self.channel_name
         )
 
