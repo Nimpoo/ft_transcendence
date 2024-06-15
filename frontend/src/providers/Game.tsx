@@ -188,8 +188,15 @@ export function GameProvider({
 
 		setWs(ws)
 
+		const handlePopState = () => {
+			window.location.reload()
+		}
+
+		window.addEventListener("popstate", handlePopState)
+
 		return () => {
 			ws.close()
+			window.removeEventListener("popstate", handlePopState)
 		}
 	}, [router])
 
