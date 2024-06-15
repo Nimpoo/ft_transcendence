@@ -99,9 +99,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
   async def game_paddles(self, text_data):
-    room = self.current_room
-    if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and text_data["player"] == "2":
-      try:
+    try:
+      room = self.current_room
+      if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"] and text_data["player"] == "2":
         if text_data["key"] == "up" and self.py_2 <= 1:
           if (self.py_2 - self.ph / 2) - 0.01 <= 0:
             self.py_2 = 0 + self.ph / 2
@@ -114,11 +114,23 @@ class GameConsumer(AsyncWebsocketConsumer):
           else:
             self.py_2 += SPEED_INCREMENT
 
-      except Exception:
-        # ? Player 2 is not the host
-        pass
+    except Exception:
+      # ? Player 2 is not the host
+      pass
 
   async def game_quit(self, text_data):
+    try:
+      cancel = self.loop.cancel()
+      print(f"cancel [DISCONNECT]: {cancel}")
+    except Exception:
+      # ? Player 2 is not the host
+      try:
+        await self.channel_layer.group_send(self.room_group_name, {
+          "type": "game.break",
+        })
+      except:
+        # * Not in an actual room
+        pass
     await self.send(json.dumps(text_data))
 
   async def game_join(self, text_data):
@@ -314,7 +326,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           self.channel_name
         )
         await self.channel_layer.group_discard(
-          self.current_room["tournament_uuid"],
+          self.tournament_name,
           self.channel_name
         )
 
@@ -905,6 +917,22 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     if hasattr(self, "tournament_name"):
 
+      if hasattr(self, "game_loop"):
+
+        try:
+          cancel = self.loop.cancel()
+          print(f"cancel [DISCONNECT]: {cancel}")
+        except Exception:
+          # ? Player 2 is not the host
+          try:
+            await self.channel_layer.group_send(self.room_group_name, {
+              "type": "game.break",
+            })
+          except Exception:
+            # * Not in an actual game
+            pass
+          pass
+
       for room in TOURNAMENT_ROOMS:
         if room["tournament_uuid"] == self.tournament_name.split("_")[-1] and self.username in room["participants"]:
           room["participants"].remove(self.username)
@@ -917,11 +945,26 @@ class GameConsumer(AsyncWebsocketConsumer):
             "participants": room["participants"],
             "message": f"{self.username} has left the tournament.",
           })
+
+          if len(room["participants"]) > 0:
+            for participant in room["participants"]:
+              await self.channel_layer.group_send(self.tournament_name, {
+                "type": "game.quit",
+                "players": [],
+                "message": f"{participant} has left the tournament because {self.username} left the game.",
+              })
+
           break
 
       if self.tournament_name:
         await self.channel_layer.group_discard(
           self.tournament_name,
+          self.channel_name
+        )
+
+      if hasattr(self, "room_group_name"):
+        await self.channel_layer.group_discard(
+          self.room_group_name,
           self.channel_name
         )
 
