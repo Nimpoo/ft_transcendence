@@ -86,7 +86,6 @@ function GamingRoom(): React.JSX.Element | null {
 
 	useEffect(() => {
 		if (!players.length) {
-			toast.error("Unauthorized access to this lobby")
 			router.push("/game")
 			return
 		}

@@ -61,9 +61,6 @@ export function GameProvider({
 
 		ws.onmessage = (event: any) => {
 			const data = JSON.parse(event.data)
-			if (data["type"] !== "game.update") {
-				console.log(data)
-			}
 
 			switch (data["type"]) {
 				case "game.create": {
@@ -158,7 +155,7 @@ export function GameProvider({
 
 				case "game.nextStep": {
 					if (data["looser"]) {
-						toast(data.message, {icon: "🫵"})
+						toast(data.message, {icon: "👾"})
 						router.push(`/game`)
 					} else {
 						toast(data.message)
@@ -170,7 +167,6 @@ export function GameProvider({
 				}
 
 				case "game.endTournament": {
-					console.log("LE TOURNOI IL EST FINI !")
 					toast(data.message, {icon: "🎉"})
 					setPlayers([])
 					setParticipants([])

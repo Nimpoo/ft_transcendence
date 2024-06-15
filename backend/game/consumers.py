@@ -21,7 +21,7 @@ ACCELERATION_FACTOR = 1.10
 MAX_SPEED = 0.015
 SPEED_INCREMENT = 0.021
 
-END_GAME = 2
+END_GAME = 10
 
 class GameConsumer(AsyncWebsocketConsumer):
 
@@ -319,7 +319,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({
           "type": "game.nextStep",
           "looser": self.username,
-          "message": "AHAHAHAHAHAH BIG LOOSER", 
+          "message": "You lose.", 
         }))
         await self.channel_layer.group_discard(
           self.room_group_name,
