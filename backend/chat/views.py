@@ -6,7 +6,6 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.http import require_GET
 
-import urllib.parse
 import json
 
 from chat.serializers import ChatSerializer
@@ -39,37 +38,37 @@ class Block(View):
                 {"error": "Bad Request", "message": "Body must be JSON."}, status=400
             )
 
-        receiver_id = body_payload.get("user_id")
+        target_id = body_payload.get("user_id")
 
-        if receiver_id is None:
+        if target_id is None:
             return JsonResponse(
                 {"error": "Bad Request", "message": "No 'user_id' provided."},
                 status=400,
             )
 
-        receiver = get_object_or_404(User, id=receiver_id)
+        target = get_object_or_404(User, id=target_id)
 
-        if user.id == receiver.id:
+        if user.id == target.id:
             return JsonResponse(
                 {"error": "Bad Request", "message": "IDs are equal."}, status=400
             )
 
-        if user.blocked.contains(receiver):
+        if user.blocked.contains(target):
             return JsonResponse(
                 {
                     "error": "Bad Request",
-                    "message": f"'{receiver.login}' is already in your blocked list.",
+                    "message": f"'{target.login}' is already in your blocked list.",
                 },
                 status=400,
             )
 
-        if user.friends.contains(receiver):
-            user.friends.remove(receiver)
+        if user.friends.contains(target):
+            user.friends.remove(target)
 
             try:
                 friend_request = FriendRequest.objects.get(
                     sender=user,
-                    receiver=receiver,
+                    target=target,
                     status__in=[
                         FriendRequest.STATUS_PENDING,
                         FriendRequest.STATUS_ACCEPTED,
@@ -78,8 +77,8 @@ class Block(View):
             except FriendRequest.DoesNotExist:
                 friend_request = get_object_or_404(
                     FriendRequest,
-                    sender=receiver,
-                    receiver=user,
+                    sender=target,
+                    target=user,
                     status__in=[
                         FriendRequest.STATUS_PENDING,
                         FriendRequest.STATUS_ACCEPTED,
@@ -89,7 +88,12 @@ class Block(View):
             friend_request.status = FriendRequest.STATUS_BLOCKED
             friend_request.save()
 
-        user.blocked.add(receiver)
+        user.blocked.add(target)
+
+        for chat in Chat.objects.filter(
+            Q(sender=user, receiver=target) | Q(sender=target, receiver=user)
+        ):
+            chat.delete()
 
         return JsonResponse(
             list(user.blocked.values("id", "login", "display_name", "created_at")),
@@ -110,31 +114,31 @@ class Block(View):
                 {"error": "Bad Request", "message": "Body must be JSON."}, status=400
             )
 
-        receiver_id = body_payload.get("user_id")
+        target_id = body_payload.get("user_id")
 
-        if receiver_id is None:
+        if target_id is None:
             return JsonResponse(
                 {"error": "Bad Request", "message": "Missing required fields."},
                 status=400,
             )
 
-        receiver = get_object_or_404(User, id=receiver_id)
+        target = get_object_or_404(User, id=target_id)
 
-        if user.id == receiver.id:
+        if user.id == target.id:
             return JsonResponse(
                 {"error": "Bad Request", "message": "IDs are equal."}, status=400
             )
 
-        if not user.blocked.contains(receiver):
+        if not user.blocked.contains(target):
             return JsonResponse(
                 {
                     "error": "Bad Request",
-                    "message": f"'{receiver.login}' isn't in your blocked list.",
+                    "message": f"'{target.login}' isn't in your blocked list.",
                 },
                 status=400,
             )
 
-        user.blocked.remove(receiver)
+        user.blocked.remove(target)
 
         return JsonResponse(
             list(user.blocked.values("id", "login", "display_name", "created_at")),
@@ -148,14 +152,21 @@ def get_conv(request: HttpRequest, user: User) -> JsonResponse:
     target_id = request.GET.get("user")
 
     if target_id is None:
-        return JsonResponse({"error": "Bad Request", "message": "You must provide `user`."}, status=400)
+        return JsonResponse(
+            {"error": "Bad Request", "message": "You must provide `user`."}, status=400
+        )
 
     try:
         target = User.objects.get(id=target_id)
     except User.DoesNotExist:
-        return JsonResponse({"error": "Not Found", "message": "The provided id does not match a user."}, status=404)
+        return JsonResponse(
+            {"error": "Not Found", "message": "The provided id does not match a user."},
+            status=404,
+        )
 
-    all_user_chat = Chat.objects.filter(Q(sender=target, receiver=user) | Q(receiver=target, sender=user))
+    all_user_chat = Chat.objects.filter(
+        Q(sender=target, receiver=user) | Q(receiver=target, sender=user)
+    )
     chat_list = [ChatSerializer(chat).data for chat in all_user_chat]
 
     return JsonResponse(chat_list, safe=False)
@@ -166,15 +177,16 @@ def get_conv(request: HttpRequest, user: User) -> JsonResponse:
 def get_all_convs(request: HttpRequest, user: User) -> JsonResponse:
     crspdts = User.objects.filter(
         id__in=[chat.sender.id for chat in user.received_messages.all()]
-            + [chat.receiver.id for chat in user.sent_messages.all()]
+        + [chat.receiver.id for chat in user.sent_messages.all()]
     )
 
     chats = [
         ChatSerializer(
             Chat.objects.filter(
-                Q(sender=user, receiver=crspdt)
-                    | Q(sender=crspdt, receiver=user)
-            ).order_by("-id").first()
+                Q(sender=user, receiver=crspdt) | Q(sender=crspdt, receiver=user)
+            )
+            .order_by("-id")
+            .first()
         ).data
         for crspdt in crspdts
     ]

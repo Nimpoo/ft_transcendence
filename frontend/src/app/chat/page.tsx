@@ -37,7 +37,7 @@ function Chat(): React.JSX.Element {
 	}, [router, status])
 
 	useEffect(() => {
-		if (session)
+		if (session && conversations === undefined)
 		{
 			const getAllConv = async () => {
 				const response = await session.api("/chat/getconvs/").catch(console.error)
@@ -51,7 +51,9 @@ function Chat(): React.JSX.Element {
 
 			getAllConv()
 		}
-	}, [session])
+		else
+			console.log(conversations)
+	}, [session, conversations])
 
 	useEffect(() => {
 		if (socket)
@@ -154,15 +156,7 @@ function Chat(): React.JSX.Element {
 	}
 
 	const handleClick = (user: User) => {
-		if (user.id === selectedConversation?.id)
-		{
-			setSelectedConversation(undefined)
-		}
-		else
-		{
-			setSelectedConversation(user)
-		}
-
+		setSelectedConversation(user.id === selectedConversation?.id ? undefined : user)
 		setSearch("")
 		setMessages(undefined)
 	}
@@ -275,8 +269,31 @@ function Chat(): React.JSX.Element {
 											</Link>
 										</li>
 										<li className="list-inline-item">
-											<button type="button" className="btn btn-danger btn-place">
-												<div>Block</div>
+											<button
+												type="button"
+												className="btn btn-danger btn-place"
+												onClick={
+													function()
+													{
+														session.api(
+															"/chat/block/",
+															"POST",
+															JSON.stringify(
+																{
+																	user_id: selectedConversation.id
+																}
+															)
+														)
+														setConversations(
+															conversations => conversations?.filter(
+																c => c.sender.id == session.id ? c.receiver.id != selectedConversation.id : c.sender.id != selectedConversation.id
+															)
+														)
+														setSelectedConversation(undefined)
+													}
+												}
+											>
+												Block
 											</button>
 										</li>
 									</ul>
