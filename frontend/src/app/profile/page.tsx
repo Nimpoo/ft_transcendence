@@ -11,6 +11,7 @@ import { useSession } from "@/providers/Session"
 import "@/styles/profile/Profile.css"
 import FriendsList from "@/components/FriendsList"
 import Loading from "../loading"
+import HistoryExtended from "@/components/HistoryExtended"
 
 function Profile(): React.JSX.Element {
 	const router = useRouter()
@@ -51,7 +52,7 @@ function Profile(): React.JSX.Element {
 				<div className="bento" style={{height: "48%"}}>
 					<div className="stats-wrapper">
 						<div className="trophies-ranking">
-							<CountUp duration={5} className="trophies-number truncate" end={0} />
+							<CountUp duration={5} className="trophies-number truncate" end={session.trophies} />
 							<Image priority
 								src={"/assets/ranking/trophy.png"}
 								width={72}
@@ -60,13 +61,13 @@ function Profile(): React.JSX.Element {
 							/>
 						</div>
 						<div className="trophies-ranking" style={{marginTop: "0.25rem"}}>
-						<h3 className="ranking-ladder">Challenger - I</h3>
-						<Image priority
-							src={"/assets/ranking/challenger_1.png"}
-							width={45}
-							height={45}
-							alt="Challenger - I"
-						/>
+							<h3 className="ranking-ladder">Challenger - I</h3>
+							<Image priority
+								src={"/assets/ranking/challenger_1.png"}
+								width={45}
+								height={45}
+								alt="Challenger - I"
+							/>
 						</div>
 					</div>
 
@@ -82,29 +83,29 @@ function Profile(): React.JSX.Element {
 								alt="Trophy"
 							/>
 						</div>
-						<CountUp duration={5} className="truncate" end={0} />
+						<CountUp duration={5} className="truncate" end={session.highest_trophies} />
 					</div>
 
 					<div className="stats-info">
 						<span>Games played</span>
-						<CountUp duration={5} className="truncate" end={0} />
+						<CountUp duration={5} className="truncate" end={session.games_played} />
 					</div>
 
 					<div className="stats-info" style={{color: "rgb(34 197 94)"}}>
 						<span>Victories</span>
-						<CountUp duration={5} className="truncate" end={0} />
+						<CountUp duration={5} className="truncate" end={session.victories} />
 					</div>
 
 					<div className="stats-info" style={{color: "rgb(239 68 68)"}}>
 						<span>Defeats</span>
-						<CountUp duration={5} className="truncate" end={0} />
+						<CountUp duration={5} className="truncate" end={session.defeats} />
 					</div>
 				</div>
 
 			</div>
 
-			<div className="bento" style={{width: "620px"}}>
-				{/* HISTORY GAMES */}
+			<div className="bento_history" style={{width: "620px", overflowY: "scroll"}}>
+				<HistoryExtended />
 			</div>
 
 			<div className="bento" style={{width: "310px"}}>

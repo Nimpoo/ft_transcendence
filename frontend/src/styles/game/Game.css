@@ -1,0 +1,12 @@
+.game_past {
+	position: relative;
+
+	width: 100%;
+	align-items: center;
+}
+
+@font-face {
+	font-family: "Pong";
+	src: url("../../../public/fonts/pong-score.ttf");
+	font-display: block;
+}

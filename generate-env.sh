@@ -14,7 +14,7 @@ if [ -f ".env" ]; then
 
 fi
 
-printf "Some variables will be asked, press \`enter\` for none.\n\n"
+printf "Some variables will be asked, press \`enter\` for none.\nGet all informations from one of your apps on https://profile.intra.42.fr/oauth/applications\n\n"
 
 cat << EOF > .env
 # 42's api keys
@@ -37,7 +37,13 @@ JWT_SECRET=$(openssl rand -base64 32)
 
 EOF
 
-printf "Write your postgres username: " 1>&2; read PG_USER
+if [[ -n $USER ]]
+then
+	PG_USER=$USER
+else
+	PG_USER=admin
+fi
+
 PG_PASSWORD=$(openssl rand -base64 32)
 
 cat << EOF >> .env

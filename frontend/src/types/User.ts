@@ -4,5 +4,10 @@ interface User
 	login: string
 	display_name: string
 	avatar: string
-	created_at: Date
+	trophies: number
+	highest_trophies: number
+	games_played: number
+	victories: number
+	defeats: number
+	created_at: string
 }

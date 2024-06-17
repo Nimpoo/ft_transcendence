@@ -1,18 +1,25 @@
 "use client"
 
+import { Ubuntu } from "next/font/google"
+
 import Link from "next/link"
 import Image from "next/image"
 import CountUp from "react-countup"
 
 import "@/styles/Homepage.css"
-import "@/styles/Text.css"
 import "@/styles/Rainbow.css"
 
 import { useSession } from "@/providers/Session"
 import FriendsList from "@/components/FriendsList"
 import UserSearchBar from "@/components/UserSearchBar"
+import History from "@/components/History"
+
 import Loading from "./loading"
 
+const ubu = Ubuntu ({
+	subsets: ["latin"],
+	weight: "700",
+})
 
 function Home(): React.JSX.Element {
 	const { session, status } = useSession()
@@ -28,56 +35,15 @@ function Home(): React.JSX.Element {
 
 				<div className="history-bento space-between-btn-4">
 					<div className="vstack gap-3 scrollab">
-						<div className="finished-games">
-							<div className="align-self-center ms-1">
-								<Image className="game"
-									src={"/assets/svg/pong.svg"}
-									width={61}
-									height={61}
-									alt="Pong logo"
-								/>
-							</div>
-							<div className="align-self-center ms-1">
-								<Image className="separator"
-									src={"/assets/svg/line.svg"}
-									width={1}
-									height={66}
-									alt="Line"
-								/>
-							</div>
-							<div className="flex-column align-self-center ms-4">
-								<div className="usernames">noalexan VS Giuugiu</div>
-								<div className="score">10 - 8</div>
-							</div>
-						</div>
-						<div className="finished-games">
-							<div className="align-self-center ms-1">
-								<Image className="game"
-									src={"/assets/svg/pong.svg"}
-									width={61}
-									height={61}
-									alt="Pong logo"
-								/>
-							</div>
-							<div className="align-self-center ms-1">
-								<Image className="separator"
-									src={"/assets/svg/line.svg"}
-									width={1}
-									height={66}
-									alt="Line"
-								/>
-							</div>
-							<div className="flex-column align-self-center ms-4">
-								<div className="usernames">MrVodki VS Nimpô</div>
-								<div className="score">10 - 5</div>
-							</div>
-						</div>
+						<History />
 					</div>
 				</div>
 
-				<button className="big-button">
-					<span className="stroke rainbow-text text-xl">PLAY</span>
-				</button>
+				<Link href="/game">
+					<button className={ "big-button " + ubu.className }>
+						<span className="stroke rainbow-text">PLAY</span>
+					</button>
+				</Link>
 
 				<div className="homepage-right-wrapper">
 					<div className="profile-bento spaceX-between-btn-2">
@@ -105,7 +71,7 @@ function Home(): React.JSX.Element {
 						<div className="pseudo-trophy-wrapper truncate">
 							<h3 style={{fontSize: "1.5rem", lineHeight: "2rem"}}>{session.display_name}</h3>
 							<div className="trophies">
-								<CountUp duration={5} className="truncate" style={{paddingLeft: "0.5rem", paddingRight: "0.5rem"}} end={0} />
+								<CountUp duration={5} className="truncate" style={{paddingLeft: "0.5rem", paddingRight: "0.5rem"}} end={session.trophies} />
 								<Image priority
 									src={"/assets/ranking/trophy.png"}
 									width={35}
