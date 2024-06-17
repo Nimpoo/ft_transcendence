@@ -16,7 +16,7 @@ logs:
 	./generate-env.sh
 
 nginx/certificates/ft_transcendence.crt: nginx/certificates
-	openssl req -x512 -nodes -days 365 -newkey rsa:2048 -keyout nginx/certificates/ft_transcendence.key -out nginx/certificates/ft_transcendence.crt -subj "/C=FR/ST=PACA/L=NICE/O=42Nice/CN=ft_transcendence.local" > /dev/null
+	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/certificates/ft_transcendence.key -out nginx/certificates/ft_transcendence.crt -subj "/C=FR/ST=PACA/L=NICE/O=42Nice/CN=ft_transcendence.local"
 
 $(DOCKER_VOLUME_DIRS):
 	@mkdir -pv $@
