@@ -12,6 +12,7 @@ from chat.serializers import ChatSerializer
 from friends.models import FriendRequest
 from users.models import User
 from chat.models import Chat
+from users.serializers import UserSerializer
 from utils.decorators import need_user
 
 
@@ -20,7 +21,7 @@ class Block(View):
     @method_decorator((need_user), name="dispatch")
     def get(self, request: HttpRequest, user: User) -> JsonResponse:
         return JsonResponse(
-            list(user.blocked.values("id", "login", "display_name", "created_at")),
+            list([UserSerializer(user).data for user in user.blocked.all()]),
             safe=False,
         )
 

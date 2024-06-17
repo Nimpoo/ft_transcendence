@@ -37,3 +37,26 @@
 .footer-wrapper .link:hover .image {
 	transform: rotate(360deg);
 }
+
+div#blocked-users-link
+{
+	cursor: pointer;
+	padding: 3px 10px;
+  border-radius: 5px;
+	transition: .2s ease-in-out;
+}
+
+div#blocked-users-link:hover
+{
+	background-color: #0001;
+}
+
+div#blocked-users-link img
+{
+	transition: .2s ease-in-out;
+}
+
+div#blocked-users-link:hover img
+{
+	transform: translateX(5px);
+}
