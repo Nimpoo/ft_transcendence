@@ -92,6 +92,70 @@ a {
 	background-color: rgb(217 217 217 / 0.6);
 }
 
+.tournament-title {
+	font-size: 4rem;
+	line-height: 1;
+	margin-bottom: 30px;
+	animation-direction: reverse;
+	animation-duration: 5s;
+	animation-name: colours;
+	animation-timing-function: ease;
+	animation-iteration-count: infinite;
+	-webkit-animation-direction: reverse;
+	-webkit-animation-duration: 5s;
+	-webkit-animation-name: colours;
+	-webkit-animation-timing-function: ease;
+	-webkit-animation-iteration-count: infinite;
+}
+
+@keyframes colours {
+	0% {color: red;}
+	5% {color: rgb(255, 102, 0);}
+	10% {color: orange;}
+	15% {color: yellow;}
+	20% {color: rgb(170, 255, 0)}
+	25% {color: rgb(128, 255, 0);}
+	30% {color: rgb(9, 255, 0);}
+	35% {color: rgb(0, 255, 123)}
+	40% {color: rgb(0, 255, 191);}
+	45% {color: rgb(0, 195, 255)}
+	50% {color: rgb(0, 145, 255);}
+	55% {color: rgb(0, 81, 255);}
+	60% {color: rgb(47, 0, 255);}
+	65% {color: rgb(81, 0, 255);}
+	70% {color: rgb(187, 0, 255);}
+	75% {color: rgb(238, 0, 255);}
+	80% {color: rgb(255, 0, 225);}
+	85% {color: rgb(255, 0, 128);}
+	90% {color: rgb(195, 18, 65);}
+	95% {color: rgb(191, 0, 16);}
+	100% {color: rgb(181, 0, 0);}
+  }
+
+@-webkit-keyframes colours {
+	0% {color: red;}
+	5% {color: rgb(255, 102, 0);}
+	10% {color: orange;}
+	15% {color: yellow;}
+	20% {color: rgb(170, 255, 0)}
+	25% {color: rgb(128, 255, 0);}
+	30% {color: rgb(9, 255, 0);}
+	35% {color: rgb(0, 255, 123)}
+	40% {color: rgb(0, 255, 191);}
+	45% {color: rgb(0, 195, 255)}
+	50% {color: rgb(0, 145, 255);}
+	55% {color: rgb(0, 81, 255);}
+	60% {color: rgb(47, 0, 255);}
+	65% {color: rgb(81, 0, 255);}
+	70% {color: rgb(187, 0, 255);}
+	75% {color: rgb(238, 0, 255);}
+	80% {color: rgb(255, 0, 225);}
+	85% {color: rgb(255, 0, 128);}
+	90% {color: rgb(195, 18, 65);}
+	95% {color: rgb(191, 0, 16);}
+	100% {color: rgb(181, 0, 0);}
+}	
+
 .big-button-xl {
 	width: 26rem;
 	height: 215px;

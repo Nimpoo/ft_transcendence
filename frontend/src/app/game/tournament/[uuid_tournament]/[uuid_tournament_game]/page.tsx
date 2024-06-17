@@ -2,7 +2,7 @@
 
 import { Ubuntu } from "next/font/google"
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 import { useSession } from "@/providers/Session"
 import { useGame } from "@/providers/Game"
@@ -25,6 +25,8 @@ function GamingRoom(): React.JSX.Element | null {
 	const { players, sendMessage, gameStatus } = useGame()
 
 	const router = useRouter()
+	const pathname = usePathname().split("/")
+	const uuid = pathname[pathname.length - 1]
 
 	useEffect(() => {
 		if (status == "disconnected") {
@@ -45,6 +47,7 @@ function GamingRoom(): React.JSX.Element | null {
 							"id": session?.id.toString(),
 							"key": "up",
 							"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
+							"uuid": uuid,
 						})
 					}
 				} else if (e.key === "s" || e.key === "S") {
@@ -55,6 +58,7 @@ function GamingRoom(): React.JSX.Element | null {
 							"id": session?.id.toString(),
 							"key": "down",
 							"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
+							"uuid": uuid,
 						})
 					}
 				}
@@ -72,9 +76,10 @@ function GamingRoom(): React.JSX.Element | null {
 		setBegin(false)
 		if (sendMessage) {
 			sendMessage({
-				"type": "game.begin",
+				"type": "game.tournamentGameBegin",
 				"user": session?.display_name,
 				"id": session?.id.toString(),
+				"game_uuid": uuid,
 			})
 		}
 	}

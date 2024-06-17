@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation"
 import "@/styles/Rainbow.css"
 import toast from "react-hot-toast"
 import Loading from "@/app/loading"
-import Link from "next/link"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -31,20 +30,21 @@ function Game(): React.JSX.Element {
 		}
 	}, [router, status])
 
-	const createGame = () => {
+	const createTournament = () => {
 		if (sendMessage) {
 			sendMessage({
-				"type": "game.create",
+				"type": "game.tournament",
 				"user": session?.display_name,
 				"id": session?.id.toString(),
+				"limit": 4,
 			})
 		}
 	}
 
-	const joinGame = () => {
+	const joinTournament = () => {
 		if (sendMessage) {
 			sendMessage({
-				"type": "game.join",
+				"type": "game.tournamentJoin",
 				"user": session?.display_name,
 				"id": session?.id.toString(),
 			})
@@ -57,21 +57,15 @@ function Game(): React.JSX.Element {
 	return (
 		<div className="mt-auto">
 			<div style={{display: "flex", justifyContent: "center"}}>
-				<button onClick={joinGame} className={ `margin-btn big-button-xl ${ubu.className}` }>
-					<span className="stroke rainbow-text">JOIN A GAME</span>
-				</button>
-
-				<button onClick={createGame} className={ `big-button-xl ${ubu.className}` }>
-					<span className="stroke rainbow-text">CREATE A ROOM</span>
-				</button>
+				<span className={ `stroke tournament-title ${ubu.className}` }>TOURNAMENT</span>
 			</div>
-
-			<div className="mt-3" style={{display: "flex", justifyContent: "center"}}>
-				<Link href={"/game/tournament"}>
-					<button className={ `big-button-xl ${ubu.className}` }>
-						<span className="stroke rainbow-text text-break">TOURNAMENT</span>
-					</button>
-				</Link>
+			<div style={{display: "flex", justifyContent: "center"}}>
+				<button onClick={joinTournament} className={ `margin-btn big-button-xl ${ubu.className}` }>
+					<span className="stroke rainbow-text">JOIN</span>
+				</button>
+				<button onClick={createTournament} className={ `big-button-xl ${ubu.className}` }>
+					<span className="stroke rainbow-text text-break">CREATE</span>
+				</button>
 			</div>
 		</div>
 	)
