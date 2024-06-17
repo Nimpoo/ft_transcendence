@@ -69,17 +69,13 @@ class UserConsumer(AsyncWebsocketConsumer):
 
         if target_id is None:
             await self.send(
-                json.dumps(
-                    {"type": "error", "message": "Please provide `target_id`"}
-                )
+                json.dumps({"type": "error", "message": "Please provide `target_id`"})
             )
             return
 
         if content is None:
             await self.send(
-                json.dumps(
-                    {"type": "error", "message": "Please provide `content`"}
-                )
+                json.dumps({"type": "error", "message": "Please provide `content`"})
             )
             return
 
@@ -103,13 +99,15 @@ class UserConsumer(AsyncWebsocketConsumer):
             sender=self.user, receiver=receiver, content=content
         )
 
+        chat_serialized = ChatSerializer(chat)
+
         await self.channel_layer.group_send(
             f"user_{self.user.login}",
             {
                 "type": "user.notification",
                 "data": {
                     "type": "message.sent",
-                    "message": ChatSerializer(chat).data,
+                    "message": await sync_to_async(chat_serialized.__getattribute__)("data"),
                 },
             },
         )
@@ -120,7 +118,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                 "type": "user.notification",
                 "data": {
                     "type": "message.receive",
-                    "message": ChatSerializer(chat).data,
+                    "message": await sync_to_async(chat_serialized.__getattribute__)("data"),
                 },
             },
         )

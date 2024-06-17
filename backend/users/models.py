@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Q
 
 
 class User(models.Model):
@@ -21,19 +20,19 @@ class User(models.Model):
     def games_played(self) -> int:
         from game.models import Game
 
-        return len(Game.objects.filter(Q(player_1=self) | Q(player_2=self)))
+        return len(Game.objects.filter(models.Q(player_1=self) | models.Q(player_2=self)))
 
     @property
     def victories(self) -> int:
         from game.models import Game
 
-        return len([game for game in Game.objects.filter(Q(player_1=self) | Q(player_2=self)) if game.winner.id == self.id])
+        return len([game for game in Game.objects.filter(models.Q(player_1=self) | models.Q(player_2=self)) if game.winner.id == self.id])
 
     @property
     def defeats(self) -> int:
         from game.models import Game
 
-        return len([game for game in Game.objects.filter(Q(player_1=self) | Q(player_2=self)) if game.looser.id == self.id])
+        return len([game for game in Game.objects.filter(models.Q(player_1=self) | models.Q(player_2=self)) if game.looser.id == self.id])
 
     def __str__(self) -> str:
         return self.login
