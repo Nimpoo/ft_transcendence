@@ -394,13 +394,13 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.channel_layer.group_send(self.room_group_name, {
       "type": "game.point",
       "player": "1",
-      "score1": "0",
+      "score1": 0,
     })
 
     await self.channel_layer.group_send(self.room_group_name, {
       "type": "game.point",
       "player": "2",
-      "score2": "0",
+      "score2": 0,
     })
     self.loop = asyncio.create_task(self.game_loop()) # ? Line 60
 
@@ -411,13 +411,13 @@ class GameConsumer(AsyncWebsocketConsumer):
     await self.channel_layer.group_send(self.room_group_name, {
       "type": "game.point",
       "player": "1",
-      "score1": "0",
+      "score1": 0,
     })
 
     await self.channel_layer.group_send(self.room_group_name, {
       "type": "game.point",
       "player": "2",
-      "score2": "0",
+      "score2": 0,
     })
     self.loop = asyncio.create_task(self.game_loop()) # ? Line 60
 
@@ -575,13 +575,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.finished",
-            "winner": self.current_room["players"][1],
+            "winner": room["players"][1],
           })
-
-          # await self.send(json.dumps({
-          #   "type": "game.finished",
-          #   "winner": room["players"][1],
-          # }))
         return 2
     # *
 
@@ -609,7 +604,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     }))
     if "sound" in ball_info:
       del ball_info["sound"]
-    
+
     return 0
 ####################################################
 ####################################################

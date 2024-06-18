@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 
 import { useSession } from "@/providers/Session"
@@ -13,8 +13,6 @@ var time = 0
 
 var score1 = 0
 var score2 = 0
-
-var start_score = false
 
 interface Ball {
 	coord: [number, number],
@@ -68,14 +66,18 @@ function Canvas({
 	const { createModal } = useModal()
 	const { message, sendMessage, gameStatus, setGameStatus, winner, play } = useGame()
 
+	const [gameEnded, setGameEnded] = useState(false);
+
 	// ? /*--------- End Game Screen ----------*/
 	const endGame =
-	<>
-		<div style={{display: "flex", flexDirection: "column", textAlign: "center"}}>
-			<h3>The winner is ...</h3>
-			<h1>{score1 < 10 && score2 < 10 ? "Nobody, someone exit the game." : winner[0]}</h1>
-		</div>
-	</>
+	<div style={{display: "flex", flexDirection: "column", textAlign: "center"}}>
+		<h3>The winner is ...</h3>
+		<h1>{
+			(score1 < 10 && score2 < 10)
+			? "Nobody, someone exit the game."
+			: winner
+		}</h1>
+	</div>
 	// ? /*------------------------------------*/
 
 	const ref = useRef<HTMLCanvasElement>(null)
@@ -101,8 +103,6 @@ function Canvas({
 			const context = canvas.getContext("2d")
 			if (context) {
 				context.clearRect(0, 0, canvas.width, canvas.height)
-				score1 = 0
-				score2 = 0
 				context.scale(dpi, dpi)
 
 // ????????????????? CONSTRUCTIONS ??????????????????
@@ -232,11 +232,6 @@ function Canvas({
 						score2 = message.score2
 					}
 				}
-
-				if (message && (message.type === "game.create" || message.type === "game.join")) {
-					score1 = 0
-					score2 = 0
-				}
 				// * /*------------------------------------*/
 
 				// * /*------------ COUNTDOWN -------------*/
@@ -259,6 +254,8 @@ function Canvas({
 // !!!!!!!!!!!!!!!!!!!!! GAME !!!!!!!!!!!!!!!!!!!!!!!
 				// ? /*------------ DEMO MODE -------------*/
 				const demo = () => {
+					score1 = 0
+					score2 = 0
 					context.clearRect(0, 0, canvas.width, canvas.height)
 
 					ground()
@@ -320,14 +317,9 @@ function Canvas({
 						demo()
 
 					} else if (gameStatus === "in-game") {
-						if (start_score === false) {
-							score1 = 0
-							score2 = 0
-							start_score = true
-						}
 						playing()
 
-					} else if (gameStatus === "finished") {
+					} else if (gameStatus === "finished" && !gameEnded) {
 						if (sendMessage) {
 							sendMessage({
 								"type": "game.finished",
@@ -335,10 +327,12 @@ function Canvas({
 								"id": session?.id.toString(),
 							})
 						}
-						start_score = false
 						router.push("/game")
 						createModal(endGame)
 						setGameStatus("pending")
+						score1 = 0
+						score2 = 0
+						setGameEnded(true);
 					}
 				}
 

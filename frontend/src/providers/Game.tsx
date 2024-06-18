@@ -12,7 +12,7 @@ const GameContext = createContext<{
 	setGameStatus: React.Dispatch<React.SetStateAction<"pending" | "in-game" | "finished">>,
 	players: string[],
 	participants: string[],
-	winner: string[],
+	winner: string,
 	play: (value: "paddle" | "wall" | "score") => void,
 	ws: null | WebSocket,
 }>({
@@ -22,7 +22,7 @@ const GameContext = createContext<{
 	setGameStatus: () => {},
 	players: [],
 	participants: [],
-	winner: [],
+	winner: "display_name",
 	play: function() {},
 	ws: null,
 })
@@ -43,7 +43,7 @@ export function GameProvider({
 	const [gameStatus, setGameStatus] = useState<"pending" | "in-game" | "finished">("pending")
 	const [players, setPlayers] = useState<string[]>([])
 	const [participants, setParticipants] = useState<string[]>([])
-	const [winner, setWinner] = useState<string[]>(["display_name", "id"])
+	const [winner, setWinner] = useState<string>("display_name")
 	const [ws, setWs] = useState<WebSocket | null>(null)
 
 	function play(value: "paddle" | "wall" | "score") {
@@ -61,6 +61,10 @@ export function GameProvider({
 
 		ws.onmessage = (event: any) => {
 			const data = JSON.parse(event.data)
+
+			if (data.type !== "game.update") {
+				console.log(data)
+			}
 
 			switch (data["type"]) {
 				case "game.create": {
@@ -115,7 +119,7 @@ export function GameProvider({
 
 				case "game.finished": {
 					setGameStatus("finished")
-					setWinner([data.winner, data.id])
+					setWinner(data.winner)
 					setMessage(data)
 					break
 				}
