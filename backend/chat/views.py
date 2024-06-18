@@ -1,10 +1,11 @@
-from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django.http import HttpRequest, JsonResponse
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.http import require_GET
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 import json
 
@@ -17,6 +18,7 @@ from utils.decorators import need_user
 
 
 class Block(View):
+    channel_layer = get_channel_layer()
 
     @method_decorator((need_user), name="dispatch")
     def get(self, request: HttpRequest, user: User) -> JsonResponse:
@@ -99,6 +101,17 @@ class Block(View):
             Q(sender=user, receiver=target) | Q(sender=target, receiver=user)
         ):
             chat.delete()
+
+        async_to_sync(self.channel_layer.group_send)(
+            f"user_{target.login}",
+            {
+                "type": "user.notification",
+                "data": {
+                    "type": "chat.blocked",
+                    "from": UserSerializer(user).data,
+                },
+            },
+        )
 
         return JsonResponse(
             list(user.blocked.values("id", "login", "display_name", "created_at")),

@@ -95,7 +95,7 @@ class UserConsumer(AsyncWebsocketConsumer):
             )
             return
 
-        if self.user.blocked.contains(receiver):
+        if await sync_to_async(self.user.blocked.contains)(receiver):
             await self.send(
                 json.dumps(
                     {"type": "error", "message": "You blocked him"}
@@ -103,7 +103,7 @@ class UserConsumer(AsyncWebsocketConsumer):
             )
             return
 
-        if receiver.blocked.contains(self.user):
+        if await sync_to_async(receiver.blocked.contains)(self.user):
             await self.send(
                 json.dumps(
                     {"type": "error", "message": "You have been blocked by him"}

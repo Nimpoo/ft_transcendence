@@ -69,28 +69,35 @@ function Chat(): React.JSX.Element {
 					return
 				}
 
-				if (data.type === "message.sent" || data.type === "message.receive")
+				switch(data.type)
 				{
-					let chat = data.message
-					setMessages(messages => messages ? [...messages, chat] : [chat])
-					
-					const existingConv = conversations?.find(
-						(conv) =>
-							(conv.sender.id === chat.sender.id && conv.receiver.id === chat.receiver.id) ||
-						(conv.sender.id === chat.receiver.id && conv.receiver.id === chat.sender.id)
-					);
+					case "message.sent":
+					case "message.receive":
+						let chat = data.message
+						setMessages(messages => messages ? [...messages, chat] : [chat])
+						
+						const existingConv = conversations?.find(
+							(conv) =>
+								(conv.sender.id === chat.sender.id && conv.receiver.id === chat.receiver.id) ||
+							(conv.sender.id === chat.receiver.id && conv.receiver.id === chat.sender.id)
+						);
 
-					if (!existingConv) {
-						const newConv: Chat = {
-							id: chat.id,
-							sender: chat.sender,
-							receiver: chat.receiver,
-							content: chat.content,
-							created_at: chat.created_at,
-						};
+						if (!existingConv) {
+							const newConv: Chat = {
+								id: chat.id,
+								sender: chat.sender,
+								receiver: chat.receiver,
+								content: chat.content,
+								created_at: chat.created_at,
+							};
 
-						setConversations((conversations) => [...(conversations || []), newConv]);
-					}
+							setConversations((conversations) => [...(conversations || []), newConv]);
+						}
+					case "chat.blocked":
+						let user: User = data.from
+						if (selectedConversation?.id === user.id)
+							setSelectedConversation(undefined)
+						setConversations(undefined)
 				}
 			}
 		}
