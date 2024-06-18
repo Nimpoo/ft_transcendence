@@ -138,9 +138,10 @@ def get_user(request: HttpRequest) -> JsonResponse:
 
 
 @require_GET
-def search(request: HttpRequest) -> JsonResponse:
+@need_user
+def search(request: HttpRequest, user: User) -> JsonResponse:
     query = request.GET.get("q")
-    results = User.objects.filter(Q(login__icontains=query) | Q(display_name__icontains=query))
+    results = User.objects.filter(Q(login__icontains=query) | Q(display_name__icontains=query)).exclude(id__in=user.blocked.all()).exclude(blocked=user)
     return JsonResponse([UserSerializer(user).data for user in results], safe=False)
 
 

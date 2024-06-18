@@ -63,31 +63,35 @@ class Block(View):
                 status=400,
             )
 
-        if user.friends.contains(target):
-            user.friends.remove(target)
-
-            try:
-                friend_request = FriendRequest.objects.get(
-                    sender=user,
-                    target=target,
-                    status__in=[
-                        FriendRequest.STATUS_PENDING,
-                        FriendRequest.STATUS_ACCEPTED,
-                    ],
-                )
-            except FriendRequest.DoesNotExist:
-                friend_request = get_object_or_404(
-                    FriendRequest,
-                    sender=target,
-                    target=user,
-                    status__in=[
-                        FriendRequest.STATUS_PENDING,
-                        FriendRequest.STATUS_ACCEPTED,
-                    ],
-                )
+        try:
+            friend_request = FriendRequest.objects.get(
+                sender=user,
+                receiver=target,
+                status__in=[
+                    FriendRequest.STATUS_PENDING,
+                    FriendRequest.STATUS_ACCEPTED,
+                ],
+            )
 
             friend_request.status = FriendRequest.STATUS_BLOCKED
             friend_request.save()
+        except FriendRequest.DoesNotExist:
+            pass
+
+        try:
+            friend_request = FriendRequest.objects.get(
+                sender=target,
+                receiver=user,
+                status__in=[
+                    FriendRequest.STATUS_PENDING,
+                    FriendRequest.STATUS_ACCEPTED,
+                ],
+            )
+
+            friend_request.status = FriendRequest.STATUS_BLOCKED
+            friend_request.save()
+        except FriendRequest.DoesNotExist:
+            pass
 
         user.blocked.add(target)
 

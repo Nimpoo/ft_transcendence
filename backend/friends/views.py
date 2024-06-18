@@ -39,6 +39,12 @@ def get_friend_request(request: HttpRequest, user: User) -> JsonResponse:
             status=404,
         )
 
+    if query_user.blocked.contains(user):
+        return JsonResponse(
+            {"error": "Not Found", "message": "There is no user with specified id."},
+            status=404,
+        )
+
     try:
         friendrequest = FriendRequest.objects.filter(
             Q(sender=user, receiver=query_user) | Q(sender=query_user, receiver=user)

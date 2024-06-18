@@ -51,8 +51,6 @@ function Chat(): React.JSX.Element {
 
 			getAllConv()
 		}
-		else
-			console.log(conversations)
 	}, [session, conversations])
 
 	useEffect(() => {
@@ -106,32 +104,30 @@ function Chat(): React.JSX.Element {
 	}, [messages])
 
 	useEffect(() => {
-		const userSearch = async () => {
-			if (search)
-			{
-				const response = await fetch(`https://${window.location.hostname}:8000/users/search?q=${encodeURIComponent(search)}`)
-
+		if (search)
+		{
+			const handleSearch = async () => {
+				const response = await session?.api(`/users/search/?q=${encodeURIComponent(search)}`)
 				if (response?.ok)
 				{
 					const data = await response.json()
 					setResults(data)
+					clearTimeout(searchTimeout.current)
 				}
+			}
 
+			if (searchTimeout.current)
 				clearTimeout(searchTimeout.current)
-			}
-			else
-			{
-				setResults(undefined)
-			}
-		}
 
-		if (searchTimeout.current)
+			searchTimeout.current = setTimeout(handleSearch, 500)
+		}
+		else
 		{
-			clearTimeout(searchTimeout.current)
+			setResults(undefined)
+			if (searchTimeout.current)
+				clearTimeout(searchTimeout.current)
 		}
-
-		searchTimeout.current = setTimeout(userSearch, 500)
-	}, [search])
+	}, [search, session])
 
 	useEffect(() => {
 		if (selectedConversation)

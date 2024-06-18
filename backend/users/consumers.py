@@ -95,6 +95,22 @@ class UserConsumer(AsyncWebsocketConsumer):
             )
             return
 
+        if self.user.blocked.contains(receiver):
+            await self.send(
+                json.dumps(
+                    {"type": "error", "message": "You blocked him"}
+                )
+            )
+            return
+
+        if receiver.blocked.contains(self.user):
+            await self.send(
+                json.dumps(
+                    {"type": "error", "message": "You have been blocked by him"}
+                )
+            )
+            return
+
         chat = await sync_to_async(Chat.objects.create)(
             sender=self.user, receiver=receiver, content=content
         )
