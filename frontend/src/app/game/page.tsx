@@ -15,6 +15,7 @@ import Link from "next/link"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function Game(): React.JSX.Element {

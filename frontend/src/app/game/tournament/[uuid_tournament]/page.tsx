@@ -16,6 +16,7 @@ import "@/styles/Tournament.css"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function TournamentRoom(): React.JSX.Element | null {

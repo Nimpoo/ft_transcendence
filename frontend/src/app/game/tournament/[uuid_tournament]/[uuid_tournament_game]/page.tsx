@@ -15,6 +15,7 @@ import "@/styles/Rainbow.css"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function GamingRoom(): React.JSX.Element | null {

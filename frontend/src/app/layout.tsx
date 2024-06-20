@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "500",
+	preload: false
 })
 
 function RootLayout({

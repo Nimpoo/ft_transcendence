@@ -14,6 +14,7 @@ import Loading from "@/app/loading"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function Game(): React.JSX.Element {

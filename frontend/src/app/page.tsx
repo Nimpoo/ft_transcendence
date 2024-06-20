@@ -20,6 +20,7 @@ import Loading from "./loading"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function Home(): React.JSX.Element {
