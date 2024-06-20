@@ -37,6 +37,7 @@ function Game(): React.JSX.Element {
 				"type": "game.create",
 				"user": session?.display_name,
 				"id": session?.id.toString(),
+				"login": session?.login,
 			})
 		}
 	}
@@ -47,6 +48,7 @@ function Game(): React.JSX.Element {
 				"type": "game.join",
 				"user": session?.display_name,
 				"id": session?.id.toString(),
+				"login": session?.login,
 			})
 		}
 	}

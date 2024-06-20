@@ -155,8 +155,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     try:
       for room in WAITING_ROOMS:
         if room["room_uuid"] == self.room_group_name.split("_")[-1]:
-          player_1 = room["players"][0]
-          player_2 = room["players"][1]
+          player_1 = room["login"][0]
+          player_2 = room["login"][1]
           score1 = self.score1
           score2 = self.score2
 
@@ -620,6 +620,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     try:
       data = json.loads(text_data)
       self.username = data.get("user", "unknown_player")
+      self.login = data.get("login", "ERROR")
       self.id = data.get("id", "ERROR")
       ############## Paddles Movements ###############
       if data["type"] == "game.paddle":
@@ -722,6 +723,9 @@ class GameConsumer(AsyncWebsocketConsumer):
           "players": [
             self.username,
           ],
+          "login": [
+            self.login
+          ]
         }
         WAITING_ROOMS.append(room)
         self.current_room = room
@@ -733,7 +737,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
       # * ############### MATCHMAKING ################
         diff = 0
-        me = await sync_to_async(User.objects.get)(login=self.username)
+        me = await sync_to_async(User.objects.get)(login=self.login)
 
         min_diff = float('inf')
         room_index = -1
@@ -746,8 +750,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 
             self.current_room = room
 
-            player_1 = await sync_to_async(User.objects.get)(login=room["players"][0])
-            if len(room["players"]) == 1:
+            player_1 = await sync_to_async(User.objects.get)(login=room["login"][0])
+            if len(room["login"]) == 1:
 
               my_trophies = me.trophies
 
@@ -757,7 +761,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 min_diff = diff
                 room_index = i
             else:
-              player_2 = await sync_to_async(User.objects.get)(login=room["players"][1])
+              player_2 = await sync_to_async(User.objects.get)(login=room["login"][1])
 
               diff = abs(player_1.trophies - player_2.trophies)
 
@@ -773,6 +777,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.channel_name
           )
           room["players"].append(self.username)
+          room["login"].append(self.login)
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.join",
             "room_uuid": room["room_uuid"],
@@ -891,6 +896,7 @@ class GameConsumer(AsyncWebsocketConsumer):
       for room in WAITING_ROOMS:
         if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
           room["players"].remove(self.username)
+          room["login"].remove(self.login)
           if not room["players"]:
             WAITING_ROOMS.remove(room)
           elif room["host"] == self.username:
