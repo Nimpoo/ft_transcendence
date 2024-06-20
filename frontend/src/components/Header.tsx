@@ -91,7 +91,7 @@ function Header(): React.JSX.Element {
 			<div className="spaceY-between-btn-4">
 				<Link
 					target="_blank"
-					href="linkedin.com/in/justine-munoz-393778300"
+					href="https://www.linkedin.com/in/justine-munoz-393778300"
 					className="button-selector"
 				>
 					<Image
