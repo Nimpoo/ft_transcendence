@@ -94,7 +94,7 @@ function FriendsList({
 					className="rounded-circle bg-cover m-2"
 					style={
 						{
-							backgroundImage: `url("https://${window.location.hostname}:8000${friend.avatar}")`,
+							backgroundImage: `url("https://${window.location.hostname}:8000/media/${friend.avatar}")`,
 							backgroundSize: "cover",
 							backgroundPosition: "center center",
 							backgroundRepeat: "no-repeat",
@@ -138,7 +138,7 @@ function FriendsList({
 					className="rounded-circle bg-cover m-2"
 					style={
 						{
-							backgroundImage: `url("https://${window.location.hostname}:8000${user.avatar}")`,
+							backgroundImage: `url("https://${window.location.hostname}:8000/media/${user.avatar}")`,
 							backgroundSize: "cover",
 							backgroundPosition: "center center",
 							backgroundRepeat: "no-repeat",

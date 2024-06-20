@@ -21,24 +21,19 @@ function History(): React.JSX.Element {
 		if (session)
 		{
 			const fetchStats = async () => {
-				const response = await toast.promise(
-					fetch(`https://${window.location.hostname}:8000/game/?user=${session?.id}`),
-					{
-						loading: `Fetching /game/?user=${session?.id}`,
-						success: `/game/?user=${session?.id} fetched`,
-						error: `Unable to fetch /game/?user=${session?.id}`
-					}
-				)
+				const response = await session.api(`/game/?user=${session?.id}`)
 
 				if (response?.ok) {
 					const data = await response.json()
 					setGames(data)
 				}
+				else
+					setGames([])
 			}
 
 			fetchStats()
 		}
-	}, [])
+	}, [session])
 
 	return (
 		<>

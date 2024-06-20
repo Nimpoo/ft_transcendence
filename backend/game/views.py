@@ -4,9 +4,11 @@ from django.db.models import Q
 from users.models import User
 from game.models import Game
 from game.serializers import GameStatSerializer
+from utils.decorators import need_user
 
 
-def get_games(request: HttpRequest) -> JsonResponse:
+@need_user
+def get_games(request: HttpRequest, user: User) -> JsonResponse:
     target_id = request.GET.get("user")
 
     if target_id is None:

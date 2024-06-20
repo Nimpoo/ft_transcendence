@@ -29,25 +29,20 @@ function HistoryExtended({
 		if (user)
 		{
 			const fetchStats = async () => {
-				const response = await toast.promise(
-					fetch(`https://${window.location.hostname}:8000/game/?user=${user?.id}`),
-					{
-						loading: `Fetching /game/?user=${user?.id}`,
-						success: `/game/?user=${user?.id} fetched`,
-						error: `Unable to fetch /game/?user=${user?.id}`
-					}
-				)
+				const response = await session?.api(`/game/?user=${user?.id}`)
 
 				if (response?.ok)
 				{
 					const data = await response.json()
 					setGames(data)
 				}
+				else
+					setGames([])
 			}
 
 			fetchStats()
 		}
-	}, [user])
+	}, [user, session])
 
 	const formatDateTime = (datetime: string) => {
 		const date = new Date(datetime)
