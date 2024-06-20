@@ -724,8 +724,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.username,
           ],
           "login": [
-            self.login
-          ]
+            self.login,
+          ],
         }
         WAITING_ROOMS.append(room)
         self.current_room = room
@@ -896,7 +896,10 @@ class GameConsumer(AsyncWebsocketConsumer):
       for room in WAITING_ROOMS:
         if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
           room["players"].remove(self.username)
-          room["login"].remove(self.login)
+          try:
+            room["login"].remove(self.login)
+          except:
+            pass
           if not room["players"]:
             WAITING_ROOMS.remove(room)
           elif room["host"] == self.username:
