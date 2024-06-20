@@ -872,7 +872,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         })
         await self.game_tournamentGameBegin() # ? Line 55
     except Exception as e:
-      print(e)
+      pass
     ################################################
 ###################################################?
 

@@ -117,7 +117,7 @@ function GamingRoom(): React.JSX.Element | null {
 								transform: "translate(-50%, -50%)",
 							}}
 						>
-							Waiting for an opponant ...
+							Waiting for an opponent ...
 						</h1>
 					)}
 				</div>

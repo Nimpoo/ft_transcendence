@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import toast from "react-hot-toast"
-import { redirect } from "next/navigation"
+import { redirect, usePathname } from "next/navigation"
 import { useCookies } from "react-cookie"
 import { useEffect, useState } from "react"
 import { useQRCode } from "next-qrcode"
@@ -271,6 +271,8 @@ function Footer(): React.JSX.Element {
 	const { createModal } = useModal()
 	const [cookies, setCookie] = useCookies(["settings"])
 
+	const pathname = usePathname()
+
 	useEffect(() => {
 		if (cookies.settings === undefined) {
 			setCookie("settings", 0b11, {sameSite: true})
@@ -281,35 +283,39 @@ function Footer(): React.JSX.Element {
 
 	if (status === "loading") {
 		return <></> // todo loading
+	} else if (pathname.includes("game")) {
+		return (
+			<></>
+		)
+	} else {
+		return (
+			<footer className="mt-auto footer-wrapper">
+				{session &&
+					<Link className="link-light" href="/chat">
+						<button className="btn shadow-none">
+							<Image className="image"
+								src="/assets/svg/chat.svg"
+								width={30}
+								height={30}
+								alt="Chat logo"
+							/>
+							Chat
+						</button>
+					</Link>
+				}
+
+				<button className="btn shadow-none" onClick={() => createModal(settingsModal)}>
+					<Image className="image"
+						src="/assets/svg/settings.svg"
+						width={30}
+						height={30}
+						alt="Settings logo"
+					/>
+					Settings
+				</button>
+			</footer>
+		)
 	}
-
-	return (
-		<footer className="mt-auto footer-wrapper">
-			{session &&
-				<Link className="link-light" href="/chat">
-					<button className="btn shadow-none">
-						<Image className="image"
-							src="/assets/svg/chat.svg"
-							width={30}
-							height={30}
-							alt="Chat logo"
-						/>
-						Chat
-					</button>
-				</Link>
-			}
-
-			<button className="btn shadow-none" onClick={() => createModal(settingsModal)}>
-				<Image className="image"
-					src="/assets/svg/settings.svg"
-					width={30}
-					height={30}
-					alt="Settings logo"
-				/>
-				Settings
-			</button>
-		</footer>
-	)
 }
 
 export default Footer

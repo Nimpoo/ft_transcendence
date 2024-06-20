@@ -7,6 +7,6 @@
 
 @font-face {
 	font-family: "Pong";
-	src: url("../../../public/fonts/pong-score.ttf");
+	src: url("/public/fonts/pong-score.ttf");
 	font-display: block;
 }
