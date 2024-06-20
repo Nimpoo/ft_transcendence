@@ -174,7 +174,12 @@ function Settings(): React.JSX.Element {
 
 								const avatar_input = form.avatar
 								if (avatar_input.value) {
-									formData.append("avatar", avatar_input.files[0])
+									const fileName = avatar_input.files[0].name;
+									const ext = fileName.substring(fileName.lastIndexOf('.'));
+									if (ext == '.jpg' || ext == '.jpeg' || ext == '.png')
+										formData.append("avatar", avatar_input.files[0])
+									else
+										toast.error('Accepted formats are : jpg, jpeg, png')
 								}
 
 								session.api("/users/me/", "POST", formData)
@@ -235,9 +240,6 @@ function Settings(): React.JSX.Element {
 									name="avatar"
 								/>
 						</div>
-
-					</form>
-
 					<div className="justify-content-evenly d-flex align-items-center">
 						<input className="btn btn-success" type="submit" value="Save changes" disabled={socket?.readyState !== WebSocket.OPEN} />
 						<button type="button" className="btn btn-danger"
@@ -258,6 +260,9 @@ function Settings(): React.JSX.Element {
 							}
 						>Log out</button>
 					</div>
+
+					</form>
+
 				</>
 			)}
 
