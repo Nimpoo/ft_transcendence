@@ -1,18 +1,57 @@
-.title {
-	font-size: 3.75rem;
+.title-header {
+	font-size: 10px;
 	line-height: 1;
 	color: white;
 	text-align: center;
 	filter: drop-shadow(4px 3px 1px rgba(0,0,0,0.25));
 }
 
+@media screen and (max-width: 575px) {
+	.title-header {
+		font-size: 30px;
+	}
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+	.title-header {
+		font-size: 40px;
+	}
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+	.title-header {
+		font-size: 50px;
+	}
+}
+
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+	.title-header {
+		font-size: 60px;
+	}
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1399px) {
+	.title-header {
+		font-size: 70px;
+	}
+}
+
+@media screen and (min-width: 1400px) {
+	.title-header {
+		font-size: 80px;
+	}
+}
+
 .mugiwara {
 	background: none;
 	border: none;
 	filter: drop-shadow(4px 4px 2px rgba(0,0,0,0.25));
+	height: auto;
+	width: auto;
 }
 
 .luffy-zoro {
 	height: auto;
 	width: auto;
 }
+

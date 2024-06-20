@@ -8,6 +8,7 @@ import CountUp from "react-countup"
 
 import "@/styles/Homepage.css"
 import "@/styles/Rainbow.css"
+import "@/styles/Text.css"
 
 import { useSession } from "@/providers/Session"
 import FriendsList from "@/components/FriendsList"
