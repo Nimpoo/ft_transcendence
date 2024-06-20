@@ -14,9 +14,16 @@ import HistoryExtended from "@/components/HistoryExtended"
 
 function UserProfile({ params }: { params: { login: string } }): React.JSX.Element {
 	const router = useRouter()
-	const { session } = useSession()
+	const { session, status } = useSession()
 	const [user, setUser] = useState<User>()
 	const [relation, setRelation] = useState<FriendRequest>()
+
+	useEffect(() => {
+		if (status == "disconnected") {
+			toast.error("You are not connected")
+			router.push("/")
+		}
+	}, [router, status])
 
 	useEffect(() => {
 		const handleFetch = async () => {
