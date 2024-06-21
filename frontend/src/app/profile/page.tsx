@@ -58,6 +58,8 @@ function Profile(): React.JSX.Element {
 								width={72}
 								height={72}
 								alt="Trophy"
+								placeholder="blur"
+								blurDataURL="/assets/ranking/trophy.png"
 							/>
 						</div>
 						<div className="trophies-ranking" style={{marginTop: "0.25rem"}}>
@@ -81,6 +83,8 @@ function Profile(): React.JSX.Element {
 								width={28}
 								height={28}
 								alt="Trophy"
+								placeholder="blur"
+								blurDataURL="/assets/ranking/trophy.png"
 							/>
 						</div>
 						<CountUp duration={5} className="truncate" end={session.highest_trophies} />

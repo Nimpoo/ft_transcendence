@@ -79,6 +79,8 @@ function Home(): React.JSX.Element {
 									width={35}
 									height={35}
 									alt="Trophy"
+									placeholder="blur"
+									blurDataURL="/assets/ranking/trophy.png"
 								/>
 							</div>
 						</div>
