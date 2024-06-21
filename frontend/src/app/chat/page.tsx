@@ -135,6 +135,11 @@ function Chat(): React.JSX.Element {
 		if (search)
 		{
 			const handleSearch = async () => {
+				if (0 > search.length || search.length > 30)
+				{
+					toast.error("Limit exceeded")
+					return
+				}
 				const response = await session?.api(`/users/search/?q=${encodeURIComponent(search)}`)
 				if (response?.ok)
 				{
@@ -342,7 +347,7 @@ function Chat(): React.JSX.Element {
 						) || (
 							<div>
 								<div className="row box-2-title rounded-bottom-0">
-									<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name(s) to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} />
+									<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} maxLength={30} />
 									{
 										results &&
 										<ul className="ulSearchBar list-group">

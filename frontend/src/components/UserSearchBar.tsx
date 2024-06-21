@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import toast from "react-hot-toast"
 
 import "@/styles/UserSearchBar.css"
 import { useSession } from "@/providers/Session"
@@ -16,6 +17,11 @@ function UserSearchBar(props: any): React.JSX.Element {
 		if (search)
 		{
 			const handleSearch = async () => {
+				if (0 > search.length || search.length > 30)
+				{
+					toast.error("Limit exceeded")
+					return
+				}
 				const response = await session?.api(`/users/search/?q=${encodeURIComponent(search)}`)
 				if (response?.ok)
 				{
@@ -40,7 +46,13 @@ function UserSearchBar(props: any): React.JSX.Element {
 
 	return (
 		<div style={{width: "100%"}}>
-			<input className="input-style-1" type="text" placeholder="Search usernames..." onChange={e => setSearch(e.target.value)} />
+			<input
+				className="input-style-1"
+				type="text"
+				placeholder="Search usernames..."
+				onChange={e => setSearch(e.target.value)}
+				maxLength={30}
+			/>
 			{results &&
 				<ul className="ul-class list-group">
 					{results.map((user, key) => (
