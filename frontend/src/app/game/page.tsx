@@ -58,7 +58,7 @@ function Game(): React.JSX.Element {
 		return <Loading />
 	}
 	return (
-		<div className="mt-auto">
+		<div className="m-auto">
 			<div style={{display: "flex", justifyContent: "center"}}>
 				<button onClick={joinGame} className={ `margin-btn big-button-xl ${ubu.className}` }>
 					<span className="stroke rainbow-text">JOIN A GAME</span>

@@ -56,7 +56,7 @@ function TournamentRoom(): React.JSX.Element | null {
 
 	return (
 		<>
-			<div className="mt-auto">
+			<div className="m-auto">
 				<div style={{display: "flex", justifyContent: "center"}}>
 					<span className={ `stroke tournament-title ${ubu.className}` }>TOURNAMENT</span>
 				</div>
