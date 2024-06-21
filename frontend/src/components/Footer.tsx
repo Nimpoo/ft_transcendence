@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import toast from "react-hot-toast"
-import { redirect, usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useCookies } from "react-cookie"
 import { useEffect, useState } from "react"
 import { useQRCode } from "next-qrcode"
@@ -24,9 +24,10 @@ function Settings(): React.JSX.Element {
 	const { Canvas } = useQRCode()
 	const [cookies, setCookie, removeCookie] = useCookies(["session", "settings"])
 	const [dfaSecret, setDfaSecret] = useState<string|null>(null)
+	const router = useRouter()
 
-	const isSoundOn = cookies.settings & 1 ? true : false
-	const isDarkModeOn = cookies.settings >> 1 & 1 ? true : false
+	const isSoundOn: boolean = (cookies.settings & 1) != 0
+	const isDarkModeOn: boolean = (cookies.settings >> 1 & 1) != 0
 
 	useEffect(() => {
 		if (session) {
@@ -55,10 +56,10 @@ function Settings(): React.JSX.Element {
 					<span className="ms-2">Sound</span>
 				</div>
 				<div className="btn-group" role="group">
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings | 1, {sameSite: true})}
+					<input type="radio" onChange={() => setCookie("settings", cookies.settings | 1, {sameSite: "none", secure: true})}
 						className="btn-check" name="setting-sound" id="setting-sound-on" hidden checked={isSoundOn} />
 					<label className="btn btn-outline-success" htmlFor="setting-sound-on">ON</label>
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~1, {sameSite: true})}
+					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~1, {sameSite: "none", secure: true})}
 						className="btn-check" name="setting-sound" id="setting-sound-off" hidden checked={!isSoundOn} />
 					<label className="btn btn-outline-danger" htmlFor="setting-sound-off">OFF</label>
 				</div>
@@ -75,10 +76,10 @@ function Settings(): React.JSX.Element {
 					<span className="ms-2">Dark Mode</span>
 				</div>
 				<div className="btn-group" role="group">
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings | 2, {sameSite: true})}
+					<input type="radio" onChange={() => setCookie("settings", cookies.settings | 2, {sameSite: "none", secure: true})}
 						className="btn-check" name="setting-dark-mode" id="setting-dark-mode-on" hidden checked={isDarkModeOn} />
 					<label className="btn btn-outline-success" htmlFor="setting-dark-mode-on">ON</label>
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~2, {sameSite: true})}
+					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~2, {sameSite: "none", secure: true})}
 						className="btn-check" name="setting-dark-mode" id="setting-dark-mode-off" hidden checked={!isDarkModeOn} />
 					<label className="btn btn-outline-danger" htmlFor="setting-dark-mode-off">OFF</label>
 				</div>
@@ -123,21 +124,6 @@ function Settings(): React.JSX.Element {
 						</div>
 					</div>
 
-					<div
-						className="d-flex justify-content-between align-items-center mb-3"
-						id="blocked-users-link"
-						onClick={() => createModal(<BlockedUsersList />, 500, 400)}
-					>
-						<span className="ms-2">Blocked users</span>
-						<Image
-							className="modal-icon"
-							src="/assets/svg/arrow-forward-outline.svg"
-							width={30}
-							height={30}
-							alt="link-right-direction logo"
-						/>
-					</div>
-
 					{dfaSecret &&
 						<>
 							<Canvas
@@ -158,6 +144,21 @@ function Settings(): React.JSX.Element {
 							</span>
 						</>
 					}
+
+					<div
+						className="d-flex justify-content-between align-items-center mb-3"
+						id="blocked-users-link"
+						onClick={() => createModal(<BlockedUsersList />, 500, 400)}
+					>
+						<span className="ms-2">Blocked users</span>
+						<Image
+							className="modal-icon"
+							src="/assets/svg/arrow-forward-outline.svg"
+							width={30}
+							height={30}
+							alt="link-right-direction logo"
+						/>
+					</div>
 
 					<form
 						onSubmit={
@@ -243,26 +244,26 @@ function Settings(): React.JSX.Element {
 									name="avatar"
 								/>
 						</div>
-					<div className="justify-content-evenly d-flex align-items-center">
-						<input className="btn btn-success" type="submit" value="Save changes" disabled={socket?.readyState !== WebSocket.OPEN} />
-						<button type="button" className="btn btn-danger"
-							onClick={
-								() => {
-									removeCookie("session", {sameSite: true})
-									clearModal()
-									toast("See you soon", {icon:"👋"})
+						<div className="justify-content-evenly d-flex align-items-center">
+							<input className="btn btn-success" type="submit" value="Save changes" disabled={socket?.readyState !== WebSocket.OPEN} />
+							<button type="button" className="btn btn-danger"
+								onClick={
+									() => {
+										removeCookie("session", {sameSite: "strict", secure: true})
+										clearModal()
+										toast("See you soon", {icon:"👋"})
 
-									if (isSoundOn) {
-										let audioObject: HTMLAudioElement = new Audio("/assets/sounds/mario.wav")
-										audioObject.volume = 0.3
-										audioObject.autoplay = true
+										if (isSoundOn) {
+											let audioObject: HTMLAudioElement = new Audio("/assets/sounds/mario.wav")
+											audioObject.volume = 0.3
+											audioObject.autoplay = true
+										}
+
+										router.push("/")
 									}
-
-									redirect("/")
 								}
-							}
-						>Log out</button>
-					</div>
+							>Log out</button>
+						</div>
 
 					</form>
 
@@ -283,7 +284,7 @@ function Footer(): React.JSX.Element {
 
 	useEffect(() => {
 		if (cookies.settings === undefined) {
-			setCookie("settings", 0b11, {sameSite: true})
+			setCookie("settings", 0b11, {sameSite: "none", secure: true})
 		}
 	}, [cookies, setCookie])
 

@@ -46,8 +46,6 @@ export function SocketProvider({
 						return
 					}
 
-					console.log(data)
-
 					const sender: User = data["from"]
 
 					switch (data["type"]) {

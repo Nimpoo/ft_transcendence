@@ -39,7 +39,7 @@ function Callback(): React.JSX.Element {
 			}
 
 			else {
-				setCookie("session", data["access_token"], {sameSite: true})
+				setCookie("session", data["access_token"], {sameSite: "strict", secure: true})
 			}
 		}
 

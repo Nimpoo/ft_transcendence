@@ -59,7 +59,7 @@ export function SessionProvider({
 			
 			handleFetch().catch(e => {
 				toast.error(e.message)
-				removeCookie("session")
+				removeCookie("session", {sameSite: "strict", secure: true})
 				setStatus("disconnected")
 				setSession(null)
 			})
