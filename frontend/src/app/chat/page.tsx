@@ -12,6 +12,7 @@ import Loading from "../loading"
 
 import "@/styles/Chat.css"
 import toast from "react-hot-toast"
+import FriendRequestNotifications from "@/components/FriendRequestNotification"
 
 
 function Chat(): React.JSX.Element {
@@ -56,8 +57,10 @@ function Chat(): React.JSX.Element {
 	useEffect(() => {
 		if (socket)
 		{
+			const a = socket.onmessage
+
 			socket.onmessage = event => {
-				let data
+				let data: any
 
 				try
 				{
@@ -69,11 +72,20 @@ function Chat(): React.JSX.Element {
 					return
 				}
 
+				const sender: User = data["from"]
+
 				switch(data.type)
 				{
+					case "friendrequest.ask":
+						toast(
+							t => <FriendRequestNotifications sender={sender} toast={t} />,
+							{ duration: 20 /* seconds */ * 1000 },
+						)
+						break
+
 					case "message.sent":
 					case "message.receive":
-						let chat = data.message
+						let chat = data["message"]
 						setMessages(messages => messages ? [...messages, chat] : [chat])
 						
 						const existingConv = conversations?.find(
@@ -82,7 +94,8 @@ function Chat(): React.JSX.Element {
 							(conv.sender.id === chat.receiver.id && conv.receiver.id === chat.sender.id)
 						);
 
-						if (!existingConv) {
+						if (!existingConv)
+						{
 							const newConv: Chat = {
 								id: chat.id,
 								sender: chat.sender,
@@ -93,12 +106,20 @@ function Chat(): React.JSX.Element {
 
 							setConversations((conversations) => [...(conversations || []), newConv]);
 						}
+
+						break
+
 					case "chat.blocked":
 						let user: User = data.from
 						if (selectedConversation?.id === user.id)
 							setSelectedConversation(undefined)
 						setConversations(undefined)
+						break
 				}
+			}
+
+			return () => {
+				socket.onmessage = a
 			}
 		}
 	}, [session, socket, selectedConversation, conversations]);

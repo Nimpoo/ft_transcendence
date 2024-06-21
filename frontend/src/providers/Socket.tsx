@@ -3,8 +3,9 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { useSession } from "@/providers/Session"
 import toast from "react-hot-toast"
+import FriendRequestNotifications from "@/components/FriendRequestNotification"
 
-const socketContext = createContext<WebSocket|null>(null)
+const socketContext = createContext<WebSocket | undefined>(undefined)
 
 export function useSocket() {
 	return useContext(socketContext)
@@ -16,7 +17,7 @@ export function SocketProvider({
 	children: React.ReactNode
 }): React.JSX.Element {
 	const { session } = useSession()
-	const [socket, setSocket] = useState<WebSocket|null>(null)
+	const [socket, setSocket] = useState<WebSocket>()
 
 	useEffect(() => {
 		let ws: WebSocket | undefined
@@ -32,11 +33,12 @@ export function SocketProvider({
 
 				ws.onclose = function(this, event) {
 					toast.error("disconnected")
+					setSocket(undefined)
 					setTimeout(connectSocket, 10000)
 				}
 
 				ws.onmessage = function(this, event) {
-					let data
+					let data: any
 
 					try {
 						data = JSON.parse(event.data)
@@ -44,33 +46,16 @@ export function SocketProvider({
 						return
 					}
 
+					console.log(data)
+
 					const sender: User = data["from"]
 
 					switch (data["type"]) {
 						case "friendrequest.ask":
-							toast(t => (
-								<span>
-									Friend Request from {sender.display_name}
-
-									<div className="btn-group">
-										<button onClick={async () => {
-											session.api("/users/friends/", "POST", JSON.stringify({user_id: sender.id}))
-											toast.dismiss(t.id)
-										}}>accept</button>
-										<button onClick={async () => {
-											session.api("/users/friends/", "DELETE", JSON.stringify({user_id: sender.id}))
-											toast.dismiss(t.id)
-										}}>reject</button>
-									</div>
-
-									<button onClick={() => toast.dismiss(t.id)}>
-										X
-									</button>
-
-								</span>
-							), {
-								duration: 20000
-							})
+							toast(
+								t => <FriendRequestNotifications sender={sender} toast={t} />,
+								{ duration: 20 /* seconds */ * 1000 },
+							)
 							break
 
 						case "friendrequest.accept":
@@ -86,7 +71,8 @@ export function SocketProvider({
 							break
 
 						case "message.receive":
-							toast(`${sender.display_name}: ${data["content"]}`)
+							const msg: Chat = data["message"]
+							toast(`${msg.sender.display_name}: ${msg.content}`)
 							break
 					}
 				}
@@ -96,11 +82,9 @@ export function SocketProvider({
 		}
 
 		return () => {
-			if (ws instanceof WebSocket) {
-				if (ws.readyState === WebSocket.OPEN) {
-					ws.onclose = () => {}
-					ws.close()
-				}
+			if (ws?.readyState === WebSocket.OPEN) {
+				ws.onclose = () => {}
+				ws.close()
 			}
 		}
 	}, [session])
