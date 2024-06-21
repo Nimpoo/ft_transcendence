@@ -169,9 +169,12 @@ function Settings(): React.JSX.Element {
 								let formData = new FormData()
 
 								const display_name_input = form.display_name
-								if (display_name_input.value && !display_name_input.classList.contains("invalid")) {
-									formData.append("display_name", display_name_input.value)
+								if ((4 > display_name_input.value.lenght || display_name_input.value.lenght > 30) || display_name_input.classList.contains("invalid"))
+								{
+									toast.error("invalid display name")
+									return
 								}
+								formData.append("display_name", display_name_input.value)
 
 								const avatar_input = form.avatar
 								if (avatar_input.value) {
@@ -181,6 +184,7 @@ function Settings(): React.JSX.Element {
 										formData.append("avatar", avatar_input.files[0])
 									else
 										toast.error('Accepted formats are : jpg, jpeg, png')
+										return
 								}
 
 								session.api("/users/me/", "POST", formData)
