@@ -22,7 +22,7 @@ const GameContext = createContext<{
 	setGameStatus: () => {},
 	players: [],
 	participants: [],
-	winner: "display_name",
+	winner: "Nobody",
 	play: function() {},
 	ws: null,
 })
@@ -43,7 +43,7 @@ export function GameProvider({
 	const [gameStatus, setGameStatus] = useState<"pending" | "in-game" | "finished">("pending")
 	const [players, setPlayers] = useState<string[]>([])
 	const [participants, setParticipants] = useState<string[]>([])
-	const [winner, setWinner] = useState<string>("display_name")
+	const [winner, setWinner] = useState<string>("Nobody")
 	const [ws, setWs] = useState<WebSocket | null>(null)
 
 	function play(value: "paddle" | "wall" | "score") {
