@@ -549,7 +549,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           "type": "game.countdown",
           "when": "in-game",
         })
-        if self.score1 == END_GAME:
+        if self.score1 >= END_GAME:
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.finished",
             "winner": room["players"][0],
@@ -571,8 +571,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           "type": "game.countdown",
           "when": "in-game",
         })
-        if self.score2 == END_GAME:
-
+        if self.score2 >= END_GAME:
           await self.channel_layer.group_send(self.room_group_name, {
             "type": "game.finished",
             "winner": room["players"][1],
