@@ -19,7 +19,7 @@ function HistoryExtended({
 
 	if (session)
 	{
-		if (user === undefined)
+		if (user == undefined)
 		{
 			user = session
 		}
@@ -60,7 +60,7 @@ function HistoryExtended({
 	return (
 		<ul className="spaceY-between-btn-4" style={{width: "100%", paddingLeft: "0rem"}}>
 			{Game?.map((stat, index) => {
-				const isPlayer1 = stat.player_1.login === session?.login
+				const isPlayer1 = stat.player_1.login === user?.login
 				const isVictory = isPlayer1 ? (stat.score1 > stat.score2) : (stat.score2 > stat.score1)
 				const formattedDateTime = formatDateTime(stat.created_at)
 
