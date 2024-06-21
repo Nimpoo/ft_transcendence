@@ -185,6 +185,9 @@ function Settings(): React.JSX.Element {
 								session.api("/users/me/", "POST", formData)
 									.then(response => response.json())
 									.then(data => {
+										if ((data["display_name"] == session.display_name) && (display_name_input.value != session.display_name)) {
+											toast.error("This display name is already taken")
+										}
 										if (setSession) {
 											setSession({...session, ...data})
 										}

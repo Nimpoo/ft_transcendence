@@ -192,8 +192,8 @@ class Me(View):
                     },
                     status=400,
                 )
-
-            user.display_name = display_name
+            if not User.objects.filter(display_name=display_name).exists():
+                user.display_name = display_name
 
         new_avatar = request.FILES.get("avatar")
         if new_avatar:
