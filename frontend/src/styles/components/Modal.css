@@ -13,6 +13,10 @@
 	transition-duration: 150ms;
 }
 
+.modal-intern::-webkit-scrollbar {
+	visibility: hidden;
+}
+
 .modal-appear {
 	opacity: 1;
 	visibility: visible;
