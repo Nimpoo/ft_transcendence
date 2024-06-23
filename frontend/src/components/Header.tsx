@@ -236,7 +236,7 @@ function Header(): React.JSX.Element {
 				</Link>
 				<Link
 					target="_blank"
-					href="mailto:mayoub@student.42nice.fr"
+					href="mailto:marwan.ayoub.pro@gmail.com"
 					className="button-selector"
 				>
 					<Image
