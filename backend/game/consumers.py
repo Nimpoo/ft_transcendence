@@ -539,7 +539,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     if self.x + self.vx + (self.w / 2) > 1.01:
       room = self.current_room
       if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
-        self.score1 += 1
+        if self.score1 < END_GAME and self.score2 < END_GAME:
+          self.score1 += 1
         await self.channel_layer.group_send(self.room_group_name, {
           "type": "game.point",
           "player": "1",
@@ -561,7 +562,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     if self.x + self.vx - (self.w / 2) < -0.01:
       room = self.current_room
       if room["room_uuid"] == self.room_group_name.split("_")[-1] and self.username in room["players"]:
-        self.score2 += 1
+        if self.score2 < END_GAME and self.score1 < END_GAME:
+          self.score2 += 1
         await self.channel_layer.group_send(self.room_group_name, {
           "type": "game.point",
           "player": "2",
