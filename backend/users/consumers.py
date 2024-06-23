@@ -79,6 +79,12 @@ class UserConsumer(AsyncWebsocketConsumer):
             )
             return
 
+        if len(content) >= 1000:
+            await self.send(
+                json.dumps({"type": "error", "message": "Please send a message under `1000 characters`"})
+            )
+            return
+
         try:
             receiver = await sync_to_async(User.objects.get)(id=target_id)
         except User.DoesNotExist:
