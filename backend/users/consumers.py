@@ -7,7 +7,7 @@ from users.models import User
 from users.serializers import UserSerializer
 from chat.models import Chat
 
-import json
+import json, re
 
 
 class UserConsumer(AsyncWebsocketConsumer):
@@ -82,6 +82,12 @@ class UserConsumer(AsyncWebsocketConsumer):
         if len(content) >= 1000:
             await self.send(
                 json.dumps({"type": "error", "message": "Please send a message under `1000 characters`"})
+            )
+            return
+
+        if not re.match(r'^[ -~]+$', content):
+            await self.send(
+                json.dumps({"type": "error", "message": "Please send a message with valid `UTF-8 format`"})
             )
             return
 

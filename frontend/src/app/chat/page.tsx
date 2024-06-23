@@ -197,8 +197,9 @@ function Chat(): React.JSX.Element {
 		{
 			const form = event.target as HTMLFormElement
 			const msg = form.msg
+			var ascii = /^[ -~\t\n\r]+$/;
 
-			if (msg.value.trim() && msg.value.length() <= 1000) {
+			if (msg.value.trim() && msg.value.length <= 1000 && ascii.test(msg.value)) {
 				socket.send(
 					JSON.stringify(
 						{
@@ -208,6 +209,8 @@ function Chat(): React.JSX.Element {
 						}
 					)
 				)
+			} else {
+				toast.error("Please, send a valid message.")
 			}
 
 			msg.value = ""
@@ -333,7 +336,7 @@ function Chat(): React.JSX.Element {
 									}
 								</div>
 								<form className="input-group" onSubmit={handleMessageSend}>
-									<input className="form-control text-box-style" name="msg" type="text" id="input" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" maxLength={1000} />
+									<input className="form-control text-box-style" name="msg" type="text" id="input" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" maxLength={999} />
 									<button className="btn btn-text-style btn-light" type="submit" id="button-send">
 										<Image className="img-chat"
 											src={"/assets/svg/Send-logo.svg"}
