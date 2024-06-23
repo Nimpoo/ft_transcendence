@@ -33,10 +33,10 @@ function RootLayout({
 	return (
 		<html lang="en">
 			<body className={ubu.className}>
-				<Toaster position="bottom-right" reverseOrder />
 
 				<div id="div" className="vstack py-4 gap-3" style={{minHeight: "100vh"}}>
 					<SessionProvider>
+						<Toaster position="bottom-right" reverseOrder />
 						<SocketProvider>
 							<ModalProvider>
 								<Header />
