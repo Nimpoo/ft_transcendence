@@ -27,7 +27,6 @@ function Settings(): React.JSX.Element {
 	const router = useRouter()
 
 	const isSoundOn: boolean = (cookies.settings & 1) != 0
-	const isDarkModeOn: boolean = (cookies.settings >> 1 & 1) != 0
 
 	useEffect(() => {
 		if (session) {
@@ -62,26 +61,6 @@ function Settings(): React.JSX.Element {
 					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~1, {sameSite: "none", secure: true})}
 						className="btn-check" name="setting-sound" id="setting-sound-off" hidden checked={!isSoundOn} />
 					<label className="btn btn-outline-danger" htmlFor="setting-sound-off">OFF</label>
-				</div>
-			</div>
-
-			<div className="d-flex justify-content-between align-items-center mb-3">
-				<div>
-					<Image className="modal-icon"
-						src="/assets/svg/dark-mode-setting.svg"
-						width={30}
-						height={30}
-						alt="dark-mode logo"
-					/>
-					<span className="ms-2">Dark Mode</span>
-				</div>
-				<div className="btn-group" role="group">
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings | 2, {sameSite: "none", secure: true})}
-						className="btn-check" name="setting-dark-mode" id="setting-dark-mode-on" hidden checked={isDarkModeOn} />
-					<label className="btn btn-outline-success" htmlFor="setting-dark-mode-on">ON</label>
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~2, {sameSite: "none", secure: true})}
-						className="btn-check" name="setting-dark-mode" id="setting-dark-mode-off" hidden checked={!isDarkModeOn} />
-					<label className="btn btn-outline-danger" htmlFor="setting-dark-mode-off">OFF</label>
 				</div>
 			</div>
 
