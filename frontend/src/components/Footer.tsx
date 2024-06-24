@@ -148,11 +148,12 @@ function Settings(): React.JSX.Element {
 								let formData = new FormData()
 
 								const display_name_input = form.display_name
-								if (4 > display_name_input.value.lenght || display_name_input.value.lenght > 30)
+								if (4 > display_name_input.value.length || display_name_input.value.length > 30)
 								{
 									toast.error("invalid display name")
 									return
 								}
+								
 								formData.append("display_name", display_name_input.value)
 
 								const avatar_input = form.avatar
