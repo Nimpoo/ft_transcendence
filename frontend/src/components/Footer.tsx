@@ -146,9 +146,10 @@ function Settings(): React.JSX.Element {
 
 								const form = e.target as HTMLFormElement
 								let formData = new FormData()
-
+								var ascii = /^[ -~\t\n\r]+$/;
 								const display_name_input = form.display_name
-								if (4 > display_name_input.value.length || display_name_input.value.length > 30)
+
+								if (4 > display_name_input.value.length || display_name_input.value.length > 30 || !ascii.test(display_name_input.value))
 								{
 									toast.error("invalid display name")
 									return
