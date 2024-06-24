@@ -79,13 +79,13 @@ function FriendsList({
 		const handleRemove = () => {
 			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: friend.id }))
 				.catch(() => toast.error("Remove failed, try again"))
-				.then(() => setFriendsList(list => list?.slice(index, index)))
+				.then(() => setFriendsList(list => list?.filter((_, i) => i !== index)))
 		}
 
 		const handleBlock = () => {
 			session?.api("/chat/block/", "POST", JSON.stringify({ user_id: friend.id }))
 				.catch(() => toast.error("Remove failed, try again"))
-				.then(() => setFriendsList(list => list?.slice(index, index)))
+				.then(() => setFriendsList(list => list?.filter((_, i) => i !== index)))
 		}
 
 		return (
@@ -107,7 +107,7 @@ function FriendsList({
 					<Link href={`/users/${friend.login}`}>
 						<h5>{friend.display_name}</h5>
 					</Link>
-					<h6>{online != undefined && (online ? "online" : "not online")}</h6>
+					<h6>{online != undefined && (online ? "online" : "offline")}</h6>
 					{(user == undefined || user.id == session?.id) &&
 						<div className="btn-group">
 							<button className="btn btn-success" onClick={handleRemove}>remove</button>
@@ -122,13 +122,13 @@ function FriendsList({
 	const FriendRequestsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
 		const handleAdd = () => {
 			session?.api("/users/friends/", "POST", JSON.stringify({ user_id: user.id }))
-				.then(() => setFriendRequestsList(list => list?.slice(index, index)))
+				.then(() => setFriendRequestsList(list => list?.filter((_, i) => i !== index)))
 				.catch(() => toast.error("Add failed, try again"))
 		}
 
 		const handleReject = () => {
 			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: user.id }))
-				.then(() => setFriendRequestsList(list => list?.slice(index, index)))
+				.then(() => setFriendRequestsList(list => list?.filter((_, i) => i !== index)))
 				.catch(() => toast.error("Rejct failed, try again"))
 		}
 
