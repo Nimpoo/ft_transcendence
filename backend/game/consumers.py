@@ -713,7 +713,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         room = {
           "room_uuid": str(room_uuid),
           "host": self.username,
-          "limit": 2,
+          "limit": 2, 
           "players": [
             self.username,
           ],
@@ -742,8 +742,14 @@ class GameConsumer(AsyncWebsocketConsumer):
 
       ################ Joining a Room ################
       elif data["type"] == "game.join":
+        for room in WAITING_ROOMS:
+            if self.username in room["players"]:
+              await self.send(text_data=json.dumps({
+              "type": "game.error",
+              "message": "You are already in a game",
+              }))
+              return 
         self.score1, self.score2 = 0, 0
-
       # * ############### MATCHMAKING ################
         diff = 0
         me = await sync_to_async(User.objects.get)(login=self.login)
