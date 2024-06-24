@@ -700,8 +700,28 @@ class GameConsumer(AsyncWebsocketConsumer):
 
       ############## Creation of a Room ##############
       if data["type"] == "game.create":
+        for room in WAITING_ROOMS:
+          if self.username in room["players"]:
+            await self.send(text_data=json.dumps({
+            "type": "game.error",
+            "message": "You are already in a game",
+            }))
+            return          
+
         self.score1, self.score2 = 0, 0
         room_uuid = uuid4()
+        room = {
+          "room_uuid": str(room_uuid),
+          "host": self.username,
+          "limit": 2,
+          "players": [
+            self.username,
+          ],
+          "login": [
+            self.login,
+          ],
+        }
+        WAITING_ROOMS.append(room)
         self.room_group_name = f"game_room_{room_uuid}"
 
         await self.channel_layer.group_add(
@@ -717,18 +737,6 @@ class GameConsumer(AsyncWebsocketConsumer):
           "score1": self.score1,
           "score2": self.score2,
         }))
-        room = {
-          "room_uuid": str(room_uuid),
-          "host": self.username,
-          "limit": 2,
-          "players": [
-            self.username,
-          ],
-          "login": [
-            self.login,
-          ],
-        }
-        WAITING_ROOMS.append(room)
         self.current_room = room
       ################################################
 
