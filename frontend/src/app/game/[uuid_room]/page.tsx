@@ -1,7 +1,7 @@
 "use client"
 
 import { Ubuntu } from "next/font/google"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 
 import { useSession } from "@/providers/Session"
@@ -23,6 +23,10 @@ const ubu = Ubuntu ({
 function GamingRoom(): React.JSX.Element | null {
 
 	const [begin, setBegin] = useState<boolean>(true)
+
+	const up = useRef<boolean>(false)
+	const down = useRef<boolean>(false)
+	const gameloop = useRef<NodeJS.Timeout>()
 
 	const { session, status } = useSession()
 	const { players, sendMessage, gameStatus } = useGame()
@@ -114,37 +118,61 @@ function GamingRoom(): React.JSX.Element | null {
 
 	useEffect(() => {
 		if (gameStatus === "in-game") {
-			const keyhandler = (e: any) => {
+			const keypresshandler = (e: any) => {
 				if (e.key === "w" || e.key === "W") {
-					if (sendMessage) {
-						sendMessage({
-							"type": "game.paddle",
-							"user": session?.display_name,
-							"id": session?.id.toString(),
-							"key": "up",
-							"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
-						})
-					}
+					up.current = true
 				} else if (e.key === "s" || e.key === "S") {
-					if (sendMessage) {
-						sendMessage({
-							"type": "game.paddle",
-							"user": session?.display_name,
-							"id": session?.id.toString(),
-							"key": "down",
-							"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
-						})
-					}
+					down.current = true
 				}
 			}
 
-			window.addEventListener("keydown", keyhandler)
+			const keyunpresshandler = (e: any) => {
+				if (e.key === "w" || e.key === "W") {
+					up.current = false
+				} else if (e.key === "s" || e.key === "S") {
+					down.current = false
+				}
+			}
+
+			window.addEventListener("keydown", keypresshandler)
+			window.addEventListener("keyup", keyunpresshandler)
 
 			return () => {
-				window.removeEventListener("keydown", keyhandler)
+				window.removeEventListener("keydown", keypresshandler)
+				window.removeEventListener("keydown", keyunpresshandler)
 			}
 		}
 	}, [gameStatus])
+
+	useEffect(() => {
+		if (gameStatus === "in-game") {
+			gameloop.current = setInterval(() => {
+				if (up.current && !down.current)
+				{
+					sendMessage({
+						"type": "game.paddle",
+						"user": session?.display_name,
+						"id": session?.id.toString(),
+						"key": "up",
+						"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
+					})
+				}
+
+				else if (!up.current && down.current)
+				{
+					sendMessage({
+						"type": "game.paddle",
+						"user": session?.display_name,
+						"id": session?.id.toString(),
+						"key": "down",
+						"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
+					})
+				}
+			}, 75)
+
+			return () => clearInterval(gameloop.current)
+		}
+	}, [gameStatus, session, players])
 
 	const LetsBegin = () => {
 		setBegin(false)
@@ -200,22 +228,26 @@ function GamingRoom(): React.JSX.Element | null {
 					)}
 				</div>
 			)}
-			<button
-				onClick={() => { createModal(man) }}
-				style={{
-					background: "transparent",
-					border: "none",
-					padding: 0,
-					cursor: "pointer",
-				}}
-			>
-				<Image
-					src={"/assets/svg/snes.svg"}
-					width={72}
-					height={72}
-					alt="Manual"
-				/>
-			</button>
+			<div style={{display: "flex", justifyContent: "center"}}>
+				<button
+					onClick={() => { createModal(man) }}
+					style={{
+						background: "transparent",
+						border: "none",
+						padding: 0,
+						cursor: "pointer",
+						width: 72,
+						height: 72,
+					}}
+				>
+					<Image
+						src={"/assets/svg/snes.svg"}
+						width={72}
+						height={72}
+						alt="Manual"
+					/>
+				</button>
+			</div>
 		</div>
 	)
 }

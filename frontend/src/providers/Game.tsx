@@ -56,15 +56,11 @@ export function GameProvider({
 		const ws = new WebSocket(`wss://${window.location.hostname}:8000/game/`)
 
 		ws.onopen = (event: Event) => {
-			console.log("Connected to Pong ✅")
+			// console.log("Connected to Pong ✅")
 		}
 
 		ws.onmessage = (event: any) => {
 			const data = JSON.parse(event.data)
-
-			if (data.type !== "game.update") {
-				console.log(data)
-			}
 
 			switch (data["type"]) {
 				case "game.create": {
