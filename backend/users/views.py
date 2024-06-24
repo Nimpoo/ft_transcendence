@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.conf import settings
 
 import requests
-import json
+import json, re
 import jwt
 import pyotp
 import urllib.request
@@ -189,6 +189,14 @@ class Me(View):
                     {
                         "error": "Bad Request",
                         "message": "display name have to be between 4 and 30 characters.",
+                    },
+                    status=400,
+                )
+            if not re.match(r'^[ -~]+$', display_name):
+                return JsonResponse(
+                    {
+                        "error": "Bad Request",
+                        "message": "display name provided is invalid.",
                     },
                     status=400,
                 )
