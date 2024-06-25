@@ -799,6 +799,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 
       ################## TOURNAMENT ##################
       elif data["type"] == "game.tournament":
+        for room in TOURNAMENT_ROOMS:
+            if self.user.login in room["participants"]:
+              await self.send(text_data=json.dumps({
+                "type": "game.error",
+                "message": "You are already in a game",
+              }))
+              return
         tournament_uuid = uuid4()
         self.tournament_name = f"tournament_room_{tournament_uuid}"
 
