@@ -55,16 +55,18 @@ export function GameProvider({
 	}
 
 	useEffect(() => {
+		let ws: WebSocket | undefined;
+
 		if (session)
 		{
 			const connect = () => {
-				const ws = new WebSocket(`wss://${window.location.hostname}:8000/game/?token=${session.token}`)
+				ws = new WebSocket(`wss://${window.location.hostname}:8000/game/?token=${session.token}`)
 
-				ws.onopen = (event: Event) => {
-					setWs(ws)
+				ws.onopen = function(this, event) {
+					setWs(this)
 				}
 
-				ws.onmessage = (event: any) => {
+				ws.onmessage = function(this, event) {
 					const data = JSON.parse(event.data)
 
 					switch (data["type"]) {
@@ -183,7 +185,8 @@ export function GameProvider({
 					}
 				}
 
-				ws.onerror = (event: Event) => {
+				ws.onclose = function(this, event) {
+					setWs(null)
 					setTimeout(connect, 3000)
 				}
 			}
@@ -198,7 +201,10 @@ export function GameProvider({
 		window.addEventListener("popstate", handlePopState)
 
 		return () => {
-			ws?.close()
+			if (ws?.readyState === WebSocket.OPEN) {
+				ws.onclose = () => {}
+				ws.close()
+			}
 			window.removeEventListener("popstate", handlePopState)
 		}
 	}, [router, session])
