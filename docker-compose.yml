@@ -20,8 +20,6 @@ services:
     volumes:
       - ./backend/media:/media
       - ./backend/static:/static
-    ports:
-      - 6969:8000
     depends_on:
       postgres:
         condition: service_healthy
