@@ -29,7 +29,7 @@ function GamingRoom(): React.JSX.Element | null {
 	const gameloop = useRef<NodeJS.Timeout>()
 
 	const { session, status } = useSession()
-	const { players, sendMessage, gameStatus } = useGame()
+	const { login, sendMessage, gameStatus } = useGame()
 	const { createModal } = useModal()
 
 	const router = useRouter()
@@ -42,7 +42,7 @@ function GamingRoom(): React.JSX.Element | null {
 
 		<h3><u>PROTECT</u> your camp while trying to <u>SCORE</u> points on the opposing camp, all that by using your <u>PADDLE</u>.</h3>
 		<h3>
-			If one of the players scores&nbsp;
+			If one of the login scores&nbsp;
 
 			<span
 				style={{
@@ -166,7 +166,7 @@ function GamingRoom(): React.JSX.Element | null {
 
 			return () => clearInterval(gameloop.current)
 		}
-	}, [gameStatus, session, players])
+	}, [gameStatus, session, login])
 
 	const LetsBegin = () => {
 		setBegin(false)
@@ -178,22 +178,22 @@ function GamingRoom(): React.JSX.Element | null {
 	}
 
 	useEffect(() => {
-		if (!players.length) {
+		if (!login.length) {
 			router.push("/game")
 			return
 		}
-	}, [players.length, router])
+	}, [login.length, router])
 
 	return (
 		<div style={{display: "flex", flexDirection: "column"}}>
 			<div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-				<h5>{players && players.length > 0 ? players[0] : "Waiting for players ..."}</h5>
-				<h5>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</h5>
+				<h5>{login && login.length > 0 ? login[0] : "Waiting for players ..."}</h5>
+				<h5>{login && login.length > 1 ? login[1] : "Waiting for players ..."}</h5>
 			</div>
 			<Canvas />
-			{begin && players[0] === session?.login && (
+			{begin && login[0] === session?.login && (
 				<div>
-					{players[1] ? (
+					{login[1] ? (
 						<button 
 							onClick={LetsBegin}
 							className={"big-button-xl " + ubu.className}

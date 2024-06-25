@@ -30,7 +30,7 @@ function GamingRoom(): React.JSX.Element | null {
 	const gameloop = useRef<NodeJS.Timeout>()
 
 	const { session, status } = useSession()
-	const { players, sendMessage, gameStatus } = useGame()
+	const { login, sendMessage, gameStatus } = useGame()
 	const { createModal } = useModal()
 
 	const router = useRouter()
@@ -169,37 +169,35 @@ function GamingRoom(): React.JSX.Element | null {
 
 			return () => clearInterval(gameloop.current)
 		}
-	}, [gameStatus, session, players])
+	}, [gameStatus, session, login])
 
 	const LetsBegin = () => {
 		setBegin(false)
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.tournamentGameBegin",
-				"user": session?.display_name,
-				"id": session?.id.toString(),
 				"game_uuid": uuid,
 			})
 		}
 	}
 
 	useEffect(() => {
-		if (!players.length) {
+		if (!login.length) {
 			router.push("/game")
 			return
 		}
-	}, [players.length, router])
+	}, [login.length, router])
 
 	return (
 		<div style={{display: "flex", flexDirection: "column"}}>
 			<div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-				<h5>{players && players.length > 0 ? players[0] : "Waiting for players ..."}</h5>
-				<h5>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</h5>
+				<h5>{login && login.length > 0 ? login[0] : "Waiting for players ..."}</h5>
+				<h5>{login && login.length > 1 ? login[1] : "Waiting for players ..."}</h5>
 			</div>
 			<Canvas />
-			{begin && players[0] === session?.display_name && (
+			{begin && login[0] === session?.login && (
 				<div>
-					{players[1] ? (
+					{login[1] ? (
 						<button 
 							onClick={LetsBegin}
 							className={"big-button-xl " + ubu.className}

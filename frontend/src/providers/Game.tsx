@@ -11,7 +11,7 @@ const GameContext = createContext<{
 	message: any,
 	gameStatus: "pending" | "in-game" | "finished",
 	setGameStatus: React.Dispatch<React.SetStateAction<"pending" | "in-game" | "finished">>,
-	players: string[],
+	login: string[],
 	participants: string[],
 	winner: string,
 	play: (value: "paddle" | "wall" | "score") => void,
@@ -21,7 +21,7 @@ const GameContext = createContext<{
 	message: undefined,
 	gameStatus: "pending",
 	setGameStatus: () => {},
-	players: [],
+	login: [],
 	participants: [],
 	winner: "Nobody",
 	play: function() {},
@@ -42,7 +42,7 @@ export function GameProvider({
 
 	const [message, setMessage] = useState<any>()
 	const [gameStatus, setGameStatus] = useState<"pending" | "in-game" | "finished">("pending")
-	const [players, setPlayers] = useState<string[]>([])
+	const [login, setLogin] = useState<string[]>([])
 	const [participants, setParticipants] = useState<string[]>([])
 	const [winner, setWinner] = useState<string>("Nobody")
 	const [ws, setWs] = useState<WebSocket | null>(null)
@@ -72,7 +72,7 @@ export function GameProvider({
 					switch (data["type"]) {
 						case "game.create": {
 							toast(data.message, {icon: "🍖"})
-							setPlayers(data.players)
+							setLogin(data.login)
 							setGameStatus("pending")
 							router.push(`/game/${data.room_uuid}`)
 							break
@@ -80,7 +80,7 @@ export function GameProvider({
 
 						case "game.join": {
 							toast(data.message, {icon: "⚔️"})
-							setPlayers(data.players)
+							setLogin(data.login)
 							setGameStatus("pending")
 							router.push(`/game/${data.room_uuid}`)
 							break
@@ -88,7 +88,7 @@ export function GameProvider({
 
 						case "game.quit": {
 							setMessage(data)
-							setPlayers(data.players)
+							setLogin(data.login)
 							setGameStatus("finished")
 							toast(data.message, {icon: "🔨"})
 							break
@@ -130,7 +130,7 @@ export function GameProvider({
 						// ! TOURNAMENT ! //
 						case "game.tournament": {
 							toast(data.message, {icon: "🍖"})
-							setParticipants(data.participants)
+							setParticipants(data.login)
 							setGameStatus("pending")
 							router.push(`/game/tournament/${data.tournament_uuid}`)
 							break
@@ -138,7 +138,7 @@ export function GameProvider({
 
 						case "game.tournamentJoin": {
 							toast(data.message, {icon: "⚔️"})
-							setParticipants(data.participants)
+							setParticipants(data.login)
 							setGameStatus("pending")
 							router.push(`/game/tournament/${data.tournament_uuid}`)
 							break
@@ -146,7 +146,7 @@ export function GameProvider({
 
 						case "game.tournamentQuit": {
 							setMessage(data)
-							setParticipants(data.participants)
+							setParticipants(data.login)
 							// setGameStatus("finished")
 							toast(data.message, {icon: "🔨"})
 							break
@@ -154,7 +154,7 @@ export function GameProvider({
 
 						case "game.tournamentLaunch": {
 							toast(data.message, {icon: "⚔️"})
-							setPlayers(data.players)
+							setLogin(data.login)
 							setGameStatus("pending")
 							router.push(`/game/tournament/${data.tournament_uuid}/${data.room_uuid}`)
 							break
@@ -166,8 +166,8 @@ export function GameProvider({
 								router.push(`/game`)
 							} else {
 								toast(data.message)
-								setPlayers(data.players)
-								setParticipants(data.participants)
+								setLogin(data.login)
+								setParticipants(data.login)
 								router.push(`/game/tournament/${data.tournament_uuid}/${data.final}`)
 							}
 							break
@@ -175,7 +175,7 @@ export function GameProvider({
 
 						case "game.endTournament": {
 							toast(data.message, {icon: "🎉"})
-							setPlayers([])
+							setLogin([])
 							setParticipants([])
 							router.push(`/game`)
 							break
@@ -219,7 +219,7 @@ export function GameProvider({
 
 	return (
 		<GameContext.Provider value={{
-			players,
+			login,
 			sendMessage,
 			message,
 			gameStatus,

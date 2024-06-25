@@ -47,8 +47,6 @@ function TournamentRoom(): React.JSX.Element | null {
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.beginTournament",
-				"user": session?.display_name,
-				"id": session?.id.toString(),
 				"tournament_uuid": uuid,
 			})
 		}
@@ -97,7 +95,7 @@ function TournamentRoom(): React.JSX.Element | null {
 				)}
 			</div>
 			<div>
-				{participants && participants.length === 4 && participants[0] === session?.display_name ? (
+				{participants && participants.length === 4 && participants[0] === session?.login ? (
 					<button 
 					onClick={LetsBegin}
 					className={"big-button-xl " + ubu.className}
