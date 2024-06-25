@@ -7,7 +7,8 @@ from users.models import User
 from users.serializers import UserSerializer
 from chat.models import Chat
 
-import json, re
+import json
+import re
 
 
 class UserConsumer(AsyncWebsocketConsumer):

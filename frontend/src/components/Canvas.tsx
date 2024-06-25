@@ -165,70 +165,70 @@ function Canvas({
 				// ! /*------------------------------------*/
 
 				// ? /*-------------- PADDLES -------------*/
-					if (message) {
-						const data = message
+				if (message) {
+					const data = message
 
-						var coord_pad_1: [number, number] = data.new_position?.paddle_coord_1 ?? [0, 0]
-						var coord_pad_2: [number, number] = data.new_position?.paddle_coord_2 ?? [0, 0]
-						var dim_pad:   [number, number] = data.new_position?.paddle_dimensions ?? [0, 0]
+					var coord_pad_1: [number, number] = data.new_position?.paddle_coord_1 ?? [0, 0]
+					var coord_pad_2: [number, number] = data.new_position?.paddle_coord_2 ?? [0, 0]
+					var dim_pad:   [number, number] = data.new_position?.paddle_dimensions ?? [0, 0]
 
-						racket_1 = {
-							coord:      [coord_pad_1[0] * width, coord_pad_1[1] * height],
-							dimensions: [dim_pad[0] * width, dim_pad[1] * height],
-							dir:        [0, 0],
-							color: "white",
-							draw: function() {
-								context.beginPath()
-								context.save()
-								context.translate(
-									-(this.dimensions[0] / 2),
-									-(this.dimensions[1] / 2),
-								)
-								context.closePath()
-								context.fillStyle = this.color
-								context.fillRect(
-									this.coord[0],
-									this.coord[1],
-									this.dimensions[0],
-									this.dimensions[1],
-								)
-								context.restore()
-							},
-						}
-
-						racket_2 = {
-							coord:      [coord_pad_2[0] * width, coord_pad_2[1] * height],
-							dimensions: [dim_pad[0] * width, dim_pad[1] * height],
-							dir:        [0, 0],
-							color: "white",
-							draw: function() {
-								context.beginPath()
-								context.save()
-								context.translate(
-									-(this.dimensions[0] / 2),
-									-(this.dimensions[1] / 2),
-								)
-								context.closePath()
-								context.fillStyle = this.color
-								context.fillRect(
-									this.coord[0],
-									this.coord[1],
-									this.dimensions[0],
-									this.dimensions[1],
-								)
-								context.restore()
-							},
-						}
+					racket_1 = {
+						coord:      [coord_pad_1[0] * width, coord_pad_1[1] * height],
+						dimensions: [dim_pad[0] * width, dim_pad[1] * height],
+						dir:        [0, 0],
+						color: "white",
+						draw: function() {
+							context.beginPath()
+							context.save()
+							context.translate(
+								-(this.dimensions[0] / 2),
+								-(this.dimensions[1] / 2),
+							)
+							context.closePath()
+							context.fillStyle = this.color
+							context.fillRect(
+								this.coord[0],
+								this.coord[1],
+								this.dimensions[0],
+								this.dimensions[1],
+							)
+							context.restore()
+						},
 					}
+
+					racket_2 = {
+						coord:      [coord_pad_2[0] * width, coord_pad_2[1] * height],
+						dimensions: [dim_pad[0] * width, dim_pad[1] * height],
+						dir:        [0, 0],
+						color: "white",
+						draw: function() {
+							context.beginPath()
+							context.save()
+							context.translate(
+								-(this.dimensions[0] / 2),
+								-(this.dimensions[1] / 2),
+							)
+							context.closePath()
+							context.fillStyle = this.color
+							context.fillRect(
+								this.coord[0],
+								this.coord[1],
+								this.dimensions[0],
+								this.dimensions[1],
+							)
+							context.restore()
+						},
+					}
+				}
 				// ? /*------------------------------------*/
 
 				// * /*-------------- SCORES --------------*/
 				if (message && message.type === "game.point") {
-					if (message.player && message.score1 && message.player === "1") {
+					if (message.player && message.score1 && message.player === 1) {
 						score1 = message.score1
 					}
 
-					if (message.player && message.score2 && message.player === "2") {
+					if (message.player && message.score2 && message.player === 2) {
 						score2 = message.score2
 					}
 				}
@@ -323,8 +323,6 @@ function Canvas({
 						if (sendMessage) {
 							sendMessage({
 								"type": "game.finished",
-								"user": session?.display_name,
-								"id": session?.id.toString(),
 							})
 						}
 						router.push("/game")

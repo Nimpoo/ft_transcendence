@@ -151,10 +151,7 @@ function GamingRoom(): React.JSX.Element | null {
 				{
 					sendMessage({
 						"type": "game.paddle",
-						"user": session?.display_name,
-						"id": session?.id.toString(),
 						"key": "up",
-						"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
 					})
 				}
 
@@ -162,10 +159,7 @@ function GamingRoom(): React.JSX.Element | null {
 				{
 					sendMessage({
 						"type": "game.paddle",
-						"user": session?.display_name,
-						"id": session?.id.toString(),
 						"key": "down",
-						"player": `${players && players[0] === session?.display_name ? "1" : "2"}`,
 					})
 				}
 			}, 75)
@@ -179,8 +173,6 @@ function GamingRoom(): React.JSX.Element | null {
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.begin",
-				"user": session?.display_name,
-				"id": session?.id.toString(),
 			})
 		}
 	}
@@ -199,7 +191,7 @@ function GamingRoom(): React.JSX.Element | null {
 				<h5>{players && players.length > 1 ? players[1] : "Waiting for players ..."}</h5>
 			</div>
 			<Canvas />
-			{begin && players[0] === session?.display_name && (
+			{begin && players[0] === session?.login && (
 				<div>
 					{players[1] ? (
 						<button 
