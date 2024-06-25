@@ -11,7 +11,6 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     friends = models.ManyToManyField("self")
-    blocked = models.ManyToManyField("self", symmetrical=False)
 
     trophies = models.IntegerField(default=0)
     highest_trophies = models.IntegerField(default=0)

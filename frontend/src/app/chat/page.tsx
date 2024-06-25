@@ -108,13 +108,6 @@ function Chat(): React.JSX.Element {
 						}
 
 						break
-
-					case "chat.blocked":
-						let user: User = data.from
-						if (selectedConversation?.id === user.id)
-							setSelectedConversation(undefined)
-						setConversations(undefined)
-						break
 				}
 			}
 
@@ -299,34 +292,6 @@ function Chat(): React.JSX.Element {
 											<Link href={`/users/${selectedConversation.login}`}>
 												<h5 className="conv-name">{selectedConversation.display_name}</h5>
 											</Link>
-										</li>
-										<li className="list-inline-item">
-											<button
-												type="button"
-												className="btn btn-danger btn-place"
-												onClick={
-													function()
-													{
-														session.api(
-															"/chat/block/",
-															"POST",
-															JSON.stringify(
-																{
-																	user_id: selectedConversation.id
-																}
-															)
-														)
-														setConversations(
-															conversations => conversations?.filter(
-																c => c.sender.id == session.id ? c.receiver.id != selectedConversation.id : c.sender.id != selectedConversation.id
-															)
-														)
-														setSelectedConversation(undefined)
-													}
-												}
-											>
-												Block
-											</button>
 										</li>
 									</ul>
 								</div>

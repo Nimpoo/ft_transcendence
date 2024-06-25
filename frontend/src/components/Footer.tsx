@@ -14,7 +14,6 @@ import { useModal } from "@/providers/Modal"
 
 import "@/styles/components/Footer/Footer.css"
 import "@/styles/components/Footer/Settings.css"
-import BlockedUsersList from "@/components/BlockedUsersList"
 
 
 function Settings(): React.JSX.Element {
@@ -123,21 +122,6 @@ function Settings(): React.JSX.Element {
 							</span>
 						</>
 					}
-
-					<div
-						className="d-flex justify-content-between align-items-center mb-3"
-						id="blocked-users-link"
-						onClick={() => createModal(<BlockedUsersList />, 500, 400)}
-					>
-						<span className="ms-2">Blocked users</span>
-						<Image
-							className="modal-icon"
-							src="/assets/svg/arrow-forward-outline.svg"
-							width={30}
-							height={30}
-							alt="link-right-direction logo"
-						/>
-					</div>
 
 					<form
 						onSubmit={

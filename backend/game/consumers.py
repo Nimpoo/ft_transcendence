@@ -396,7 +396,7 @@ class GameConsumer(AsyncWebsocketConsumer):
       "player": 2,
       "score2": 0,
     })
-    self.loop = asyncio.create_task(self.game_loop()) # ? Line 60
+    self.loop = asyncio.create_task(self.game_loop()) # ? Line 420
 
   async def game_tournamentGameBegin(self):
     self.score1 = 0
@@ -413,7 +413,7 @@ class GameConsumer(AsyncWebsocketConsumer):
       "player": 2,
       "score2": 0,
     })
-    self.loop = asyncio.create_task(self.game_loop()) # ? Line 60
+    self.loop = asyncio.create_task(self.game_loop()) # ? Line 420
 
 ####################################################
 ####################################################
@@ -451,7 +451,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           continue
 
         await asyncio.sleep(0.016) # 60fps
-        update = await self.update_data(ball_info, update) # ? Line 99
+        update = await self.update_data(ball_info, update) # ? Line 486
         if update == 0:
           continue
         else:
@@ -654,7 +654,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           "type": "game.countdown",
           "when": "begin",
         })
-        await self.game_begin() # ? Line 55
+        await self.game_begin() # ? Line 384
       ################################################
 
       ############### Finish The Game ################
@@ -874,7 +874,7 @@ class GameConsumer(AsyncWebsocketConsumer):
           "type": "game.countdown",
           "when": "begin",
         })
-        await self.game_tournamentGameBegin() # ? Line 55
+        await self.game_tournamentGameBegin() # ? Line 401
     ################################################
 ###################################################?
 

@@ -82,12 +82,6 @@ function FriendsList({
 				.then(() => setFriendsList(list => list?.filter((_, i) => i !== index)))
 		}
 
-		const handleBlock = () => {
-			session?.api("/chat/block/", "POST", JSON.stringify({ user_id: friend.id }))
-				.catch(() => toast.error("Remove failed, try again"))
-				.then(() => setFriendsList(list => list?.filter((_, i) => i !== index)))
-		}
-
 		return (
 			<li style={{display: "flex", flexDirection: "row"}}>
 				<div
@@ -109,10 +103,7 @@ function FriendsList({
 					</Link>
 					<h6>{online != undefined && (online ? "online" : "offline")}</h6>
 					{(user == undefined || user.id == session?.id) &&
-						<div className="btn-group">
-							<button className="btn btn-success" onClick={handleRemove}>remove</button>
-							<button className="btn btn-danger" onClick={handleBlock}>block</button>
-						</div>
+						<button className="btn btn-danger" onClick={handleRemove}>remove</button>
 					}
 				</div>
 			</li>

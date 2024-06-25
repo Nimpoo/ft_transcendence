@@ -39,12 +39,6 @@ def get_friend_request(request: HttpRequest, user: User) -> JsonResponse:
             status=404,
         )
 
-    if query_user.blocked.contains(user):
-        return JsonResponse(
-            {"error": "Not Found", "message": "There is no user with specified id."},
-            status=404,
-        )
-
     try:
         friendrequest = FriendRequest.objects.filter(
             Q(sender=user, receiver=query_user) | Q(sender=query_user, receiver=user)
@@ -115,18 +109,6 @@ class Friend(View):
         if user.id == receiver.id:
             return JsonResponse(
                 {"error": "Bad Request", "message": "IDs are equal."}, status=400
-            )
-
-        if user.blocked.contains(receiver):
-            return JsonResponse(
-                {"error": "Bad Request", "message": "you blocked him"},
-                status=400,
-            )
-
-        if receiver.blocked.contains(user):
-            return JsonResponse(
-                {"error": "Bad Request", "message": f"{receiver.login} blocked you"},
-                status=400,
             )
 
         if user.friends.contains(receiver):

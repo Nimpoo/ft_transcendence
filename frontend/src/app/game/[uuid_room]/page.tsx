@@ -61,7 +61,7 @@ function GamingRoom(): React.JSX.Element | null {
 		<br />
 		<br />
 
-		<h1>Control</h1>
+		<h1>Controls</h1>
 
 		<br />
 
@@ -92,7 +92,7 @@ function GamingRoom(): React.JSX.Element | null {
 		<br />
 		<br />
 
-		<h1>Trophies calculs</h1>
+		<h1>Trophies calcul</h1>
 
 		<br />
 
