@@ -39,10 +39,8 @@ export function SessionProvider({
 	useEffect(() => {
 		if (cookies.session) {
 			const handleFetch = async () => {
-				const api = (url: string | URL | Request, method: "GET"|"POST"|"DELETE" = "GET", body?: BodyInit) => toast.promise(
-					fetch(`https://${window.location.hostname}:8000${url}`, { headers: { Authorization: `Bearer ${cookies.session}` }, method, body }),
-					{loading: `Fetching ${url}`, success: `${url} fetched`, error: `Unable to fetch ${url}`}
-				)
+				const api = (url: string | URL | Request, method: "GET"|"POST"|"DELETE" = "GET", body?: BodyInit) =>
+					fetch(`https://${window.location.hostname}:8000${url}`, { headers: { Authorization: `Bearer ${cookies.session}` }, method, body })
 
 				const response = await api("/users/me/")
 

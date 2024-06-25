@@ -182,6 +182,7 @@ function Settings(): React.JSX.Element {
 							</div>
 								<input
 									className="put-your-name-there"
+									maxLength={30}
 									type="text"
 									name="display_name"
 									defaultValue={session.display_name}

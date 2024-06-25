@@ -115,7 +115,6 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def game_quit(self, text_data):
     try:
       cancel = self.loop.cancel()
-      print(f"cancel [DISCONNECT]: {cancel}")
     except Exception:
       # ? Player 2 is not the host
       try:
@@ -139,7 +138,6 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def game_finished(self, text_data):
     try:
       cancel = self.loop.cancel()
-      print(f"cancel [DISCONNECT]: {cancel}")
     except Exception:
       # ? Player 2 is not the host
       await self.channel_layer.group_send(self.room_group_name, {
@@ -375,7 +373,6 @@ class GameConsumer(AsyncWebsocketConsumer):
   async def game_break(self, text_data):
     try:
       cancel = self.loop.cancel()
-      print(f"cancel [CHANNELS]: {cancel}")
     except Exception:
       # ? Player 2 is not the host
       pass
@@ -886,7 +883,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         try:
           cancel = self.loop.cancel()
-          print(f"cancel [DISCONNECT]: {cancel}")
         except Exception:
           # ? Player 2 is not the host
           await self.channel_layer.group_send(self.room_group_name, {
@@ -927,7 +923,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         try:
           cancel = self.loop.cancel()
-          print(f"cancel [DISCONNECT]: {cancel}")
         except Exception:
           # ? Player 2 is not the host
           try:

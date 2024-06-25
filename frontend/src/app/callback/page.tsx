@@ -13,20 +13,13 @@ function Callback(): React.JSX.Element {
 
 	useEffect(() => {
 		const handleCallback = async (token: string, dfa: string|null = null) => {
-			let response = await toast.promise(
-				fetch(
+			let response = await fetch(
 					`https://${window.location.hostname}:8000/users/`,
 					{
 						method: "POST",
 						body: JSON.stringify((typeof dfa === "string") ? {token, dfa} : {token})
 					}
-				),
-				{
-					loading: "Fetching /users",
-					success: "/users fetched",
-					error: "Unable to fetch /users"
-				}
-			)
+				)
 
 			let data = await response.json()
 
@@ -46,14 +39,7 @@ function Callback(): React.JSX.Element {
 		const code = searchParams.get("code")
 
 		if (code) {
-			toast.promise(
-				getAccessToken(code),
-				{
-					loading: "Fetching api.intra.42.fr",
-					success: "api.intra.42.fr fetched",
-					error: "Unable to fetch api.intra.42.fr"
-				}
-			)
+				getAccessToken(code)
 				.then(handleCallback)
 				.catch(e => toast.error("Something went wrong, try again."))
 				.then(() => router.push("/"))

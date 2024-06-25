@@ -23,14 +23,7 @@ function FriendsList({
 		if (user)
 		{
 			const fetchFriendsList = async () => {
-				const response = await toast.promise(
-					fetch(`https://${window.location.hostname}:8000/users/friends/?user=${user.id}`),
-					{
-						loading: `Fetching /users/friends/?user=${user.id}`,
-						success: `/users/friends/?user=${user.id} fetched`,
-						error: `Unable to fetch /users/friends/?user=${user.id}`
-					}
-				)
+				const response = await fetch(`https://${window.location.hostname}:8000/users/friends/?user=${user.id}`)
 
 				if (response.ok)
 				{

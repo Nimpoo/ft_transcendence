@@ -27,7 +27,6 @@ export function SocketProvider({
 				ws = new WebSocket(`wss://${window.location.hostname}:8000/users/?token=${session.token}`)
 
 				ws.onopen = function(this, event) {
-					toast.success("connected")
 					setSocket(this)
 				}
 
