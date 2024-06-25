@@ -16,6 +16,7 @@ import "@/styles/Tournament.css"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function TournamentRoom(): React.JSX.Element | null {
@@ -46,8 +47,6 @@ function TournamentRoom(): React.JSX.Element | null {
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.beginTournament",
-				"user": session?.display_name,
-				"id": session?.id.toString(),
 				"tournament_uuid": uuid,
 			})
 		}
@@ -55,7 +54,7 @@ function TournamentRoom(): React.JSX.Element | null {
 
 	return (
 		<>
-			<div className="mt-auto">
+			<div className="m-auto">
 				<div style={{display: "flex", justifyContent: "center"}}>
 					<span className={ `stroke tournament-title ${ubu.className}` }>TOURNAMENT</span>
 				</div>
@@ -96,7 +95,7 @@ function TournamentRoom(): React.JSX.Element | null {
 				)}
 			</div>
 			<div>
-				{participants && participants.length === 4 && participants[0] === session?.display_name ? (
+				{participants && participants.length === 4 && participants[0] === session?.login ? (
 					<button 
 					onClick={LetsBegin}
 					className={"big-button-xl " + ubu.className}

@@ -38,7 +38,7 @@ function Modal({
 			onClick={handleCloseModal}
 		>
 			<div
-				className={`modal-intern ${isVisible ? "modal-pop-up" : "modal-pop-down" }`}
+				className={`modal-intern ${isVisible ? "modal-pop-up" : "modal-pop-down" } overflow-scroll-y`}
 				style={{ height, width }}
 				onClick={(e) => e.stopPropagation()}
 			>

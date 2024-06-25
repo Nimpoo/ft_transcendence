@@ -12,6 +12,7 @@ import Loading from "../loading"
 
 import "@/styles/Chat.css"
 import toast from "react-hot-toast"
+import FriendRequestNotifications from "@/components/FriendRequestNotification"
 
 
 function Chat(): React.JSX.Element {
@@ -37,7 +38,7 @@ function Chat(): React.JSX.Element {
 	}, [router, status])
 
 	useEffect(() => {
-		if (session)
+		if (session && conversations === undefined)
 		{
 			const getAllConv = async () => {
 				const response = await session.api("/chat/getconvs/").catch(console.error)
@@ -51,13 +52,15 @@ function Chat(): React.JSX.Element {
 
 			getAllConv()
 		}
-	}, [session])
+	}, [session, conversations])
 
 	useEffect(() => {
 		if (socket)
 		{
+			const a = socket.onmessage
+
 			socket.onmessage = event => {
-				let data
+				let data: any
 
 				try
 				{
@@ -69,14 +72,50 @@ function Chat(): React.JSX.Element {
 					return
 				}
 
-				if (data.type === "message.sent" || data.type === "message.receive")
+				const sender: User = data["from"]
+
+				switch(data.type)
 				{
-					let chat = data.message
-					setMessages(messages => messages ? [...messages, chat] : [chat])
+					case "friendrequest.ask":
+						toast(
+							t => <FriendRequestNotifications sender={sender} toast={t} />,
+							{ duration: 20 /* seconds */ * 1000 },
+						)
+						break
+
+					case "message.sent":
+					case "message.receive":
+						let chat = data["message"]
+						setMessages(messages => messages ? [...messages, chat] : [chat])
+						
+						const existingConv = conversations?.find(
+							(conv) =>
+								(conv.sender.id === chat.sender.id && conv.receiver.id === chat.receiver.id) ||
+							(conv.sender.id === chat.receiver.id && conv.receiver.id === chat.sender.id)
+						);
+
+						if (!existingConv)
+						{
+							const newConv: Chat = {
+								id: chat.id,
+								sender: chat.sender,
+								receiver: chat.receiver,
+								content: chat.content,
+								created_at: chat.created_at,
+							};
+
+							setConversations((conversations) => [...(conversations || []), newConv]);
+						}
+
+						break
 				}
 			}
+
+			return () => {
+				socket.onmessage = a
+			}
 		}
-	}, [session, socket])
+	}, [session, socket, selectedConversation, conversations]);
 
 	useEffect(() => {
 		if (chatContainerRef.current)
@@ -86,32 +125,35 @@ function Chat(): React.JSX.Element {
 	}, [messages])
 
 	useEffect(() => {
-		const userSearch = async () => {
-			if (search)
-			{
-				const response = await fetch(`https://${window.location.hostname}:8000/users/search?q=${encodeURIComponent(search)}`)
-
+		if (search)
+		{
+			const handleSearch = async () => {
+				if (0 > search.length || search.length > 30)
+				{
+					toast.error("Limit exceeded")
+					return
+				}
+				const response = await session?.api(`/users/search/?q=${encodeURIComponent(search)}`)
 				if (response?.ok)
 				{
 					const data = await response.json()
 					setResults(data)
+					clearTimeout(searchTimeout.current)
 				}
+			}
 
+			if (searchTimeout.current)
 				clearTimeout(searchTimeout.current)
-			}
-			else
-			{
-				setResults(undefined)
-			}
-		}
 
-		if (searchTimeout.current)
+			searchTimeout.current = setTimeout(handleSearch, 500)
+		}
+		else
 		{
-			clearTimeout(searchTimeout.current)
+			setResults(undefined)
+			if (searchTimeout.current)
+				clearTimeout(searchTimeout.current)
 		}
-
-		searchTimeout.current = setTimeout(userSearch, 500)
-	}, [search])
+	}, [search, session])
 
 	useEffect(() => {
 		if (selectedConversation)
@@ -136,15 +178,7 @@ function Chat(): React.JSX.Element {
 	}
 
 	const handleClick = (user: User) => {
-		if (user.id === selectedConversation?.id)
-		{
-			setSelectedConversation(undefined)
-		}
-		else
-		{
-			setSelectedConversation(user)
-		}
-
+		setSelectedConversation(user.id === selectedConversation?.id ? undefined : user)
 		setSearch("")
 		setMessages(undefined)
 	}
@@ -156,16 +190,21 @@ function Chat(): React.JSX.Element {
 		{
 			const form = event.target as HTMLFormElement
 			const msg = form.msg
+			var ascii = /^[ -~\t\n\r]+$/;
 
-			socket.send(
-				JSON.stringify(
-					{
-						"type": "message.send",
-						"target_id": selectedConversation.id,
-						"content": msg.value,
-					}
+			if (msg.value.trim() && msg.value.length <= 1000 && ascii.test(msg.value)) {
+				socket.send(
+					JSON.stringify(
+						{
+							"type": "message.send",
+							"target_id": selectedConversation.id,
+							"content": msg.value,
+						}
+					)
 				)
-			)
+			} else {
+				toast.error("Please, send a valid message.")
+			}
 
 			msg.value = ""
 		}
@@ -233,7 +272,7 @@ function Chat(): React.JSX.Element {
 						selectedConversation && (
 							<div>
 								<div className="row box-2-title rounded-bottom-0">
-									<ul style={{display: "flex"}} className="list-inline">
+									<ul style={{display: "flex", width: "880px", height: "65px"}} className="list-inline">
 										<li className="list-inline-item" style={{marginTop: "3px"}}>
 												<div
 													className="rounded-circle bg-cover"
@@ -254,18 +293,6 @@ function Chat(): React.JSX.Element {
 												<h5 className="conv-name">{selectedConversation.display_name}</h5>
 											</Link>
 										</li>
-										<li className="list-inline-item dropplace">
-											<div className="dropdown">
-												<button className="dropbtn" data-bs-auto-close="true">
-													<Image className="img-chat"
-														src={"/assets/svg/Three-dots.svg"}
-														width={25}
-														height={10}
-														alt="parameters"
-													/>
-												</button>
-											</div>
-										</li>
 									</ul>
 								</div>
 								<div className="conv-box" ref={chatContainerRef}>
@@ -274,7 +301,7 @@ function Chat(): React.JSX.Element {
 									}
 								</div>
 								<form className="input-group" onSubmit={handleMessageSend}>
-									<input className="form-control text-box-style" name="msg" type="text" id="input" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" />
+									<input className="form-control text-box-style" name="msg" type="text" id="input" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" maxLength={999} />
 									<button className="btn btn-text-style btn-light" type="submit" id="button-send">
 										<Image className="img-chat"
 											src={"/assets/svg/Send-logo.svg"}
@@ -288,10 +315,10 @@ function Chat(): React.JSX.Element {
 						) || (
 							<div>
 								<div className="row box-2-title rounded-bottom-0">
-									<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name(s) to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} />
+									<input className="form-control input-style rounded-bottom-0 rounded-start-0" type="text" placeholder="Enter name to start to chat..." aria-label="start chat" onChange={e => setSearch(e.target.value)} maxLength={30} />
 									{
 										results &&
-										<ul>
+										<ul className="ulSearchBar list-group">
 											{
 												results.map(
 													(user, key) => {
@@ -301,9 +328,9 @@ function Chat(): React.JSX.Element {
 														}
 
 														return (
-															<li key={key}>
+															<li className="liSearchBar list-group-item" key={key}>
 																<Link onClick={() => handleClick(user)} href="#">
-																	{user.display_name}
+																	<a className="aSearchBar">{user.display_name}</a>
 																</Link>
 															</li>
 														)
@@ -318,7 +345,6 @@ function Chat(): React.JSX.Element {
 									<input className="form-control text-box-style" type="text" placeholder="New message" aria-label="enter message with one button add-on" aria-describedby="button-send" autoComplete="off" disabled></input>
 									<button className="btn btn-text-style btn-light" type="submit" id="button-send" disabled>
 										<Image
-											className="logo-send"
 											src={"/assets/svg/Send-logo.svg"}
 											width={21}
 											height={22}

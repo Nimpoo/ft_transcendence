@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "500",
+	preload: false
 })
 
 function RootLayout({
@@ -32,10 +33,10 @@ function RootLayout({
 	return (
 		<html lang="en">
 			<body className={ubu.className}>
-				<Toaster position="bottom-right" reverseOrder />
 
 				<div id="div" className="vstack py-4 gap-3" style={{minHeight: "100vh"}}>
 					<SessionProvider>
+						<Toaster position="bottom-right" reverseOrder />
 						<SocketProvider>
 							<ModalProvider>
 								<Header />

@@ -23,14 +23,7 @@ function FriendsList({
 		if (user)
 		{
 			const fetchFriendsList = async () => {
-				const response = await toast.promise(
-					fetch(`https://${window.location.hostname}:8000/users/friends/?user=${user.id}`),
-					{
-						loading: `Fetching /users/friends/?user=${user.id}`,
-						success: `/users/friends/?user=${user.id} fetched`,
-						error: `Unable to fetch /users/friends/?user=${user.id}`
-					}
-				)
+				const response = await fetch(`https://${window.location.hostname}:8000/users/friends/?user=${user.id}`)
 
 				if (response.ok)
 				{
@@ -45,7 +38,7 @@ function FriendsList({
 		else if (session)
 		{
 			const fetchFriendRequestsList = async () => {
-				const response = await session.api("/users/friends/requests/")
+				const response = await session.api("/users/friends/receivedrequests/")
 				if (response.ok)
 				{
 					const data = await response.json()
@@ -79,13 +72,7 @@ function FriendsList({
 		const handleRemove = () => {
 			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: friend.id }))
 				.catch(() => toast.error("Remove failed, try again"))
-				.then(() => setFriendsList(list => list?.slice(index, index)))
-		}
-
-		const handleBlock = () => {
-			session?.api("/chat/block/", "POST", JSON.stringify({ user_id: friend.id }))
-				.catch(() => toast.error("Remove failed, try again"))
-				.then(() => setFriendsList(list => list?.slice(index, index)))
+				.then(() => setFriendsList(list => list?.filter((_, i) => i !== index)))
 		}
 
 		return (
@@ -107,12 +94,9 @@ function FriendsList({
 					<Link href={`/users/${friend.login}`}>
 						<h5>{friend.display_name}</h5>
 					</Link>
-					<h6>{online != undefined && (online ? "online" : "not online")}</h6>
+					<h6>{online != undefined && (online ? "online" : "offline")}</h6>
 					{(user == undefined || user.id == session?.id) &&
-						<div className="btn-group">
-							<button className="btn btn-success" onClick={handleRemove}>remove</button>
-							<button className="btn btn-danger" onClick={handleBlock}>block</button>
-						</div>
+						<button className="btn btn-danger" onClick={handleRemove}>remove</button>
 					}
 				</div>
 			</li>
@@ -122,13 +106,13 @@ function FriendsList({
 	const FriendRequestsListItem = ({ user, index }: { user: User, index: number }): React.JSX.Element => {
 		const handleAdd = () => {
 			session?.api("/users/friends/", "POST", JSON.stringify({ user_id: user.id }))
-				.then(() => setFriendRequestsList(list => list?.slice(index, index)))
+				.then(() => setFriendRequestsList(list => list?.filter((_, i) => i !== index)))
 				.catch(() => toast.error("Add failed, try again"))
 		}
 
 		const handleReject = () => {
 			session?.api("/users/friends/", "DELETE", JSON.stringify({ user_id: user.id }))
-				.then(() => setFriendRequestsList(list => list?.slice(index, index)))
+				.then(() => setFriendRequestsList(list => list?.filter((_, i) => i !== index)))
 				.catch(() => toast.error("Rejct failed, try again"))
 		}
 

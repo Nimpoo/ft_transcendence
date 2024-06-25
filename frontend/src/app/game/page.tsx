@@ -15,6 +15,7 @@ import Link from "next/link"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function Game(): React.JSX.Element {
@@ -35,8 +36,6 @@ function Game(): React.JSX.Element {
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.create",
-				"user": session?.display_name,
-				"id": session?.id.toString(),
 			})
 		}
 	}
@@ -45,8 +44,6 @@ function Game(): React.JSX.Element {
 		if (sendMessage) {
 			sendMessage({
 				"type": "game.join",
-				"user": session?.display_name,
-				"id": session?.id.toString(),
 			})
 		}
 	}
@@ -55,7 +52,7 @@ function Game(): React.JSX.Element {
 		return <Loading />
 	}
 	return (
-		<div className="mt-auto">
+		<div className="m-auto">
 			<div style={{display: "flex", justifyContent: "center"}}>
 				<button onClick={joinGame} className={ `margin-btn big-button-xl ${ubu.className}` }>
 					<span className="stroke rainbow-text">JOIN A GAME</span>

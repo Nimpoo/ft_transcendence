@@ -8,6 +8,7 @@ import CountUp from "react-countup"
 
 import "@/styles/Homepage.css"
 import "@/styles/Rainbow.css"
+import "@/styles/Text.css"
 
 import { useSession } from "@/providers/Session"
 import FriendsList from "@/components/FriendsList"
@@ -19,6 +20,7 @@ import Loading from "./loading"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function Home(): React.JSX.Element {
@@ -77,6 +79,8 @@ function Home(): React.JSX.Element {
 									width={35}
 									height={35}
 									alt="Trophy"
+									placeholder="blur"
+									blurDataURL="/assets/ranking/trophy.png"
 								/>
 							</div>
 						</div>

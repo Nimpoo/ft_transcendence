@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import toast from "react-hot-toast"
-import { redirect } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useCookies } from "react-cookie"
 import { useEffect, useState } from "react"
 import { useQRCode } from "next-qrcode"
@@ -19,13 +19,13 @@ import "@/styles/components/Footer/Settings.css"
 function Settings(): React.JSX.Element {
 	const { session, setSession } = useSession()
 	const socket = useSocket()
-	const { clearModal } = useModal()
+	const { createModal, clearModal } = useModal()
 	const { Canvas } = useQRCode()
 	const [cookies, setCookie, removeCookie] = useCookies(["session", "settings"])
 	const [dfaSecret, setDfaSecret] = useState<string|null>(null)
+	const router = useRouter()
 
-	const isSoundOn = cookies.settings & 1 ? true : false
-	const isDarkModeOn = cookies.settings >> 1 & 1 ? true : false
+	const isSoundOn: boolean = (cookies.settings & 1) != 0
 
 	useEffect(() => {
 		if (session) {
@@ -41,7 +41,7 @@ function Settings(): React.JSX.Element {
 
 	return (
 		<div className="modal-wrapper">
-			<h2 className="mb-3">Settings</h2>
+			<h2 className="text-title-settings">Settings</h2>
 
 			<div className="d-flex justify-content-between align-items-center mb-3">
 				<div>
@@ -54,32 +54,12 @@ function Settings(): React.JSX.Element {
 					<span className="ms-2">Sound</span>
 				</div>
 				<div className="btn-group" role="group">
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings | 1, {sameSite: true})}
+					<input type="radio" onChange={() => setCookie("settings", cookies.settings | 1, {sameSite: "none", secure: true})}
 						className="btn-check" name="setting-sound" id="setting-sound-on" hidden checked={isSoundOn} />
 					<label className="btn btn-outline-success" htmlFor="setting-sound-on">ON</label>
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~1, {sameSite: true})}
+					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~1, {sameSite: "none", secure: true})}
 						className="btn-check" name="setting-sound" id="setting-sound-off" hidden checked={!isSoundOn} />
 					<label className="btn btn-outline-danger" htmlFor="setting-sound-off">OFF</label>
-				</div>
-			</div>
-
-			<div className="d-flex justify-content-between align-items-center mb-3">
-				<div>
-					<Image className="modal-icon"
-						src="/assets/svg/dark-mode-setting.svg"
-						width={30}
-						height={30}
-						alt="dark-mode logo"
-					/>
-					<span className="ms-2">Dark Mode</span>
-				</div>
-				<div className="btn-group" role="group">
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings | 2, {sameSite: true})}
-						className="btn-check" name="setting-dark-mode" id="setting-dark-mode-on" hidden checked={isDarkModeOn} />
-					<label className="btn btn-outline-success" htmlFor="setting-dark-mode-on">ON</label>
-					<input type="radio" onChange={() => setCookie("settings", cookies.settings & ~2, {sameSite: true})}
-						className="btn-check" name="setting-dark-mode" id="setting-dark-mode-off" hidden checked={!isDarkModeOn} />
-					<label className="btn btn-outline-danger" htmlFor="setting-dark-mode-off">OFF</label>
 				</div>
 			</div>
 
@@ -150,20 +130,36 @@ function Settings(): React.JSX.Element {
 
 								const form = e.target as HTMLFormElement
 								let formData = new FormData()
-
+								var ascii = /^[ -~\t\n\r]+$/;
 								const display_name_input = form.display_name
-								if (display_name_input.value && !display_name_input.classList.contains("invalid")) {
-									formData.append("display_name", display_name_input.value)
+
+								if (4 > display_name_input.value.length || display_name_input.value.length > 30 || !ascii.test(display_name_input.value))
+								{
+									toast.error("invalid display name")
+									return
 								}
+								
+								formData.append("display_name", display_name_input.value)
 
 								const avatar_input = form.avatar
 								if (avatar_input.value) {
-									formData.append("avatar", avatar_input.files[0])
+									const fileName = avatar_input.files[0].name;
+									const ext = fileName.substring(fileName.lastIndexOf('.'));
+									if (ext == '.jpg' || ext == '.jpeg' || ext == '.png')
+										formData.append("avatar", avatar_input.files[0])
+									else
+									{
+										toast.error('Accepted formats are : jpg, jpeg, png')
+										return
+									}
 								}
 
 								session.api("/users/me/", "POST", formData)
 									.then(response => response.json())
 									.then(data => {
+										if ((data["display_name"] == session.display_name) && (display_name_input.value != session.display_name)) {
+											toast.error("This display name is already taken")
+										}
 										if (setSession) {
 											setSession({...session, ...data})
 										}
@@ -185,6 +181,8 @@ function Settings(): React.JSX.Element {
 								<span className="ms-2">Display Name</span>
 							</div>
 								<input
+									className="put-your-name-there"
+									maxLength={30}
 									type="text"
 									name="display_name"
 									defaultValue={session.display_name}
@@ -213,33 +211,34 @@ function Settings(): React.JSX.Element {
 								<span className="ms-2">Avatar</span>
 							</div>
 								<input
+									className="put-your-new-avatar-there"
 									type="file"
 									name="avatar"
 								/>
 						</div>
+						<div className="justify-content-evenly d-flex align-items-center">
+							<input className="btn btn-success" type="submit" value="Save changes" disabled={socket?.readyState !== WebSocket.OPEN} />
+							<button type="button" className="btn btn-danger"
+								onClick={
+									() => {
+										removeCookie("session", {sameSite: "strict", secure: true})
+										clearModal()
+										toast("See you soon", {icon:"👋"})
 
-						<input type="submit" value="save" disabled={socket?.readyState !== WebSocket.OPEN} />
+										if (isSoundOn) {
+											let audioObject: HTMLAudioElement = new Audio("/assets/sounds/mario.wav")
+											audioObject.volume = 0.3
+											audioObject.autoplay = true
+										}
+
+										router.push("/")
+									}
+								}
+							>Log out</button>
+						</div>
+
 					</form>
 
-					<div className="justify-content-center d-flex align-items-center">
-						<button type="button" className="btn btn-danger"
-							onClick={
-								() => {
-									removeCookie("session", {sameSite: true})
-									clearModal()
-									toast("See you soon", {icon:"👋"})
-
-									if (isSoundOn) {
-										let audioObject: HTMLAudioElement = new Audio("/assets/sounds/mario.wav")
-										audioObject.volume = 0.3
-										audioObject.autoplay = true
-									}
-
-									redirect("/")
-								}
-							}
-						>Log out</button>
-					</div>
 				</>
 			)}
 
@@ -253,9 +252,11 @@ function Footer(): React.JSX.Element {
 	const { createModal } = useModal()
 	const [cookies, setCookie] = useCookies(["settings"])
 
+	const pathname = usePathname()
+
 	useEffect(() => {
 		if (cookies.settings === undefined) {
-			setCookie("settings", 0b11, {sameSite: true})
+			setCookie("settings", 0b11, {sameSite: "none", secure: true})
 		}
 	}, [cookies, setCookie])
 
@@ -263,35 +264,39 @@ function Footer(): React.JSX.Element {
 
 	if (status === "loading") {
 		return <></> // todo loading
+	} else if (pathname.includes("game")) {
+		return (
+			<></>
+		)
+	} else {
+		return (
+			<footer className="mt-auto footer-wrapper">
+				{session &&
+					<Link className="link-light" href="/chat">
+						<button className="btn shadow-none">
+							<Image className="image"
+								src="/assets/svg/chat.svg"
+								width={30}
+								height={30}
+								alt="Chat logo"
+							/>
+							Chat
+						</button>
+					</Link>
+				}
+
+				<button className="btn shadow-none" onClick={() => createModal(settingsModal)}>
+					<Image className="image"
+						src="/assets/svg/settings.svg"
+						width={30}
+						height={30}
+						alt="Settings logo"
+					/>
+					Settings
+				</button>
+			</footer>
+		)
 	}
-
-	return (
-		<footer className="mt-auto footer-wrapper">
-			{session &&
-				<Link className="link-light" href="/chat">
-					<button className="btn shadow-none">
-						<Image className="image"
-							src="/assets/svg/chat.svg"
-							width={30}
-							height={30}
-							alt="Chat logo"
-						/>
-						Chat
-					</button>
-				</Link>
-			}
-
-			<button className="btn shadow-none" onClick={() => createModal(settingsModal)}>
-				<Image className="image"
-					src="/assets/svg/settings.svg"
-					width={30}
-					height={30}
-					alt="Settings logo"
-				/>
-				Settings
-			</button>
-		</footer>
-	)
 }
 
 export default Footer

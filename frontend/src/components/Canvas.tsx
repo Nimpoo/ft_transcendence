@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 
 import { useSession } from "@/providers/Session"
@@ -13,8 +13,6 @@ var time = 0
 
 var score1 = 0
 var score2 = 0
-
-var start_score = false
 
 interface Ball {
 	coord: [number, number],
@@ -68,14 +66,18 @@ function Canvas({
 	const { createModal } = useModal()
 	const { message, sendMessage, gameStatus, setGameStatus, winner, play } = useGame()
 
+	const [gameEnded, setGameEnded] = useState(false);
+
 	// ? /*--------- End Game Screen ----------*/
 	const endGame =
-	<>
-		<div style={{display: "flex", flexDirection: "column", textAlign: "center"}}>
-			<h3>The winner is ...</h3>
-			<h1>{score1 < 10 && score2 < 10 ? "Nobody, someone exit the game." : winner[0]}</h1>
-		</div>
-	</>
+	<div style={{display: "flex", flexDirection: "column", textAlign: "center"}}>
+		<h3>The winner is ...</h3>
+		<h1>{
+			(score1 < 10 && score2 < 10)
+			? "Nobody, someone exit the game."
+			: winner
+		}</h1>
+	</div>
 	// ? /*------------------------------------*/
 
 	const ref = useRef<HTMLCanvasElement>(null)
@@ -101,8 +103,6 @@ function Canvas({
 			const context = canvas.getContext("2d")
 			if (context) {
 				context.clearRect(0, 0, canvas.width, canvas.height)
-				score1 = 0
-				score2 = 0
 				context.scale(dpi, dpi)
 
 // ????????????????? CONSTRUCTIONS ??????????????????
@@ -165,77 +165,72 @@ function Canvas({
 				// ! /*------------------------------------*/
 
 				// ? /*-------------- PADDLES -------------*/
-					if (message) {
-						const data = message
+				if (message) {
+					const data = message
 
-						var coord_pad_1: [number, number] = data.new_position?.paddle_coord_1 ?? [0, 0]
-						var coord_pad_2: [number, number] = data.new_position?.paddle_coord_2 ?? [0, 0]
-						var dim_pad:   [number, number] = data.new_position?.paddle_dimensions ?? [0, 0]
+					var coord_pad_1: [number, number] = data.new_position?.paddle_coord_1 ?? [0, 0]
+					var coord_pad_2: [number, number] = data.new_position?.paddle_coord_2 ?? [0, 0]
+					var dim_pad:   [number, number] = data.new_position?.paddle_dimensions ?? [0, 0]
 
-						racket_1 = {
-							coord:      [coord_pad_1[0] * width, coord_pad_1[1] * height],
-							dimensions: [dim_pad[0] * width, dim_pad[1] * height],
-							dir:        [0, 0],
-							color: "white",
-							draw: function() {
-								context.beginPath()
-								context.save()
-								context.translate(
-									-(this.dimensions[0] / 2),
-									-(this.dimensions[1] / 2),
-								)
-								context.closePath()
-								context.fillStyle = this.color
-								context.fillRect(
-									this.coord[0],
-									this.coord[1],
-									this.dimensions[0],
-									this.dimensions[1],
-								)
-								context.restore()
-							},
-						}
-
-						racket_2 = {
-							coord:      [coord_pad_2[0] * width, coord_pad_2[1] * height],
-							dimensions: [dim_pad[0] * width, dim_pad[1] * height],
-							dir:        [0, 0],
-							color: "white",
-							draw: function() {
-								context.beginPath()
-								context.save()
-								context.translate(
-									-(this.dimensions[0] / 2),
-									-(this.dimensions[1] / 2),
-								)
-								context.closePath()
-								context.fillStyle = this.color
-								context.fillRect(
-									this.coord[0],
-									this.coord[1],
-									this.dimensions[0],
-									this.dimensions[1],
-								)
-								context.restore()
-							},
-						}
+					racket_1 = {
+						coord:      [coord_pad_1[0] * width, coord_pad_1[1] * height],
+						dimensions: [dim_pad[0] * width, dim_pad[1] * height],
+						dir:        [0, 0],
+						color: "white",
+						draw: function() {
+							context.beginPath()
+							context.save()
+							context.translate(
+								-(this.dimensions[0] / 2),
+								-(this.dimensions[1] / 2),
+							)
+							context.closePath()
+							context.fillStyle = this.color
+							context.fillRect(
+								this.coord[0],
+								this.coord[1],
+								this.dimensions[0],
+								this.dimensions[1],
+							)
+							context.restore()
+						},
 					}
+
+					racket_2 = {
+						coord:      [coord_pad_2[0] * width, coord_pad_2[1] * height],
+						dimensions: [dim_pad[0] * width, dim_pad[1] * height],
+						dir:        [0, 0],
+						color: "white",
+						draw: function() {
+							context.beginPath()
+							context.save()
+							context.translate(
+								-(this.dimensions[0] / 2),
+								-(this.dimensions[1] / 2),
+							)
+							context.closePath()
+							context.fillStyle = this.color
+							context.fillRect(
+								this.coord[0],
+								this.coord[1],
+								this.dimensions[0],
+								this.dimensions[1],
+							)
+							context.restore()
+						},
+					}
+				}
 				// ? /*------------------------------------*/
 
 				// * /*-------------- SCORES --------------*/
 				if (message && message.type === "game.point") {
-					if (message.player && message.score1 && message.player === "1") {
+					if (message.player && message.score1 && message.player === 1) {
 						score1 = message.score1
 					}
 
-					if (message.player && message.score2 && message.player === "2") {
+					if (message.player && message.score2 && message.player === 2) {
 						score2 = message.score2
 					}
-				}
-
-				if (message && (message.type === "game.create" || message.type === "game.join")) {
-					score1 = 0
-					score2 = 0
 				}
 				// * /*------------------------------------*/
 
@@ -259,6 +254,8 @@ function Canvas({
 // !!!!!!!!!!!!!!!!!!!!! GAME !!!!!!!!!!!!!!!!!!!!!!!
 				// ? /*------------ DEMO MODE -------------*/
 				const demo = () => {
+					score1 = 0
+					score2 = 0
 					context.clearRect(0, 0, canvas.width, canvas.height)
 
 					ground()
@@ -320,25 +317,20 @@ function Canvas({
 						demo()
 
 					} else if (gameStatus === "in-game") {
-						if (start_score === false) {
-							score1 = 0
-							score2 = 0
-							start_score = true
-						}
 						playing()
 
-					} else if (gameStatus === "finished") {
+					} else if (gameStatus === "finished" && !gameEnded) {
 						if (sendMessage) {
 							sendMessage({
 								"type": "game.finished",
-								"user": session?.display_name,
-								"id": session?.id.toString(),
 							})
 						}
-						start_score = false
 						router.push("/game")
 						createModal(endGame)
 						setGameStatus("pending")
+						score1 = 0
+						score2 = 0
+						setGameEnded(true);
 					}
 				}
 

@@ -8,6 +8,7 @@ from users.serializers import UserSerializer
 from chat.models import Chat
 
 import json
+import re
 
 
 class UserConsumer(AsyncWebsocketConsumer):
@@ -69,17 +70,25 @@ class UserConsumer(AsyncWebsocketConsumer):
 
         if target_id is None:
             await self.send(
-                json.dumps(
-                    {"type": "error", "message": "Please provide `target_id`"}
-                )
+                json.dumps({"type": "error", "message": "Please provide `target_id`"})
             )
             return
 
         if content is None:
             await self.send(
-                json.dumps(
-                    {"type": "error", "message": "Please provide `content`"}
-                )
+                json.dumps({"type": "error", "message": "Please provide `content`"})
+            )
+            return
+
+        if len(content) >= 1000:
+            await self.send(
+                json.dumps({"type": "error", "message": "Please send a message under `1000 characters`"})
+            )
+            return
+
+        if not re.match(r'^[ -~]+$', content):
+            await self.send(
+                json.dumps({"type": "error", "message": "Please send a message with valid `UTF-8 format`"})
             )
             return
 
@@ -103,13 +112,15 @@ class UserConsumer(AsyncWebsocketConsumer):
             sender=self.user, receiver=receiver, content=content
         )
 
+        chat_serialized = ChatSerializer(chat)
+
         await self.channel_layer.group_send(
             f"user_{self.user.login}",
             {
                 "type": "user.notification",
                 "data": {
                     "type": "message.sent",
-                    "message": ChatSerializer(chat).data,
+                    "message": await sync_to_async(chat_serialized.__getattribute__)("data"),
                 },
             },
         )
@@ -120,7 +131,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                 "type": "user.notification",
                 "data": {
                     "type": "message.receive",
-                    "message": ChatSerializer(chat).data,
+                    "message": await sync_to_async(chat_serialized.__getattribute__)("data"),
                 },
             },
         )

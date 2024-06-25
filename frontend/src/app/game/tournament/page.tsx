@@ -14,6 +14,7 @@ import Loading from "@/app/loading"
 const ubu = Ubuntu ({
 	subsets: ["latin"],
 	weight: "700",
+	preload: false
 })
 
 function Game(): React.JSX.Element {
@@ -32,22 +33,13 @@ function Game(): React.JSX.Element {
 
 	const createTournament = () => {
 		if (sendMessage) {
-			sendMessage({
-				"type": "game.tournament",
-				"user": session?.display_name,
-				"id": session?.id.toString(),
-				"limit": 4,
-			})
+			sendMessage({"type": "game.tournament"})
 		}
 	}
 
 	const joinTournament = () => {
 		if (sendMessage) {
-			sendMessage({
-				"type": "game.tournamentJoin",
-				"user": session?.display_name,
-				"id": session?.id.toString(),
-			})
+			sendMessage({"type": "game.tournamentJoin"})
 		}
 	}
 
@@ -55,7 +47,7 @@ function Game(): React.JSX.Element {
 		return <Loading />
 	}
 	return (
-		<div className="mt-auto">
+		<div className="m-auto">
 			<div style={{display: "flex", justifyContent: "center"}}>
 				<span className={ `stroke tournament-title ${ubu.className}` }>TOURNAMENT</span>
 			</div>

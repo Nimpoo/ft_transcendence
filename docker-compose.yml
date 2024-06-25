@@ -7,8 +7,6 @@ services:
         - NEXT_PUBLIC_REDIRECT_URI=${REDIRECT_URI}
         - NEXT_PUBLIC_CLIENT_ID=${CLIENT_ID}
         - CLIENT_SECRET=${CLIENT_SECRET}
-    ports:
-      - 3000:3000
     restart: always
 
   pong:
@@ -59,6 +57,7 @@ services:
   nginx:
     image: nginx
     ports:
+      - 3000:3000
       - 8000:8000
     volumes:
       - ./backend/static:/static:ro
@@ -66,5 +65,6 @@ services:
       - ./nginx/ft_transcendence.conf:/etc/nginx/conf.d/ft_transcendence.conf
       - ./nginx/certificates:/certificates
     depends_on:
+      - ping
       - pong
     restart: always

@@ -1,4 +1,3 @@
-from django.core import serializers
 from django.core.files import File
 from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -9,7 +8,7 @@ from django.db.models import Q
 from django.conf import settings
 
 import requests
-import json
+import json, re
 import jwt
 import pyotp
 import urllib.request
@@ -139,7 +138,8 @@ def get_user(request: HttpRequest) -> JsonResponse:
 
 
 @require_GET
-def search(request: HttpRequest) -> JsonResponse:
+@need_user
+def search(request: HttpRequest, user: User) -> JsonResponse:
     query = request.GET.get("q")
     results = User.objects.filter(Q(login__icontains=query) | Q(display_name__icontains=query))
     return JsonResponse([UserSerializer(user).data for user in results], safe=False)
@@ -192,8 +192,16 @@ class Me(View):
                     },
                     status=400,
                 )
-
-            user.display_name = display_name
+            if not re.match(r'^[ -~]+$', display_name):
+                return JsonResponse(
+                    {
+                        "error": "Bad Request",
+                        "message": "display name provided is invalid.",
+                    },
+                    status=400,
+                )
+            if not User.objects.filter(display_name=display_name).exists():
+                user.display_name = display_name
 
         new_avatar = request.FILES.get("avatar")
         if new_avatar:

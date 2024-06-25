@@ -19,7 +19,7 @@ function HistoryExtended({
 
 	if (session)
 	{
-		if (user === undefined)
+		if (user == undefined)
 		{
 			user = session
 		}
@@ -29,25 +29,20 @@ function HistoryExtended({
 		if (user)
 		{
 			const fetchStats = async () => {
-				const response = await toast.promise(
-					fetch(`https://${window.location.hostname}:8000/game/?user=${user?.id}`),
-					{
-						loading: `Fetching /game/?user=${user?.id}`,
-						success: `/game/?user=${user?.id} fetched`,
-						error: `Unable to fetch /game/?user=${user?.id}`
-					}
-				)
+				const response = await session?.api(`/game/?user=${user?.id}`)
 
 				if (response?.ok)
 				{
 					const data = await response.json()
 					setGames(data)
 				}
+				else
+					setGames([])
 			}
 
 			fetchStats()
 		}
-	}, [user])
+	}, [user, session])
 
 	const formatDateTime = (datetime: string) => {
 		const date = new Date(datetime)
@@ -65,7 +60,7 @@ function HistoryExtended({
 	return (
 		<ul className="spaceY-between-btn-4" style={{width: "100%", paddingLeft: "0rem"}}>
 			{Game?.map((stat, index) => {
-				const isPlayer1 = stat.player_1.login === session?.login
+				const isPlayer1 = stat.player_1.login === user?.login
 				const isVictory = isPlayer1 ? (stat.score1 > stat.score2) : (stat.score2 > stat.score1)
 				const formattedDateTime = formatDateTime(stat.created_at)
 
