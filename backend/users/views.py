@@ -47,6 +47,12 @@ class Index(View):
                 status=400,
             )
 
+        if not re.match(r'^[ -~]+$', token):
+            return JsonResponse(
+                {"error": "Bad Request", "message": "There is invalid char(s) in token."},
+                status=400
+            )
+
         response = requests.get(
             "https://api.intra.42.fr/v2/me",
             headers={"Authorization": f"Bearer {token}"},
