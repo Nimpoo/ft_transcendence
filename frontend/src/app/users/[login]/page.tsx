@@ -16,7 +16,9 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 	const router = useRouter()
 	const { session, status } = useSession()
 	const [user, setUser] = useState<User>()
-	const [relation, setRelation] = useState<FriendRequest>()
+	const [friends, setFriends] = useState<User[]>()
+	const [receivedFriendRequests, setReceivedFriendRequests] = useState<User[]>()
+	const [sentFriendRequests, setSentFriendRequests] = useState<User[]>()
 
 	useEffect(() => {
 		if (status == "disconnected") {
@@ -44,21 +46,58 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 	}, [params, router])
 
 	useEffect(() => {
-		if (session && user)
+		if (session)
 		{
-			const handleFetch = async () => {
-				const response = await session.api(`/users/friends/requests/?user=${user.id}`)
-
+			const handleFriendsFetch = async () => {
+				const response = await session.api(`/users/friends/?user=${session.id}`)
+				
 				if (response.ok)
 				{
 					const data = await response.json().catch(() => null)
-					setRelation(data)
+					setFriends(data)
 				}
 			}
+			
+			handleFriendsFetch()
 
-			handleFetch()
 		}
-	}, [session, user])
+	}, [session])
+
+	useEffect(() => {
+		if (session)
+		{
+			const handleReceivedFriendRequestsFetch = async () => {
+				const response = await session.api(`/users/friends/receivedrequests/`)
+				
+				if (response.ok)
+				{
+					const data = await response.json().catch(() => null)
+					setReceivedFriendRequests(data)
+				}
+			}
+			
+			handleReceivedFriendRequestsFetch()
+
+		}
+	}, [session])
+
+	useEffect(() => {
+		if (session)
+		{
+			const handleSentFriendRequestsFetch = async () => {
+				const response = await session.api(`/users/friends/sentrequests/`)
+				
+				if (response.ok)
+				{
+					const data = await response.json().catch(() => null)
+					setSentFriendRequests(data)
+				}
+			}
+			
+			handleSentFriendRequestsFetch()
+
+		}
+	}, [session])
 
 	if (user == undefined) {
 		return <Loading />
@@ -82,31 +121,75 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 							}}
 						/>
 						<h1 style={{fontSize: "1.875rem", lineHeight: "2.25rem", marginTop: "0.75rem"}}>{user.display_name}</h1>
-						{session && session.id != user.id && (
-						<div>
-							{relation &&
-								(
-									relation.status === "pending" && ( // ? Is there a pending request
-										relation.sender === session.id && ( // ? Did I sent
+						{
+							session && session.id != user.id && (
+								<div>
+									{
+										friends?.find(u => u.id === user.id) && (
+											<button
+												onClick={
+													async () => {
+														const response = await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))
+														if (response.ok) {
+															setFriends(list => list?.filter(u => u.id !== user.id))
+														}
+													}
+												}
+											>remove</button>
+										) || receivedFriendRequests?.find(u => u.id === user.id) && (
+											<div>
+												<button
+													onClick={
+														async () => {
+															const response = await session.api("/users/friends/", "POST", JSON.stringify({user_id: user.id}))
+															if (response.ok) {
+																setReceivedFriendRequests(list => list?.filter(u => u.id !== user.id))
+																setFriends(list => list ? [...list, user] : [user])
+															}
+														}
+													}
+												>accept</button>
+												<button
+													onClick={
+														async () => {
+															const response = await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))
+															if (response.ok) {
+																setReceivedFriendRequests(list => list?.filter(u => u.id !== user.id))
+															}
+														}
+													}
+												>reject</button>
+											</div>
+										) || sentFriendRequests?.find(u => u.id === user.id) && (
 											<div>
 												<button disabled>pending...</button>
-												<button onClick={async () => setRelation(await (await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))).json())}>cancel</button>
+												<button
+													onClick={
+														async () => {
+															const response = await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))
+															if (response.ok) {
+																setSentFriendRequests(list => list?.filter(u => u.id !== user.id))
+															}
+														}
+													}
+												>cancel</button>
 											</div>
 										) || (
-											<div>
-												<button onClick={async () => setRelation(await (await session.api("/users/friends/", "POST", JSON.stringify({user_id: user.id}))).json())}>accept</button>
-												<button onClick={async () => setRelation(await (await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))).json())}>reject</button>
-											</div>
+											<button
+												onClick={
+													async () => {
+														const response = await session.api("/users/friends/", "POST", JSON.stringify({user_id: user.id}))
+														if (response.ok) {
+															setSentFriendRequests(list => list ? [...list, user] : [user])
+														}
+													}
+												}
+											>add</button>
 										)
-									) || relation.status === "accepted" && ( // ? Is he my friend ?
-										<button onClick={async () => setRelation(await (await session.api("/users/friends/", "DELETE", JSON.stringify({user_id: user.id}))).json())}>remove</button>
-									)
-								) || (
-									<button onClick={async () => setRelation(await (await session.api("/users/friends/", "POST", JSON.stringify({user_id: user.id}))).json())}>add</button>
-								)
-							}
-						</div>
-					)}
+									}
+								</div>
+							)
+						}
 					</div>
 				</div>
 
@@ -124,13 +207,13 @@ function UserProfile({ params }: { params: { login: string } }): React.JSX.Eleme
 							/>
 						</div>
 						<div className="trophies-ranking" style={{marginTop: "0.25rem"}}>
-						<h3 className="ranking-ladder">Challenger - I</h3>
-						<Image priority
-							src={"/assets/ranking/challenger_1.png"}
-							width={45}
-							height={45}
-							alt="Challenger - I"
-						/>
+							<h3 className="ranking-ladder">Challenger - I</h3>
+							<Image priority
+								src={"/assets/ranking/challenger_1.png"}
+								width={45}
+								height={45}
+								alt="Challenger - I"
+							/>
 						</div>
 					</div>
 
