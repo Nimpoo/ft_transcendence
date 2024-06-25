@@ -6,11 +6,13 @@ import { useRouter, usePathname } from "next/navigation"
 
 import { useSession } from "@/providers/Session"
 import { useGame } from "@/providers/Game"
+import { useModal } from "@/providers/Modal"
 
 import toast from "react-hot-toast"
 import Canvas from "@/components/Canvas"
 
 import "@/styles/Rainbow.css"
+import Image from "next/image"
 
 const ubu = Ubuntu ({
 	subsets: ["latin"],
@@ -21,6 +23,7 @@ const ubu = Ubuntu ({
 function GamingRoom(): React.JSX.Element | null {
 
 	const [begin, setBegin] = useState<boolean>(true)
+
 	const up = useRef<boolean>(false)
 	const down = useRef<boolean>(false)
 
@@ -28,10 +31,85 @@ function GamingRoom(): React.JSX.Element | null {
 
 	const { session, status } = useSession()
 	const { players, sendMessage, gameStatus } = useGame()
+	const { createModal } = useModal()
 
 	const router = useRouter()
 	const pathname = usePathname().split("/")
 	const uuid = pathname[pathname.length - 1]
+
+	const man = 
+	<div style={{display: "flex", flexDirection: "column", textAlign: "center"}}>
+		<h1>Goal</h1>
+
+		<br />
+
+		<h3><u>PROTECT</u> your camp while trying to <u>SCORE</u> points on the opposing camp, all that by using your <u>PADDLE</u>.</h3>
+		<h3>
+			If one of the players scores&nbsp;
+
+			<span
+				style={{
+					backgroundColor: "rgb(97, 45, 175)",
+					border: "solid",
+					borderColor: "rgb(7, 5, 75)",
+				}}
+			>
+				10 POINTS
+			</span>
+
+			, he will emerge victorious and end the game.
+		</h3>
+		<h3>Careful, the ball get <u>FASTER</u> each collision with a paddle.</h3>
+
+		<br />
+		<br />
+
+		<h1>Controls</h1>
+
+		<br />
+
+		<div style={{display: "flex", justifyContent: "center", flexDirection: "row"}}>
+			<h3
+				style={{
+					backgroundColor: "rgb(97, 45, 175)",
+					border: "solid",
+					borderColor: "rgb(7, 5, 75)",
+				}}
+			>
+				&apos; W &apos;
+			</h3>
+			<h3>&emsp;&rarr; go <u>UP</u> the paddle</h3>
+		</div>
+		<div style={{display: "flex", justifyContent: "center", flexDirection: "row"}}>
+			<h3
+				style={{
+					backgroundColor: "rgb(97, 45, 175)",
+					border: "solid",
+					borderColor: "rgb(7, 5, 75)",
+				}}
+			>
+				&apos; S &apos;</h3>
+			<h3>&emsp;&rarr; go <u>DOWN</u> the paddle</h3>
+		</div>
+
+		<br />
+		<br />
+
+		<h1>Trophies calcul</h1>
+
+		<br />
+
+		<h3
+			style={{
+				backgroundColor: "rgb(97, 45, 175)",
+				border: "solid",
+				borderColor: "rgb(7, 5, 75)",
+			}}
+		>
+			| [YOUR SCORE] - [OPPONANT SCORE] * 3 |
+		</h3>
+		<p>This is the number of <u>TROPHIES</u> you lose or win.</p>
+	</div>
 
 	useEffect(() => {
 		if (status == "disconnected") {
@@ -148,6 +226,26 @@ function GamingRoom(): React.JSX.Element | null {
 					)}
 				</div>
 			)}
+			<div style={{display: "flex", justifyContent: "center"}}>
+				<button
+					onClick={() => { createModal(man) }}
+					style={{
+						background: "transparent",
+						border: "none",
+						padding: 0,
+						cursor: "pointer",
+						width: 72,
+						height: 72,
+					}}
+				>
+					<Image
+						src={"/assets/svg/snes.svg"}
+						width={72}
+						height={72}
+						alt="Manual"
+					/>
+				</button>
+			</div>
 		</div>
 	)
 }

@@ -9,7 +9,6 @@ import Image from "next/image"
 
 import "@/styles/Homepage.css"
 import Link from "next/link"
-import toast from "react-hot-toast"
 
 function History(): React.JSX.Element {
 
