@@ -10,5 +10,6 @@ urlpatterns = [
   path('', views.Friend.as_view()),
 
   # /requests - GET - get friend request(s) [user_id]
-	path('requests/', views.get_friend_request)
+	path('sentrequests/', views.get_sent_friend_request),
+	path('receivedrequests/', views.get_received_friend_request)
 ]

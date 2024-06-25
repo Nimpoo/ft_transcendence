@@ -38,7 +38,7 @@ function FriendsList({
 		else if (session)
 		{
 			const fetchFriendRequestsList = async () => {
-				const response = await session.api("/users/friends/requests/")
+				const response = await session.api("/users/friends/receivedrequests/")
 				if (response.ok)
 				{
 					const data = await response.json()
@@ -122,7 +122,7 @@ function FriendsList({
 					className="rounded-circle bg-cover m-2"
 					style={
 						{
-							backgroundImage: `url("https://${window.location.hostname}:8000/media/${user.avatar}")`,
+							backgroundImage: `url("https://${window.location.hostname}:8000${user.avatar}")`,
 							backgroundSize: "cover",
 							backgroundPosition: "center center",
 							backgroundRepeat: "no-repeat",

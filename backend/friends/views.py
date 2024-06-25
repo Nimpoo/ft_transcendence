@@ -16,43 +16,15 @@ import json
 
 
 @need_user
-def get_friend_request(request: HttpRequest, user: User) -> JsonResponse:
-    query_id = request.GET.get("user")
+def get_sent_friend_request(request: HttpRequest, user: User) -> JsonResponse:
+    return JsonResponse(
+        [UserSerializer(user).data for user in User.objects.filter(id__in=user.sent_friend_requests.filter(status=FriendRequest.STATUS_PENDING).values("receiver"))],safe=False)
 
-    if query_id is None:
-        return JsonResponse(
-            list(
-                User.objects.filter(
-                    id__in=user.received_friend_requests.filter(
-                        status=FriendRequest.STATUS_PENDING
-                    ).values_list("sender", flat=True)
-                ).values("id", "login", "display_name", "avatar", "created_at")
-            ),
-            safe=False,
-        )
 
-    try:
-        query_user = User.objects.get(id=query_id)
-    except User.DoesNotExist:
-        return JsonResponse(
-            {"error": "Not Found", "message": "There is no user with specified id."},
-            status=404,
-        )
-
-    try:
-        friendrequest = FriendRequest.objects.filter(
-            Q(sender=user, receiver=query_user) | Q(sender=query_user, receiver=user)
-        ).latest("id")
-    except FriendRequest.DoesNotExist:
-        return JsonResponse(
-            {
-                "error": "Not Found",
-                "message": "There is no friend request between you and specified user.",
-            },
-            status=404,
-        )
-
-    return JsonResponse(FriendRequestSerializer(friendrequest).data)
+@need_user
+def get_received_friend_request(request: HttpRequest, user: User) -> JsonResponse:
+    return JsonResponse(
+        [UserSerializer(user).data for user in User.objects.filter(id__in=user.received_friend_requests.filter(status=FriendRequest.STATUS_PENDING).values("sender"))],safe=False)
 
 
 class Friend(View):
