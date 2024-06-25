@@ -246,7 +246,7 @@ function Header(): React.JSX.Element {
 						height={32}
 						alt="Mail logo"
 					/>
-					<p className="text-for-button">mayoub@student.42nice.fr</p>
+					<p className="text-for-button">marwan.ayoub.pro@gmail.com</p>
 				</Link>
 			</div>
 
