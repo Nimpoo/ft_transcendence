@@ -47,6 +47,12 @@ class Index(View):
                 status=400,
             )
 
+        if not re.match(r'^[ -~]+$', token):
+            return JsonResponse(
+                {"error": "Bad Request", "message": "There is invalid char(s) in token."},
+                status=400
+            )
+
         response = requests.get(
             "https://api.intra.42.fr/v2/me",
             headers={"Authorization": f"Bearer {token}"},
@@ -94,8 +100,7 @@ class Index(View):
             dfa = body_payload.get("dfa")
             if dfa is None:
                 return JsonResponse(
-                    {"error": "dfa", "message": "DFA required for this account."},
-                    status=406,
+                    {"wait!": "yo I need dfa bro"}
                 )
 
             if not pyotp.TOTP(user.dfa_secret).verify(dfa):
