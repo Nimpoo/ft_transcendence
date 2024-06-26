@@ -24,15 +24,15 @@ function Callback(): React.JSX.Element {
 			let data = await response.json()
 
 			if (response.status != 200) {
-				if ((typeof dfa === "string") && response.status != 401 || response.status != 406) {
-					throw new Error(data["message"])
-				}
-
-				await handleCallback(token, String(prompt("Enter your 2FA secret: ")))
+				throw new Error(data["message"])
 			}
-
 			else {
-				setCookie("session", data["access_token"], {sameSite: "strict", secure: true})
+				if (data["wait!"] === "yo I need dfa bro") {
+					await handleCallback(token, String(prompt("Enter your 2FA secret: ")))
+				}
+				else {
+					setCookie("session", data["access_token"], {sameSite: "strict", secure: true})
+				}
 			}
 		}
 

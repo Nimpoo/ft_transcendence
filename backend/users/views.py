@@ -100,8 +100,7 @@ class Index(View):
             dfa = body_payload.get("dfa")
             if dfa is None:
                 return JsonResponse(
-                    {"error": "dfa", "message": "DFA required for this account."},
-                    status=406,
+                    {"wait!": "yo I need dfa bro"}
                 )
 
             if not pyotp.TOTP(user.dfa_secret).verify(dfa):
